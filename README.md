@@ -11,18 +11,41 @@ Sending a single link that contains all desired social medias is all you need.
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
 
-## Success Criteria 
-Our success criteria includes:
-1. Complete Login and Signup mechanism
-2. Dashboard for adding, removing, editing and reviewing (CRUD operation) Links
-3. The deployed page should be accessable by public
-4. Proper Database Diagram
-5. Proper APIs   
+## **Success Criteria**
+To determine the success of the Social Links Page project, the following measurable criteria have been established:
 
-## Non Goals
-these are some goal we do not care about:
-1. Hosting it online (yet)
-2. two
+1. **Complete User Authentication System**
+   A fully functional login and signup mechanism that securely manages user registration, authentication, and access control.
+2. **Interactive Dashboard with Full CRUD Functionality**
+   A responsive and intuitive dashboard that enables users to create, read, update, and delete their social media links efficiently.
+3. **Publicly Accessible User Pages**
+   Each user’s customized social links page must be successfully deployed and accessible through a public URL.
+4. **Structured and Well-Designed Database Schema**
+   A properly designed and normalized database diagram ensuring data integrity, scalability, and maintainability.
+5. **Robust and Well-Documented APIs**
+   The system must provide clear, secure, and reliable API endpoints for all necessary operations between the frontend and backend.
+
+
+## **Non-Goals**
+To maintain focus and ensure timely delivery, the following items are explicitly out of scope for the current version of the project:
+
+1. **Advanced Analytics and Reporting**
+   The system will not include complex analytics features such as visitor tracking, heatmaps, or click statistics.
+2. **Third-Party Authentication Integration**
+   External login options (e.g., Google, Facebook, GitHub) will not be supported in this release.
+4. **Drag-and-Drop Link Arrangement**
+   Dynamic link rearrangement through drag-and-drop functionality is not included in the current scope.
+5. **Custom Domain Linking**
+   Users will not be able to connect personal or custom domains to their social links page.
+6. **Premium or Subscription-Based Features**
+   All features will remain free; paid plans or monetization mechanisms are outside the current project phase.
+7. **Search Engine Optimization (SEO) Tools**
+   The project will not include built-in SEO or meta-tag management tools for user pages.
+8. **Media Hosting Services**
+   Users will not be able to upload or host images or videos directly within the platform; only external links are supported.
+9. **Multi-Language Support**
+   The application will only be available in English, with no immediate plan for localization.
+
 
 ## Time Table
 | Weeks | Task |
