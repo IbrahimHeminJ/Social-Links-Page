@@ -54,6 +54,18 @@ To maintain focus and ensure timely delivery, the following items are explicitly
 | 2     |      |
 
 ## User-Stories
+Perfect — since this is your **Social Links Page** project (built with **Vue 3 + TypeScript** frontend and **Spring Boot** backend), here are **9 well-structured user stories** tailored to your app:
+
+1. **As a new user**, I want to **sign up with my email and password**, so that I can **create an account and start building my social links page**.
+2. **As a returning user**, I want to **log in securely to my dashboard**, so that I can **manage and edit my existing links**.
+3. **As a user**, I want to **add links to my various social media platforms**, so that **visitors can easily access all my online profiles from one page**.
+4. **As a user**, I want to **customize the appearance of my social links page (colors)**, so that **it matches my personal or brand style**.
+5. **As a user**, I want to **preview my social links page before publishing**, so that **I can ensure it looks the way I want**.
+6. **As a user**, I want to **copy or share a single public URL to my social links page**, so that **I can share all my social accounts easily with others**.
+7. **As a user**, I want to **edit or remove links from my dashboard**, so that **I can keep my page updated with my latest social media accounts**.
+8. **As a user**, I want to **log out securely**, so that **my personal data and account remain protected on shared devices**.
+
+Would you like me to also add a **set of success criteria and non-goals** that match these user stories (for example, what will count as “success” for your MVP vs. what’s out of scope)?
 
 ## Team Links
 [Our Kanban](https://trello.com/invite/b/68f2864a1d463749d57c831f/ATTIe20ffc9dde2872cde5513eea36c5bfbbBF22C3AD/social-links-page)   
