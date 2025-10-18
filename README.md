@@ -65,8 +65,6 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 7. **As a user**, I want to **edit or remove links from my dashboard**, so that **I can keep my page updated with my latest social media accounts**.
 8. **As a user**, I want to **log out securely**, so that **my personal data and account remain protected on shared devices**.
 
-Would you like me to also add a **set of success criteria and non-goals** that match these user stories (for example, what will count as “success” for your MVP vs. what’s out of scope)?
-
 ## Team Links
 [Our Kanban](https://trello.com/invite/b/68f2864a1d463749d57c831f/ATTIe20ffc9dde2872cde5513eea36c5bfbbBF22C3AD/social-links-page)   
 [Figma design](https://www.figma.com/design/YyVY83BTaMs8ojsVnbOHZk/Social-Links-Page?node-id=0-1&t=lYUZrxpuYDuBCmtm-1)
