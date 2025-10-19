@@ -47,11 +47,14 @@ To maintain focus and ensure timely delivery, the following items are explicitly
    The application will only be available in English, with no immediate plan for localization.
 
 
-## Time Table
+## Expected Time Table
+
 | Weeks | Task |
 |-------|------|
-| 1     |      |
-| 2     |      |
+| 1     | **Project Setup & Database Design**<br>• Set up Spring Boot backend project structure<br>• Set up Vue 3 + TypeScript frontend project<br>• Design and implement database schema<br>• Configure development environment and Git repository<br>• Create basic project documentation |
+| 2     | **Authentication & Backend APIs**<br>• Implement user registration (signup) endpoint<br>• Implement login and JWT-based authentication<br>• Create CRUD API endpoints for social links management<br>• Implement logout functionality<br>• Write API documentation<br>• Conduct API testing (Postman/Thunder Client) |
+| 3     | **Frontend Development & Dashboard**<br>• Build authentication pages (Login & Signup)<br>• Create user dashboard with CRUD functionality for links<br>• Implement link customization features (colors, styling)<br>• Build preview functionality for social links page<br>• Integrate frontend with backend APIs<br>• Implement responsive design |
+| 4     | **Public Page & Deployment**<br>• Build public-facing social links page with unique URLs<br>• Implement copy/share URL functionality<br>• Conduct end-to-end testing and bug fixes<br>• Deploy backend to cloud platform (Heroku/Railway/AWS)<br>• Deploy frontend (Vercel/Netlify)<br>• Final documentation and project presentation preparation |
 
 ## User-Stories
 Perfect — since this is your **Social Links Page** project (built with **Vue 3 + TypeScript** frontend and **Spring Boot** backend), here are **9 well-structured user stories** tailored to your app:
