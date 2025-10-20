@@ -69,11 +69,12 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 8. **As a user**, I wanna **log out securely**, so that **my personal data and account remain protected on shared devices**.
 
 ## Team Members 
-- Halwest Salam 
-- Ibrahim Hemin
-- Mustafa Kabeer 
-- Suhaib Fadhil
-- Zheer Salam
+- Halwest Salam [Halwest-S](https://github.com/Halwest-S)
+- Ibrahim Hemin [IbrahimHeminJ](https://github.com/IbrahimHeminJ)
+- Mustafa Kabeer [Mustafa-Kabeer](https://github.com/Mustafa-Kabeer)
+- Suhaib Fadhil [SuhaebFazelMohammad](https://github.com/SuhaebFazelMohammad)
+- Zheer Salam [Zheers9](https://github.com/Zheers9)
+
 
 ## Team Links Resources
 [Our Kanban](https://trello.com/invite/b/68f2864a1d463749d57c831f/ATTIe20ffc9dde2872cde5513eea36c5bfbbBF22C3AD/social-links-page)   
