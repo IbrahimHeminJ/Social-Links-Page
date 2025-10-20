@@ -6,7 +6,7 @@ Socil links page is a web application made using Vue3 TS + Spring boot, Social l
 ## Problem and Solution
 Nowadays people have an account in almost all social medias, In networking with other people sending links separatly and paragraphs that contian all the social medias can be anoyning, un-proffesional and in-efficiant.
 We provide a sloution for that where users can gather all there social contacts into a single web page were it is accessable every where and easliy managable through dashboard.
-Sending a single link that contains all desired social medias is all you need.   
+Sending a single link or qr code that contains all desired social medias is all you need.   
 
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
