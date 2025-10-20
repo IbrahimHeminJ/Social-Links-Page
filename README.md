@@ -73,7 +73,7 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 - Ibrahim Hemin
 - Mustafa Kabeer 
 - Suhaib Fadhil
-- Zheer Salam
+- Zhir Salam
 
 ## Team Links Resources
 [Our Kanban](https://trello.com/invite/b/68f2864a1d463749d57c831f/ATTIe20ffc9dde2872cde5513eea36c5bfbbBF22C3AD/social-links-page)   
