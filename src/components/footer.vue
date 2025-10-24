@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    const year = new Date().getFullYear()
+    const year = new Date().getFullYear() 
 </script>
 <template>
     <footer class="bg-gray-800 text-white py-4 px-12">
