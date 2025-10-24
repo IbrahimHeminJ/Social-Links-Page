@@ -73,7 +73,7 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 - Ibrahim Hemin [IbrahimHeminJ](https://github.com/IbrahimHeminJ)
 - Mustafa Kabeer [Mustafa-Kabeer](https://github.com/Mustafa-Kabeer)
 - Suhaib Fadhil [SuhaebFazelMohammad](https://github.com/SuhaebFazelMohammad)
-- Zheer Salam [Zheers9](https://github.com/Zheers9)
+- Zhir Salam [Zheers9](https://github.com/Zheers9)
 
 
 ## Team Links Resources
