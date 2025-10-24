@@ -11,7 +11,7 @@ Sending a single link or qr code that contains all desired social medias is all 
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
 
-## **Success Criteria**
+## Success Criteria
 To determine the success of the Social Links Page project, the following measurable criteria have been established:
 
 1. **Complete User Authentication System**
@@ -24,6 +24,17 @@ To determine the success of the Social Links Page project, the following measura
    A properly designed and normalized database diagram ensuring data integrity, scalability, and maintainability.
 5. **Robust and Well-Documented APIs**
    The system must provide clear, secure, and reliable API endpoints for all necessary operations between the frontend and backend.
+
+## Core Features
+
+| ID | Feature                 | Description                                      |
+| -- | ----------------------- | ------------------------------------------------ |
+| F1 | User Profile Management | Create, view, update personal information        |
+| F2 | Button/Links Management | Add, view, update, reorder and soft-delete links |
+| F3 | Interests & Search      | Search users via interest tags                   |
+| F4 | Reporting System        | Report users for inappropriate content           |
+| F5 | Domain Filtering        | Detect and block harmful domains in links        |
+| F6 | Admin Privileges        | Moderation of reports & user accounts            |
 
 
 ## **Non-Goals**
@@ -67,6 +78,31 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 6. **As a user**, I wanna **copy or share a single public URL to my social links page**, so that **I can share all my social accounts easily with others**.
 7. **As a user**, I wanna **edit or remove links from my dashboard**, so that **I can keep my page updated with my latest social media accounts**.
 8. **As a user**, I wanna **log out securely**, so that **my personal data and account remain protected on shared devices**.
+
+## ER diagram of database schema
+<img width="1553" height="823" alt="Screenshot 2025-10-24 205935" src="https://github.com/user-attachments/assets/0fd2853c-544d-451a-a246-767e744d6c75" />
+
+## Workflow Diagrams
+
+### Creating a Social Button
+
+```
+User Clicks Add Button → Server Receives Request → Validate Domain → Insert into buttonLinks → Insert into userButtonMapping (order)
+```
+
+### Searching Users by Interest
+
+```
+Search Input → Find Interest ID → Get Users with that Interest → Return user cards with profile info
+```
+
+### Reporting a User
+
+```
+User Submits a Report → Save into Reports Table → Admin Review → Update Status (RESOLVED / REJECTED) + ReasonOfAction
+```
+
+
 
 ## Team Members 
 - Halwest Salam [Halwest-S](https://github.com/Halwest-S)
