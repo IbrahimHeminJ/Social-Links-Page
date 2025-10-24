@@ -1,7 +1,7 @@
 # Social-Links-Page
 
 ## Introduction
-Socil links page is a web application made using Vue3 TS + Spring boot, Social links page is about a tool that helps user to make a web page of there own that contains desired links of there social media, users can login into there account through a login process or they can make one in case they were new, the Scoial links page of the user is managed through a dashboard, Where loaded with options for cusomization.
+Social links page is a web application made using Vue3 TS + Spring boot, Social links page is about a tool that helps user to make a web page of there own that contains desired links of there social media, users can login into there account through a login process or they can make one in case they were new, the Scoial links page of the user is managed through a dashboard, Where loaded with options for cusomization.
 
 ## Problem and Solution
 Nowadays people have an account in almost all social medias, In networking with other people sending links separatly and paragraphs that contian all the social medias can be anoyning, un-proffesional and in-efficiant.
