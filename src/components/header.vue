@@ -10,10 +10,10 @@ const handleSearch = () => {
 </script>
 
 <template>
-  <header class="border-b py-[120px] px-12">
+  <header class="border-b py-[0px] h-[100px] px-12 pt-5">
     <nav class="flex justify-between items-center">   
       <div class="relative">
-        <span class="absolute left-3 top-1/2 transform -translate-y-1/2">
+        <span class="absolute left-4 top-1/2 transform -translate-y-1/2">
           <img src="../assets/icons/search.svg" alt="search" class="size-[29px]">
         </span>
         <input
@@ -21,7 +21,7 @@ const handleSearch = () => {
           @keyup.enter="handleSearch"
           type="text"
           placeholder="Explore Community"
-          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-10 pr-4 py-2 rounded-lg border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-64"
+          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-12 pr-6 py-4 rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-full text-lg"
         />
       </div> 
       <button>
