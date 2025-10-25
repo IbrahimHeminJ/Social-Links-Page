@@ -1,11 +1,44 @@
 import type { RouteRecordRaw } from "vue-router";
-import Dashboard from '../../views/admin/dashboard.vue'
+import Links from '../../views/admin/links.vue'
+import Profile from '../../views/admin/profile.vue'
+import About from '../../views/admin/about.vue'
+import Policies from '../../views/admin/prolicies.vue'
 
 const AdminRoutes: RouteRecordRaw[] = [
     {
-        path: '/admin',
-        name: 'admin.dashboard',
-        component: Dashboard,
+        path: '/admin/links',
+        name: 'admin.links',
+        component: Links,
+        meta: {
+            title: 'Admin Dashboard',
+            requiresAuth: true,
+            requiresAdmin: true,
+        },
+    },
+    {
+        path: '/admin/profile',
+        name: 'admin.profile',
+        component: Profile,
+        meta: {
+            title: 'Admin Dashboard',
+            requiresAuth: true,
+            requiresAdmin: true,
+        },
+    },
+    {
+        path: '/admin/about',
+        name: 'admin.about',
+        component: About,
+        meta: {
+            title: 'Admin Dashboard',
+            requiresAuth: true,
+            requiresAdmin: true,
+        },
+    },
+    {
+        path: '/admin/policies',
+        name: 'admin.policies',
+        component: Policies,
         meta: {
             title: 'Admin Dashboard',
             requiresAuth: true,
