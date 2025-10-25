@@ -1,5 +1,5 @@
 <script setup lang="ts"></script>
-<template>
+<template> 
   <div
     class="max-md:top-[57px] bg-white border-r fixed flex flex-col items-start md:items-center px-4 justify-between left-0 md:w-[263px] w-[221px] h-full border-[#9F9F9F]"
   >
@@ -22,7 +22,7 @@
         <li class="font-medium">
             <router-link :to="{ name: 'admin.policies' }">Policies</router-link>
         </li>
-      </ul>
+      </ul> 
     </div>
     <div>
       <img
