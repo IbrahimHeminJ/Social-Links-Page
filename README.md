@@ -109,6 +109,118 @@ Search Input → Find Interest ID → Get Users with that Interest → Return us
 User Submits a Report → Save into Reports Table → Admin Review → Update Status (RESOLVED / REJECTED) + ReasonOfAction
 ```
 
+## Database overview
+Here is a qucik discription of the database
+
+### `users`
+
+This is the **central table** — everything else connects to users.
+
+**Fields summary:**
+
+* `id`: Primary key
+* `username`, `email`, `name`, `phoneNo`: Basic user info
+* `profileImage`: Blob for the user’s avatar
+* `passwordHashed`: Hashed password (good security practice)
+* `role`: Enum for roles (e.g., admin, user, moderator)
+* `created_at`, `updated_at`: Timestamps for account tracking
+* `isDeleted`, `isPremium`: Status flags
+* `failedLoginAttempts`: For login security
+
+**Purpose:** Stores all registered users and their profile data.
+
+
+
+### `themePresets` + `userPage`
+
+* `themePresets` defines the **available design themes** (e.g., “dark mode,” “minimalist”).
+* `userPage` links each user to a chosen theme:
+
+  * `userId` → references `users.id`
+  * `themeId` → references `themePresets.id`
+
+**Purpose:** Every user can have their own page with a selected theme.
+
+
+
+### `buttonLinks` + `userButtonMapping`
+
+* `buttonLinks` contains information about **link buttons** (e.g., “GitHub,” “Instagram,” “Portfolio”):
+
+  * Fields like `title`, `description`, `icon`, `link`, `timestampOfCreation`, etc.
+  * `isActive` and `isVisible` indicate the button’s state.
+  * `noClicks` can track analytics.
+
+* `userButtonMapping` connects users to their buttons:
+
+  * `userId` → references `users.id`
+  * `buttonId` → references `buttonLinks.id`
+  * `order` defines the button’s display sequence.
+
+**Purpose:** Users can add, reorder, and manage multiple social buttons on their page.
+
+
+
+### `reports`
+
+Handles **user reporting system**, allowing reports on inappropriate users or content.
+
+**Fields summary:**
+
+* `emailOfReporter`: who submitted the report
+* `reportedOnUser`: which user is being reported (linked to `users.id`)
+* `title`, `description`: details about the issue
+* `reportTypeId`: type/category of report
+* `reportStatus`, `handledBy`, `reasonOfAction`: for admin moderation
+
+**Purpose:** Supports community moderation and admin action tracking.
+
+
+
+### `domainBlockList`
+
+Contains **blocked domains**, likely to prevent users from linking to harmful or blacklisted websites.
+
+**Purpose:** Used for link safety checks before allowing users to add a button link.
+
+
+
+### `interests` + `userInterestMapping`
+
+* `interests` lists all possible interest categories (e.g., “Technology,” “Design,” “Travel”).
+* `userInterestMapping` connects users with their interests:
+
+  * `userId` → references `users.id`
+  * `interestId` → references `interests.id`
+
+**Purpose:** Lets users define their personal interests, possibly for recommendation or filtering.
+
+
+
+### Summary of Relationships
+
+| Relationship                            | Type        | Description                          |
+| --------------------------------------- | ----------- | ------------------------------------ |
+| users ↔ userPage                        | 1–1         | Each user has one page and one theme |
+| users ↔ userButtonMapping ↔ buttonLinks | 1–M         | Users can have multiple links        |
+| users ↔ reports                         | 1–M         | Users can be reported multiple times |
+| users ↔ userInterestMapping ↔ interests | M–M         | Users can have multiple interests    |
+| buttonLinks ↔ domainBlockList           | –           | Used indirectly for validation       |
+| themePresets                            | independent | Defines reusable themes              |
+
+
+### Overall
+database is **clean, modular, and scalable** — it supports:
+
+* User profiles with theming and customization
+* Personal and social link management
+* Interest-based personalization
+* Security via blocked domains and report handling
+* Analytics (click tracking)
+
+**In short:**
+This database powers a **customizable social link page platform** where users create personal pages with buttons (links) to their social media or content, choose themes, declare interests, and where admins can handle reports and restrict unsafe domains.
+
 
 
 ## Team Members 
