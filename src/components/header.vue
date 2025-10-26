@@ -23,8 +23,8 @@ const handleMenuClick = () => {
 </script>
 
 <template>
-  <header class="border-b border-[#9F9F9F] md:h-[95px] h-[57px] px-8">
-    <nav class="flex justify-between items-center h-full">
+  <header class="border-b border-[#9F9F9F] px-8 md:py-0 py-5">
+    <nav class="flex justify-between items-center md:h-[95px] h-[57px]">
       <div class="md:hidden flex items-center gap-x-5">
         <img
           src="../assets/icons/menu.svg"
@@ -45,7 +45,7 @@ const handleMenuClick = () => {
           class="size-[19px]"
         />
       </div>
-      <div class="relative max-md:hidden h-16 w-[388px]">
+      <div class="relative max-md:hidden">
         <span class="absolute left-5 top-1/2 transform -translate-y-1/2">
           <img
             src="../assets/icons/search.svg"
@@ -58,7 +58,7 @@ const handleMenuClick = () => {
           @keyup.enter="handleSearch"
           type="text"
           placeholder="Explore Community"
-          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-13 pr-4 py-2 rounded-[60px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-[388px] h-16"
+          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-13 pr-4 rounded-[60px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-[388px] h-16"
         />
       </div>
       <img

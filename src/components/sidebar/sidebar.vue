@@ -1,4 +1,7 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+const route = useRoute()
+</script>
 <template> 
   <div
     class="max-md:top-[57px] bg-white border-r fixed flex flex-col items-start md:items-center px-4 justify-between left-0 md:w-[263px] w-[221px] h-full border-[#9F9F9F]"
@@ -9,17 +12,25 @@
         alt="logo"
         class="w-[137.44px] h-[47.88px] max-md:hidden"
       />
-      <ul class="flex flex-col gap-y-4 text-lg">
-        <li class="font-medium">
+      <ul class="flex flex-col gap-y-4 text-lg w-full ">
+        <li class="font-medium px-4 rounded-full"
+        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.links' }"
+        >
             <router-link :to="{ name: 'admin.links' }">Links</router-link>
         </li>
-        <li class="font-medium">
+        <li class="font-medium px-4 rounded-full"
+        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.profile' }"
+        >
             <router-link :to="{ name: 'admin.profile' }">Profile</router-link>
         </li>
-        <li class="font-medium">
+        <li class="font-medium px-4 rounded-full"
+        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.about' }"
+        >
             <router-link :to="{ name: 'admin.about' }">About</router-link>
         </li>
-        <li class="font-medium">
+        <li class="font-medium px-4 rounded-full"
+        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.policies' }"
+        >
             <router-link :to="{ name: 'admin.policies' }">Policies</router-link>
         </li>
       </ul> 
