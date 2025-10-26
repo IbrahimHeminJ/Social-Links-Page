@@ -8,6 +8,13 @@ Nowadays people have an account in almost all social medias, In networking with 
 We provide a sloution for that where users can gather all there social contacts into a single web page were it is accessable every where and easliy managable through dashboard.
 Sending a single link or qr code that contains all desired social medias is all you need.   
 
+## Project scope
+
+## System users
+* Admin
+* Normal User
+* Premium Users
+
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
 
@@ -80,7 +87,7 @@ Perfect — since this is your **Social Links Page** project (built with **Vue 3
 8. **As a user**, I wanna **log out securely**, so that **my personal data and account remain protected on shared devices**.
 
 ## ER diagram of database schema
-<img width="1553" height="823" alt="Screenshot 2025-10-24 205935" src="https://github.com/user-attachments/assets/0fd2853c-544d-451a-a246-767e744d6c75" />
+<img width="1635" height="844" alt="image" src="https://github.com/user-attachments/assets/be63ea0b-3b6e-426f-8828-a49df351f5ad" />
 
 ## Workflow Diagrams
 
