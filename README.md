@@ -31,7 +31,7 @@ To determine the success of the Social Links Page project, the following measura
 | -- | ----------------------- | ------------------------------------------------ |
 | F1 | User Profile Management | Create, view, update personal information        |
 | F2 | Button/Links Management | Add, view, update, reorder and soft-delete links |
-| F3 | Interests & Search      | Search users via interest tags                   |
+| F3 | Interests & Search (explore page)     | Search users via interest tags                   |
 | F4 | Reporting System        | Report users for inappropriate content           |
 | F5 | Domain Filtering        | Detect and block harmful domains in links        |
 | F6 | Admin Privileges        | Moderation of reports & user accounts            |
