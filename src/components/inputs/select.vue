@@ -11,7 +11,6 @@
         :class="{ 'rounded-b-none': isOpen }"
       >
         <span v-if="selectedOption" class="flex items-center gap-2">
-          <span class="text-lg">{{ getIcon(selectedOption) }}</span>
           <span>{{ selectedOption }}</span>
         </span>
         <span v-else class="text-gray-400">{{ placeholder }}</span>
@@ -52,9 +51,6 @@
             class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 transition-colors cursor-pointer text-left"
             :class="{ 'bg-blue-50': selectedOption === option.label }"
           >
-            <span class="text-lg min-w-[24px]">{{
-              getIcon(option.label)
-            }}</span>
             <span class="flex-1">{{ option.label }}</span>
             <svg
               v-if="selectedOption === option.label"
@@ -84,21 +80,12 @@ interface Option {
   value: string;
 }
 
-const props = defineProps({
-  label: {
-    type: String,
-    required: true,
-  },
-  placeholder: {
-    type: String,
-    default: "Select an option",
-    required: true,
-  },
-  modelValue: {
-    type: String,
-    default: "",
-  },
-});
+const props = defineProps<{
+  label: string;
+  placeholder?: string;
+  modelValue: string;
+  options: Option[];
+}>();
 
 const emit = defineEmits(["update:modelValue"]);
 
@@ -110,7 +97,9 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue) {
-      const option = options.find((opt) => opt.value === newValue);
+      const option = (props.options as Option[]).find(
+        (opt) => opt.value === newValue
+      );
       selectedOption.value = option ? option.label : null;
     } else {
       selectedOption.value = null;
@@ -118,45 +107,6 @@ watch(
   },
   { immediate: true }
 );
-
-const options: Option[] = [
-  { label: "Instagram", value: "instagram" },
-  { label: "Facebook", value: "facebook" },
-  { label: "GitHub", value: "github" },
-  { label: "LinkedIn", value: "linkedin" },
-  { label: "Twitter", value: "twitter" },
-  { label: "YouTube", value: "youtube" },
-  { label: "Snapchat", value: "snapchat" },
-  { label: "TikTok", value: "tiktok" },
-  { label: "Discord", value: "discord" },
-  { label: "Telegram", value: "telegram" },
-  { label: "WhatsApp", value: "whatsapp" },
-  { label: "Pinterest", value: "pinterest" },
-  { label: "Reddit", value: "reddit" },
-  { label: "Twitch", value: "twitch" },
-  { label: "Spotify", value: "spotify" },
-];
-
-const getIcon = (label: string): string => {
-  const iconMap: { [key: string]: string } = {
-    Instagram: "📷",
-    Facebook: "📘",
-    GitHub: "🐙",
-    LinkedIn: "💼",
-    Twitter: "🐦",
-    YouTube: "▶️",
-    Snapchat: "👻",
-    TikTok: "🎵",
-    Discord: "💬",
-    Telegram: "✈️",
-    WhatsApp: "💬",
-    Pinterest: "📌",
-    Reddit: "🔴",
-    Twitch: "🎮",
-    Spotify: "🎵",
-  };
-  return iconMap[label] || "🔗";
-};
 
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;

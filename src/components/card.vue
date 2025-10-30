@@ -15,6 +15,7 @@
     </div>
     <div>
       <img
+        @click="handleDelete"
         src="../assets/icons/garbage.svg"
         alt="garbage"
         class="w-[17px] h-[21.86px] cursor-pointer"
@@ -30,9 +31,10 @@ import { ref, computed } from "vue";
 interface Props {
   icon: string;
   title: string;
+  handleDelete: () => void;
 }
 
-const { icon, title } = defineProps<Props>();
+const { icon, title, handleDelete } = defineProps<Props>();
 
 const iconError = ref(false);
 

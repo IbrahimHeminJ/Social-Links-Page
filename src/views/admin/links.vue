@@ -1,4 +1,11 @@
 <template>
+  <Transition name="fade" v-show="showAlert">
+    <Alert
+      :item="selectedItem"
+      @confirm="handleConfirmDelete"
+      @close="handleCloseAlert"
+    />
+  </Transition>
   <div
     class="w-full h-auto pb-10 px-12 md:pt-10 pt-5 flex flex-col gap-y-4"
     v-if="addNewLink"
@@ -26,6 +33,7 @@
           :key="index"
           :icon="getIconForPlatform(link.platform)"
           :title="link.title"
+          :handleDelete="() => handleDeleteLink(index)"
         />
       </div>
     </div>
@@ -74,6 +82,7 @@
         />
         <Select
           label="Platform"
+          :options="platforms"
           placeholder="Select a platform"
           v-model="formData.platform"
         />
@@ -95,7 +104,8 @@ import TextHeading from "../../components/textHeading.vue";
 import Card from "../../components/card.vue";
 import Input from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
-import { reactive, ref } from "vue";
+import Alert from "../../components/alerts/alert.vue";
+import { reactive, ref, computed } from "vue";
 
 interface LinkItem {
   title: string;
@@ -104,7 +114,18 @@ interface LinkItem {
   platform: string;
 }
 
+const platforms = ref([
+  { label: "Instagram", value: "instagram" },
+  { label: "Facebook", value: "facebook" },
+  { label: "GitHub", value: "github" },
+  { label: "LinkedIn", value: "linkedin" },
+  { label: "Twitter", value: "twitter" },
+  { label: "YouTube", value: "youtube" },
+]);
+
 const addNewLink = ref(true);
+
+const showAlert = ref(false);
 
 const formData = reactive({
   title: "",
@@ -114,6 +135,12 @@ const formData = reactive({
 });
 
 const linkItems = ref<LinkItem[]>([]);
+
+const selectedIndex = ref<number | null>(null);
+const selectedItem = computed<LinkItem | null>(() => {
+  if (selectedIndex.value === null) return null;
+  return linkItems.value[selectedIndex.value] ?? null;
+});
 
 const getIconForPlatform = (platform: string): string => {
   // Return the platform name as the icon (this should match SVG filename in icons folder)
@@ -155,5 +182,26 @@ function handleSubmit() {
   if (lastLink) {
     console.log("Icon for last link:", getIconForPlatform(lastLink.platform));
   }
+}
+
+function handleShowAlert() {
+  showAlert.value = true;
+}
+
+function handleCloseAlert() {
+  showAlert.value = false;
+}
+
+function handleDeleteLink(index: number) {
+  selectedIndex.value = index;
+  handleShowAlert();
+}
+
+function handleConfirmDelete() {
+  if (selectedIndex.value !== null) {
+    linkItems.value.splice(selectedIndex.value, 1);
+    selectedIndex.value = null;
+  }
+  handleCloseAlert();
 }
 </script>
