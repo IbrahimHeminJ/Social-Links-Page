@@ -75,7 +75,7 @@ To maintain focus and ensure timely delivery, the following items are explicitly
 | 4     | **Public Page & Deployment**<br>• Build public-facing social links page with unique URLs<br>• Implement copy/share URL functionality<br>• Conduct end-to-end testing and bug fixes<br>• Deploy backend to cloud platform (Heroku/Railway/AWS)<br>• Deploy frontend (Vercel/Netlify)<br>• Final documentation and project presentation preparation |
 
 ## User-Stories
-Perfect — since this is your **Social Links Page** project (built with **Vue 3 + TypeScript** frontend and **Spring Boot** backend), here are **9 well-structured user stories** tailored to your app:
+Here we have **9 user stories** :
 
 1. **As a new user**, I want to **sign up with my email and password**, so that I can **create an account and start building my social links page**.
 2. **As a returning user**, I want to **log in securely to my dashboard**, so that I can **manage and edit my existing links**.
@@ -224,11 +224,11 @@ This database powers a **customizable social link page platform** where users cr
 
 
 ## Team Members 
-- Halwest Salam [Halwest-S](https://github.com/Halwest-S)
-- Ibrahim Hemin [IbrahimHeminJ](https://github.com/IbrahimHeminJ)
-- Mustafa Kabeer [Mustafa-Kabeer](https://github.com/Mustafa-Kabeer)
-- Suhaib Fadhil [SuhaebFazelMohammad](https://github.com/SuhaebFazelMohammad)
-- Zhir Salam [Zheers9](https://github.com/Zheers9)
+- [Halwest Salam](https://github.com/Halwest-S)
+- [Ibrahim Hemin](https://github.com/IbrahimHeminJ)
+- [Mustafa Kabeer](https://github.com/Mustafa-Kabeer)
+- [Suhaeb Fazel](https://github.com/SuhaebFazelMohammad)
+- [Zheer Salam](https://github.com/Zheers9)
 
 
 ## Team Links Resources
