@@ -1,33 +1,71 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from "vue";
+
+interface Props {
+  toggleSidebar?: () => void;
+}
+
+const props = defineProps<Props>();
+
+const searchQuery = ref("");
+
+const handleSearch = () => {
+  // Handle search functionality
+  console.log("Searching for:", searchQuery.value);
+};
+
+const handleMenuClick = () => {
+  // Only toggle on mobile screens
+  if (window.innerWidth < 768) {
+    props.toggleSidebar?.();
+  }
+};
+</script>
+
 <template>
-  <header class="bg-gray-800 text-white py-4 px-12">
-    <nav class="flex justify-between items-center">
-        <div>
-            <router-link to="/" class="text-2xl font-bold">
-                Social Links Page
-            </router-link>
-        </div>
-      <div>
-        <ul class="flex items-center gap-x-4">
-          <li>
-            <router-link :to="{ name: 'home' }">Home</router-link>
-          </li>
-          <li>
-            <router-link :to="{ name: 'about' }">About</router-link>
-          </li>
-          <li>
-            <router-link :to="{ name: 'contact' }">Contact</router-link>
-          </li>
-        </ul>
+  <header class="border-b border-[#9F9F9F] px-8 md:py-0 py-5 min-md:h-[95px] h-[57px]">
+    <nav class="flex justify-between items-center h-full">
+      <div class="md:hidden flex items-center gap-x-5">
+        <img
+          src="../assets/icons/menu.svg"
+          alt="menu"
+          class="size-[19px] cursor-pointer"
+          @click="handleMenuClick"
+        />
+        <img
+          src="../assets/icons/icon.svg"
+          alt="logo"
+          class="w-[87.44px] h-[30.31px]"
+        />
       </div>
-      <div class="flex items-center gap-x-4">
-        <button>
-          <router-link :to="{ name: 'login' }">Login</router-link>
-        </button>
-        <button>
-          <router-link :to="{ name: 'signup' }">Register</router-link>
-        </button>
+      <div class="md:hidden">
+        <img
+          src="../assets/icons/search.svg"
+          alt="search"
+          class="size-[19px]"
+        />
       </div>
+      <div class="relative max-md:hidden">
+        <span class="absolute left-5 top-1/2 transform -translate-y-1/2">
+          <img
+            src="../assets/icons/search.svg"
+            alt="search"
+            class="size-[21px]"
+          />
+        </span>
+        <input
+          v-model="searchQuery"
+          @keyup.enter="handleSearch"
+          type="text"
+          placeholder="Explore Community"
+          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-13 pr-4 text-2xl rounded-[60px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-[388px] h-16"
+        />
+      </div>
+      <img
+        src="../assets/icons/moon.svg"
+        alt="logo"
+        class="size-[21px] max-md:hidden"
+      />
     </nav>
   </header>
 </template>

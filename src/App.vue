@@ -7,6 +7,6 @@ const route = useRoute()
 
 <template>
     
-  <AuthLayout v-if="route.name === 'login' || route.name === 'signup'" />
-  <GuestLayout v-else /> 
+  <AuthLayout v-if="route.name === 'login' || route.name === 'signup'" /> 
+  <GuestLayout v-else />
 </template>
