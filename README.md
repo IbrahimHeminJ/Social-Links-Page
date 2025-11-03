@@ -8,7 +8,6 @@ Nowadays people have an account in almost all social medias, In networking with 
 We provide a sloution for that where users can gather all there social contacts into a single web page were it is accessable every where and easliy managable through dashboard.
 Sending a single link or qr code that contains all desired social medias is all you need.   
 
-## Project scope
 
 ## System users
 * Admin
