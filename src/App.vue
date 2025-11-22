@@ -10,5 +10,5 @@ const route = useRoute()
   
   <GuestLayout v-if="route.name === 'home'" />
   <AuthLayout v-else-if="route.name === 'login' || route.name === 'signup'" /> 
-  <AdminLayout v-else-if="route.name === 'user'" />
+  <AdminLayout v-else-if="route.name === 'admin.links' || route.name === 'admin.profile' || route.name === 'admin.about' || route.name === 'admin.policies' || route.name === 'admin.themes'" />
 </template>
