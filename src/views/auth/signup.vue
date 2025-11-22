@@ -117,7 +117,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Text from '../../components/inputs/text.vue';
-import Submit from '../../components/buttons/submit.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 
 const username = ref('')

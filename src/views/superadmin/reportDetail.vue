@@ -49,7 +49,7 @@
 
       <!-- Reported Type -->
       <div>
-        <label class="block text-sm font-medium text-gray-900 mb-2">Reported Type</label>
+        <label class="block text-sm font-medium text-gray-900 mb-2">Report Type</label>
         <div class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900">
           {{ getReportTypeLabel(reportData.reportType) }}
         </div>
@@ -64,12 +64,8 @@
       </div>
 
       <!-- Reason for action -->
-      <div>
-        <label class="block text-sm font-medium text-gray-900 mb-2">Reason for action</label>
-        <div class="w-full px-4 py-3 bg-white border-b-2 border-blue-500 text-gray-900">
-          {{ reportData.reason || '-' }}
-        </div>
-      </div>
+        <Text label="Reason for action" v-model="reportData.reason" type="text" placeholder="Enter reason for action" />
+
 
       <!-- Action Buttons -->
       <div class="flex justify-center gap-4 pt-4">
@@ -93,6 +89,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Text from '../../components/inputs/text.vue'
 
 const router = useRouter()
 const route = useRoute()

@@ -1,15 +1,6 @@
 <template>
   <div class="p-4 md:p-6">
     <div class="mb-6">
-      <button 
-        @click="goBack"
-        class="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Users
-      </button>
       <h1 class="text-2xl font-bold text-gray-900">Edit User</h1>
     </div>
     
@@ -42,73 +33,28 @@
         </div>
 
         <!-- Username -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-          <input
-            v-model="formData.username"
-            type="text"
-            class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-            placeholder="Enter username"
-          />
-        </div>
+        <Text v-model="formData.username" label="Username" type="text" placeholder="Enter username" />
+        
 
         <!-- Name -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-          <input
-            v-model="formData.name"
-            type="text"
-            class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-            placeholder="Enter name"
-          />
-        </div>
+        <Text v-model="formData.name" label="Name" type="text" placeholder="Enter name" />
+        
 
         <!-- Email -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-          <input
-            v-model="formData.email"
-            type="email"
-            class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-            placeholder="Enter email"
-          />
-        </div>
+         <Text v-model="formData.email" label="Email" type="email" placeholder="Enter email" />
+         
 
         <!-- Phone -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-          <input
-            v-model="formData.phone"
-            type="tel"
-            class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-            placeholder="Enter phone number"
-          />
-        </div>
+         <Text v-model="formData.phone" label="Phone Number" type="tel" placeholder="Enter phone number" />
+        
 
         <!-- Change Password Section -->
         <div class="border-t border-gray-200 pt-6">
           <h2 class="text-lg font-semibold text-gray-900 mb-4">Change Password</h2>
           
           <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-              <input
-                v-model="passwordData.newPassword"
-                type="password"
-                class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-                placeholder="Enter new password"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-              <input
-                v-model="passwordData.confirmPassword"
-                type="password"
-                class="w-full px-4 py-2 border-b-2 border-gray-300 focus:border-blue-500 focus:outline-none transition-colors"
-                placeholder="Confirm new password"
-              />
-            </div>
+            <Text v-model="passwordData.newPassword" label="New Password" type="password" placeholder="Enter new password" />
+            <Text v-model="passwordData.confirmPassword" label="Confirm New Password" type="password" placeholder="Confirm new password" />
           </div>
         </div>
 
@@ -136,6 +82,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import Text from '../../components/inputs/text.vue'
 
 const router = useRouter()
 const route = useRoute()
