@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import Footer from '../components/footer.vue';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import Icon from '../assets/icons/icon.svg';
 
 import SearchBar from '../components/inputs/searchBar.vue';
 
 const searchQuery = ref('');
+const router = useRouter();
 
-const handleSearch = (value: string) => {
-  // Later: navigate to Explore page or call API
-  console.log('Searching for:', value);
+const goToExplore = () => {
+  router.push({ name: 'explore' });
 };
 const features = [
   {
@@ -29,6 +30,12 @@ const features = [
     text: "Fully responsive and optimized for all devices",
   },
 ];
+
+const getNumberOfUsers = () => {
+
+  return 1000;
+};
+const numberOfUsers = ref(getNumberOfUsers());
 
 </script>
 <template>
@@ -63,13 +70,16 @@ const features = [
         </div>
 
         <!-- Search -->
-        <SearchBar v-model="searchQuery" placeholder="Explore Community" class="w-full md:max-w-md mt-3"
-          @search="handleSearch" />
+        <SearchBar
+        v-model="searchQuery"
+        placeholder="Explore Community"
+        class="w-full md:max-w-md mt-3"
+        @click="goToExplore" />
 
         <!-- Explore text -->
         <div class="mt-2">
           <h1 class="font-bold text-base lg:text-lg">Explore Community</h1>
-          <p class="font-semibold text-xs lg:text-sm mt-1">1K + people</p>
+          <p class="font-semibold text-xs lg:text-sm mt-1">{{ numberOfUsers }} people</p>
         </div>
       </div>
     </section>
