@@ -1,6 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Footer from '../components/footer.vue';
+</script>
 <template>
-  <div>
-    <h1>Home</h1>
-  </div>
+<main>
+hello
+</main>
+<Footer/>
 </template>

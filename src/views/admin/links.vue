@@ -86,14 +86,7 @@
           placeholder="Select a platform"
           v-model="formData.platform"
         />
-        <div class="w-full grid place-content-center">
-          <button
-            type="submit"
-            class="w-full cursor-pointer bg-[#009AFF] text-white font-bold py-1.5 px-9 rounded-[10px] hover:bg-[#009AFF]/80 transition-colors"
-          >
-            ADD
-          </button>
-        </div>
+        <Submit />
       </div>
     </form>
   </div>
@@ -106,6 +99,7 @@ import Input from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
 import Alert from "../../components/alerts/alert.vue";
 import { reactive, ref, computed } from "vue";
+import Submit from "../../components/buttons/submit.vue";
 
 interface LinkItem {
   title: string;
