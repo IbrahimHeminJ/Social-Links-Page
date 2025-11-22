@@ -2,6 +2,7 @@
 import AdminLayout from './layouts/adminLayout.vue'
 import AuthLayout from './layouts/authLayout.vue'
 import GuestLayout from './layouts/guestLayout.vue'
+import SocialLinksLayout from './layouts/socialLinksLayout.vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 </script>
@@ -11,4 +12,5 @@ const route = useRoute()
   <GuestLayout v-if="route.name === 'home'" />
   <AuthLayout v-else-if="route.name === 'login' || route.name === 'signup'" /> 
   <AdminLayout v-else-if="route.name === 'admin.links' || route.name === 'admin.profile' || route.name === 'admin.about' || route.name === 'admin.policies' || route.name === 'admin.themes'" />
+  <SocialLinksLayout v-else-if="route.name === 'social-links'" />
 </template>
