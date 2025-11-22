@@ -24,6 +24,11 @@ const route = useRoute()
             <router-link :to="{ name: 'admin.profile' }">Profile</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
+        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.themes' }"
+        >
+            <router-link :to="{ name: 'admin.themes' }">Themes</router-link>
+        </li>
+        <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.about' }"
         >
             <router-link :to="{ name: 'admin.about' }">About</router-link>
