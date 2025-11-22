@@ -10,9 +10,9 @@ Sending a single link or qr code that contains all desired social medias is all 
 
 
 ## System users
+* Super admin
 * Admin
 * Normal User
-* Premium Users
 
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
