@@ -12,9 +12,9 @@
       <!-- Profile Section -->
       <div class="px-4 md:px-6 pb-4 flex flex-col items-center">
         <img 
-          src="../../assets/icons/icon.svg" 
+          src="../../assets/images/man.png" 
           alt="Profile" 
-          class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2"
+          class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2 object-cover"
           :class="profileBorderClass"
         >
         <h2 class="text-xl md:text-2xl font-bold mb-2" :class="textColorClass">Zheer Salam</h2>
@@ -40,7 +40,7 @@
                 :alt="link.platform" 
                 class="w-6 h-6 md:w-8 md:h-8"
               >
-              <p class="font-bold text-sm md:text-base" :class="getButtonTextClass()">
+              <p class="font-bold text-lg md:text-base" :class="getButtonTextClass()">
                 {{ link.title }}
               </p>
             </div>
@@ -62,7 +62,7 @@
         </div>
         <!-- Social Links Page Generator -->
         <div class="flex items-center gap-x-2">
-          <img src="../../assets/icons/icon.svg" alt="Logo" class="w-5 h-5 md:w-6 md:h-6">
+          <img src="../assets/icons/icon.svg" alt="SOCIAL LINKS PAGE GENERATOR Logo" class="w-6 h-6 md:w-8 md:h-8">
           <div class="flex flex-col">
             <p class="text-xs md:text-sm font-bold leading-tight" :class="textColorClass">SOCIAL LINKS</p>
             <p class="text-xs leading-tight" :class="textColorClass">PAGE GENERATOR</p>
@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import facebookIcon from '../assets/icons/facebook.svg'
 
 interface SocialLink {
   title: string
@@ -205,7 +206,8 @@ const getButtonSubtextClass = () => {
 }
 
 const getIconPath = (platform: string) => {
-  return `../../assets/icons/${platform}.svg`
+  // For testing: use facebook.svg for all links
+  return facebookIcon
 }
 
 const handleLinkClick = (url: string) => {
