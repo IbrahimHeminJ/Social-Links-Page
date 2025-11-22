@@ -15,8 +15,6 @@ import Icon from '../assets/icons/icon.svg';
           <div class="w-16 h-16 rounded-xl bg-white flex items-center justify-center">
             <img :src="Icon" alt="Logo" class="w-10 h-10" />
           </div>
-
-            
           <!-- Brand text -->
           <div class="uppercase">
             <p class="font-extrabold text-lg sm:text-xl leading-[1.1] tracking-wide">
