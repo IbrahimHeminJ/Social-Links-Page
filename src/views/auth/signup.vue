@@ -13,79 +13,29 @@
         <!-- Left Column -->
         <div class="space-y-8">
           <!-- Username Field -->
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Username</label>
-            <input
-              v-model="username"
-              type="text"
-              placeholder="e.g. Mustafa"
-              :class="['w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors', usernameFocused ? 'border-b' : 'border-b-3']"
-              style="border-bottom-color: #009AFF;"
-              @focus="usernameFocused = true"
-              @blur="usernameFocused = false"
-            />
-          </div>
+          <Text v-model="username" label="Username" placeholder="e.g. Mustafa" type="text" class="mb-6" />
+          
 
           <!-- Email Field -->
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
-            <input
-              v-model="email"
-              type="email"
-              placeholder="e.g. Mustafa@example.com"
-              :class="['w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors', emailFocused ? 'border-b' : 'border-b-3']"
-              style="border-bottom-color: #009AFF;"
-              @focus="emailFocused = true"
-              @blur="emailFocused = false"
-            />
-          </div>
+           <Text v-model="email" label="Email" placeholder="e.g. Mustafa@example.com" type="email" class="mb-6" />
+          
 
           <!-- Password Field -->
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Password</label>
-            <input
-              v-model="password"
-              type="password"
-              placeholder="e.g. 123456789"
-              :class="['w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors', passwordFocused ? 'border-b' : 'border-b-3']"
-              style="border-bottom-color: #009AFF;"
-              @focus="passwordFocused = true"
-              @blur="passwordFocused = false"
-            />
-          </div>
+          <Text v-model="password" label="Password" placeholder="e.g. 123456789" type="password" class="mb-6" />
+          
         </div>
 
         <!-- Middle Column -->
         <div class="space-y-8">
           <!-- Name Field -->
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Name</label>
-            <input
-              v-model="name"
-              type="text"
-              placeholder="e.g. Mustafa"
-              :class="['w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors', nameFocused ? 'border-b' : 'border-b-3']"
-              style="border-bottom-color: #009AFF;"
-              @focus="nameFocused = true"
-              @blur="nameFocused = false"
-            />
-          </div>
+          <Text v-model="name" label="Name" placeholder="e.g. Mustafa" type="text" class="mb-6" />
+        
 
           <!-- Phone Number Field -->
-          <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Phone Number</label>
-            <input
-              v-model="phoneNumber"
-              type="tel"
-              placeholder="e.g. +1234567890"
-              :class="['w-full px-4 py-3 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors', phoneFocused ? 'border-b' : 'border-b-3']"
-              style="border-bottom-color: #009AFF;"
-              @focus="phoneFocused = true"
-              @blur="phoneFocused = false"
-            />
-          </div>
+          <Text v-model="phoneNumber" label="Phone Number" placeholder="e.g. +1234567890" type="tel" class="mb-6" />
 
           <!-- Tag Field -->
+
           <div>
             <label class="block text-gray-700 text-sm font-medium mb-2">Tag</label>
             
@@ -163,8 +113,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import Text from '../../components/inputs/text.vue';
 
 const username = ref('')
 const email = ref('')
@@ -174,11 +125,6 @@ const phoneNumber = ref('')
 const selectedTag = ref('')
 const profileImage = ref('')
 
-const usernameFocused = ref(false)
-const emailFocused = ref(false)
-const passwordFocused = ref(false)
-const nameFocused = ref(false)
-const phoneFocused = ref(false)
 
 const fileInput = ref(null)
 const router = useRouter()
