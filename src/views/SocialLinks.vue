@@ -5,8 +5,17 @@
   >
     <div class="w-full max-w-md">
       <!-- Header -->
-      <div class="px-4 md:px-6 pt-2 md:pt-3">
-        <p class="text-sm mb-4" :class="headerTextClass">Explore page</p>
+      <div class="px-4 md:px-6 pt-2 md:pt-3 flex items-center justify-between mb-4">
+        
+        <button 
+          @click="goToHome"
+          class="text-white hover:opacity-80 transition-opacity"
+          aria-label="Go to home"
+        >
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Profile Section -->
@@ -36,7 +45,7 @@
             <!-- First Row: Icon and Title -->
             <div class="flex items-center gap-x-3 mb-1">
               <img 
-                :src="getIconPath(link.platform)" 
+                :src="getIconPath()" 
                 :alt="link.platform" 
                 class="w-6 h-6 md:w-8 md:h-8"
               >
@@ -62,7 +71,7 @@
         </div>
         <!-- Social Links Page Generator -->
         <div class="flex items-center gap-x-2">
-          <img src="../assets/icons/icon.svg" alt="SOCIAL LINKS PAGE GENERATOR Logo" class="w-6 h-6 md:w-8 md:h-8">
+          <img src="../assets/icons/icon.svg" alt="SOCIAL LINKS PAGE GENERATOR Logo" class="w-16 h-16 md:w-20 md:h-20">
           <div class="flex flex-col">
             <p class="text-xs md:text-sm font-bold leading-tight" :class="textColorClass">SOCIAL LINKS</p>
             <p class="text-xs leading-tight" :class="textColorClass">PAGE GENERATOR</p>
@@ -75,7 +84,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import facebookIcon from '../assets/icons/facebook.svg'
+
+const router = useRouter()
 
 interface SocialLink {
   title: string
@@ -142,11 +154,6 @@ const subtitleColorClass = computed(() => {
     : 'text-white/90'
 })
 
-const headerTextClass = computed(() => {
-  return themeNumber.value === 2 
-    ? 'text-gray-400' 
-    : 'text-white/80'
-})
 
 const profileBorderClass = computed(() => {
   return themeNumber.value === 2 
@@ -205,13 +212,17 @@ const getButtonSubtextClass = () => {
   return 'text-white/90'
 }
 
-const getIconPath = (platform: string) => {
+const getIconPath = () => {
   // For testing: use facebook.svg for all links
   return facebookIcon
 }
 
 const handleLinkClick = (url: string) => {
   window.open(url, '_blank')
+}
+
+const goToHome = () => {
+  router.push({ name: 'home' })
 }
 </script>
 
