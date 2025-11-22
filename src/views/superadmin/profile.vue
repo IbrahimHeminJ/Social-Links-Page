@@ -97,6 +97,7 @@
 
         <!-- Save Changes Button -->
         <div class="mt-8 flex justify-center">
+          <Submit text="Save Changes" @click="handleSave" />
           <button
             @click="handleSave"
             class="px-8 py-3 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors"
@@ -111,6 +112,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import Submit from '../../components/buttons/submit.vue'
 
 const fileInput = ref<HTMLInputElement | null>(null)
 

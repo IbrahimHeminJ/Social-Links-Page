@@ -94,9 +94,10 @@
 
       <!-- Signup Button -->
       <div class="mt-8 flex justify-center">
+
         <button
           @click="handleSignup"
-          class="bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-4"
+          class="cursor-pointer bg-[#009AFF] text-white font-bold rounded-[10px] hover:bg-[#009AFF]/80 transition-colors py-3 px-4 mb-4"
           style="width: 100%; max-width: 300px;"
         >
           Signup
@@ -106,7 +107,7 @@
       <!-- Login Link -->
       <div class="text-center">
         <span class="text-gray-600 text-sm">have an account? </span>
-        <a @click="goToLogin" class="text-blue-600 text-sm underline hover:text-blue-800 cursor-pointer">Login</a>
+        <Hyperlink text="Login Here" @click="goToLogin" />
       </div>
     </div>
   </div>
@@ -116,6 +117,8 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Text from '../../components/inputs/text.vue';
+import Submit from '../../components/buttons/submit.vue';
+import Hyperlink from '../../components/buttons/hyperlink.vue';
 
 const username = ref('')
 const email = ref('')
