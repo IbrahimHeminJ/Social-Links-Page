@@ -26,7 +26,7 @@
         </div>
 
         <!-- Middle Column -->
-        <div class="space-y-8">
+        <div class="">
           <!-- Name Field -->
           <Text v-model="name" label="Name" placeholder="e.g. Mustafa" type="text" class="mb-6" />
         

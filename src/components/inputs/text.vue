@@ -31,10 +31,13 @@
   const modelValue = defineModel<string>({ required: true });
 </script>
 <template>
-  <div class="flex flex-col gap-y-4">
+  <div class="flex flex-col">
     <label class=" text-gray-700 text-lg font-medium mb-1 md:text-xl">
       {{ label }}
     </label>
+    <p class="text-gray-600 text-xs mb-3 pt-2 md:text-[14px]">
+      {{ description }}
+    </p>
     <input
       type="{{ type }}"
       :id="label"
