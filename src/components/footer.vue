@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import Icon from '../assets/icons/icon.svg';
-    const year = new Date().getFullYear() 
+import Icon from '../assets/icons/icon.svg'; 
 </script>
 <template>
   <footer class="bg-[#1a1a1a] text-white font-sans">
