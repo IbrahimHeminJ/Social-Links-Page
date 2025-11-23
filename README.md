@@ -278,7 +278,7 @@ graph LR
     Backend -->|SQL Queries| Database[(Relational Database)]
 ```
 ### Creating a Social Button
-```
+```mermaid
 flowchart LR
     A[User clicks Add Button] --> B[Frontend sends create request]
     B --> C[Backend validates domain]
@@ -290,7 +290,7 @@ flowchart LR
 ```
 
 ### Reporting a User
-```
+```mermaid
 flowchart LR
     R1[User Submits a Report] --> R2[Save into Reports Table]
     R2 --> R3[Admin Review]
