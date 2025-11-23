@@ -132,8 +132,7 @@ The overall flow is: the user interacts with the Vue 3 frontend in the browser, 
 
 
 ## ER diagram of database schema
-<img width="1635" height="844" alt="image" src="https://github.com/user-attachments/assets/be63ea0b-3b6e-426f-8828-a49df351f5ad" />
-
+<img width="2290" height="1223" alt="Screenshot 2025-11-23 204508" src="https://github.com/user-attachments/assets/f30ce65a-d9df-450f-9563-05d49bb2ebcb" />
 
 ## Database overview
 Here is a quick description of the database
