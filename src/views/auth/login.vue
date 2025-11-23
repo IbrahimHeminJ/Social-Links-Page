@@ -80,7 +80,6 @@ const handleLogin = async () => {
       <!-- Password Field -->
       <Text v-model="loginData.password" label="Password" placeholder="Enter your password" type="password" class="mb-6" />
   
-
       <!-- Login Button -->
       <Submit text="Login" @click="handleLogin" class="h-[50px] mb-6" />
 
