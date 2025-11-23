@@ -1,7 +1,7 @@
 # Social-Links-Page
 
 ## Introduction
-Social links page is a web application made using Vue3 TS + Spring boot, Social links page is about a tool that helps user to make a web page of there own that contains desired links of there social media, users can login into there account through a login process or they can make one in case they were new, the Scoial links page of the user is managed through a dashboard, Where loaded with options for cusomization.
+Social links page is a web application made using Vue3 TS + Laravel, Social links page is about a tool that helps user to make a web page of there own that contains desired links of there social media, users can login into there account through a login process or they can make one in case they were new, the Scoial links page of the user is managed through a dashboard, Where loaded with options for cusomization.
 
 ## Problem and Solution
 Nowadays people have an account in almost all social medias, In networking with other people sending links separatly and paragraphs that contian all the social medias can be anoyning, un-proffesional and in-efficiant.
@@ -12,7 +12,6 @@ Sending a single link or qr code that contains all desired social medias is all 
 ## System users
 * Admin
 * Normal User
-* Premium Users
 
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influcers, content creator, tech enthusiast and Anyone in needs for the feature.   
@@ -54,13 +53,11 @@ To maintain focus and ensure timely delivery, the following items are explicitly
    Dynamic link rearrangement through drag-and-drop functionality is not included in the current scope.
 5. **Custom Domain Linking**
    Users will not be able to connect personal or custom domains to their social links page.
-6. **Premium or Subscription-Based Features**
-   All features will remain free; paid plans or monetization mechanisms are outside the current project phase.
-7. **Search Engine Optimization (SEO) Tools**
+6. **Search Engine Optimization (SEO) Tools**
    The project will not include built-in SEO or meta-tag management tools for user pages.
-8. **Media Hosting Services**
+7. **Media Hosting Services**
    Users will not be able to upload or host images or videos directly within the platform; only external links are supported.
-9. **Multi-Language Support**
+8. **Multi-Language Support**
    The application will only be available in English, with no immediate plan for localization.
 
 
@@ -68,7 +65,7 @@ To maintain focus and ensure timely delivery, the following items are explicitly
 
 | Weeks | Task |
 |-------|------|
-| 1     | **Project Setup & Database Design**<br>• Set up Spring Boot backend project structure<br>• Set up Vue 3 + TypeScript frontend project<br>• Configure development environment and Git repository<br>• Create basic project documentation |
+| 1     | **Project Setup & Database Design**<br>• Set up Laravel backend project structure<br>• Set up Vue 3 + TypeScript frontend project<br>• Configure development environment and Git repository<br>• Create basic project documentation |
 | 2     | **Authentication & Backend APIs**<br>• Implement user registration (signup) endpoint<br>• Implement login and JWT-based authentication<br>• Create CRUD API endpoints for social links management<br>• Implement logout functionality<br>• Write API documentation<br>• Conduct API testing (Postman/Thunder Client) |
 | 3     | **Frontend Development & Dashboard**<br>• Build authentication pages (Login & Signup)<br>• Create user dashboard with CRUD functionality for links<br>• Implement link customization features (colors, styling)<br>• Build preview functionality for social links page<br>• Integrate frontend with backend APIs<br>• Implement responsive design |
 | 4     | **Public Page & Deployment**<br>• Build public-facing social links page with unique URLs<br>• Implement copy/share URL functionality<br>• Conduct end-to-end testing and bug fixes<br>• Deploy backend to cloud platform (Heroku/Railway/AWS)<br>• Deploy frontend (Vercel/Netlify)<br>• Final documentation and project presentation preparation |
