@@ -59,11 +59,16 @@
             </p>
           </button>
       </div>
-
+      
+      <ReportWindow
+        :show="showReport"
+        @close="showReport = false"
+        @submit="handleSubmitReport"
+      />  
       <!-- Footer -->
       <div class="px-4 md:px-6 pb-4 md:pb-6 flex items-center justify-between">
         <!-- Report User -->
-        <div class="flex items-center gap-x-2">
+        <div @click="showReport = true" class="flex items-center gap-x-2">
           <svg class="w-5 h-5 md:w-6 md:h-6" :class="textColorClass" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
           </svg>
@@ -72,10 +77,6 @@
         <!-- Social Links Page Generator -->
         <div class="flex items-center gap-x-2">
           <img src="../assets/icons/icon.svg" alt="SOCIAL LINKS PAGE GENERATOR Logo" class="w-16 h-16 md:w-20 md:h-20">
-          <div class="flex flex-col">
-            <p class="text-xs md:text-sm font-bold leading-tight" :class="textColorClass">SOCIAL LINKS</p>
-            <p class="text-xs leading-tight" :class="textColorClass">PAGE GENERATOR</p>
-          </div>
         </div>
       </div>
     </div>
@@ -86,8 +87,20 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import facebookIcon from '../assets/icons/facebook.svg'
+import ReportWindow from '../components/reports/reportWindow.vue'
 
 const router = useRouter()
+const showReport = ref(false);
+
+const handleSubmitReport = (payload: {
+  title: string;
+  description: string;
+  type: string;
+}) => {
+  console.log("Report payload:", payload);
+  // call backend here
+  showReport.value = false;
+};
 
 interface SocialLink {
   title: string
