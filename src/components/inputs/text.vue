@@ -1,6 +1,6 @@
     
 <script setup lang="ts">
-    
+
   import { defineProps,ref } from "vue";
   const focus = ref(false);
   const props = defineProps({
@@ -39,7 +39,7 @@
       {{ description }}
     </p>
     <input
-      type="{{ type }}"
+      :type="type"
       :id="label"
       :placeholder="placeholder"
       v-model="modelValue"
