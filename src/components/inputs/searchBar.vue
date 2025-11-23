@@ -28,12 +28,6 @@ const onKeyup = (event: KeyboardEvent) => {
   <div
     class="w-full bg-[#f4f4f4] rounded-full px-4 py-3 flex items-center shadow-sm"
   >
-    <!-- Search icon -->
-    <div class="mr-3 flex items-center justify-center">
-      <!-- simple magnifier icon -->
-      <img src="/src/assets/icons/search.svg" alt="Search Icon" class="w-6 h-auto" />
-    </div>
-
     <!-- Input -->
     <input
       type="text"
@@ -45,5 +39,14 @@ const onKeyup = (event: KeyboardEvent) => {
       @focus="emit('focus')"
       @blur="emit('blur')"
     />
+    
+    <!-- Search Button -->
+    <button
+      @click="emit('search', props.modelValue)"
+      class="ml-2 px-4 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold hover:bg-[#0094ff]/90 transition-colors"
+      type="button"
+    >
+      Search
+    </button>
   </div>
 </template>

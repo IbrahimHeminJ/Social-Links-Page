@@ -19,25 +19,9 @@ router.beforeEach((to, _from, next) => {
   // Sync auth state from localStorage before checking (ensures state is up-to-date)
   authStore.syncAuthState();
 
-  // Debug: Log auth state
-  console.log('Router guard - Auth check:', {
-    route: to.name,
-    isAuthenticated: authStore.isAuthenticated,
-    hasToken: !!authStore.token,
-    hasUser: !!authStore.user,
-    user: authStore.user,
-    userRole: authStore.userRole,
-    isAdmin: authStore.isAdmin,
-    isSuperAdmin: authStore.isSuperAdmin,
-    requiresAuth: to.meta.requiresAuth,
-    requiresAdmin: to.meta.requiresAdmin,
-    requiresSuperAdmin: to.meta.requiresSuperAdmin
-  });
-
   // Check if route requires authentication
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      console.log('Not authenticated, redirecting to login');
       // Not authenticated, redirect to login
       next({ name: 'login', query: { redirect: to.fullPath } });
       return;
@@ -45,7 +29,6 @@ router.beforeEach((to, _from, next) => {
 
     // Check if route requires admin role
     if (to.meta.requiresAdmin && !authStore.isAdmin) {
-      console.log('User is not admin. User role:', authStore.userRole, 'User object:', authStore.user);
       // Not admin, redirect to home or show error
       next({ name: 'home' });
       return;

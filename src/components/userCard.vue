@@ -21,7 +21,7 @@ const goToProfile = () => {
 
 <template>
   <article
-    class="min-w-[175px] max-w-[240px] bg-[#f7f7f7] border border-[#0094ff] rounded-3xl
+    class="w-[175px] bg-[#f7f7f7] border border-[#0094ff] rounded-3xl
            flex flex-col items-center text-center py-6 px-4 shadow-sm"
   >
     <img
@@ -30,11 +30,11 @@ const goToProfile = () => {
       class="w-24 h-24 rounded-full object-cover mb-4"
     />
 
-    <h3 class="text-lg font-semibold mb-1">
+    <h3 class="text-lg font-semibold mb-1 w-full break-words">
       {{ name }}
     </h3>
 
-    <p class="text-sm text-gray-700 mb-4">
+    <p class="text-sm text-gray-700 mb-4 w-full break-words">
       {{ role }}
     </p>
 

@@ -12,8 +12,8 @@ const AdminRoutes: RouteRecordRaw[] = [
         component: Links,
         meta: {
             title: 'Admin Dashboard',
-            requiresAuth: true,
-            requiresAdmin: true,
+            //requiresAuth: true,
+            //requiresAdmin: true,
         },
     },
     {

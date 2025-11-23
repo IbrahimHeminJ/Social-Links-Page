@@ -4,6 +4,7 @@ import Login from '../../views/auth/login.vue'
 import Signup from '../../views/auth/signup.vue'
 import SocialLinks from '../../views/SocialLinks.vue'
 import ExplorePage from '../../views/ExplorePage.vue'
+import AllUsers from '../../views/AllUsers.vue'
 
 const guestRoutes: RouteRecordRaw[] = [
     {
@@ -44,6 +45,15 @@ const guestRoutes: RouteRecordRaw[] = [
         component: ExplorePage,
         meta: {
             title: 'Explore',
+            requiresAuth: false,
+        },
+    },
+    {
+        path: '/explore/all-users',
+        name: 'allUsers',
+        component: AllUsers,
+        meta: {
+            title: 'All Users',
             requiresAuth: false,
         },
     }
