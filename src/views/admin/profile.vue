@@ -4,7 +4,8 @@ import defaultProfile from '../../assets/images/4.jpg';
 import Text from '../../components/inputs/text.vue';
 import TextHeading from '../../components/textHeading.vue';
 import Submit from '../../components/buttons/submit.vue';
-import AuthService from '../../services/authService.ts';
+import AuthService from '../../services/authService';
+import api from '../../services/api';
 
 const user = ref(AuthService.getStoredUser())
 const profileData = reactive({
@@ -12,13 +13,11 @@ const profileData = reactive({
     name: user.value?.name || '',
     email: user.value?.email || '',
     phoneNumber: user.value?.phone || '',
+    tags: user.value?.tag || '',
 });
 
-const handleSave = () => {
-    // Logic to save profile changes
-    console.log('Profile data saved:', profileData);
-};
 const profileImage = ref(defaultProfile);
+const selectedImageFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const handleEditClick = () => {
@@ -30,13 +29,42 @@ const handleImageChange = (event: Event) => {
     const file = target.files?.[0];
     
     if (file && file.type.startsWith('image/')) {
+        selectedImageFile.value = file;
         const reader = new FileReader();
         reader.onload = (e) => {
             profileImage.value = e.target?.result as string;
         };
         reader.readAsDataURL(file);
     } else {
-        profileImage.value = '../../assets/images/4.jpg';
+        selectedImageFile.value = null;
+        profileImage.value = defaultProfile;
+    }
+};
+
+const handleSave = async () => {
+    const formData = new FormData();
+    formData.append('name', profileData.name);
+    formData.append('username', profileData.username);
+    formData.append('email', profileData.email);
+    formData.append('phone_no', profileData.phoneNumber);
+    formData.append('tags', profileData.tags);
+
+    if (selectedImageFile.value) {
+        formData.append('profile_image', selectedImageFile.value);
+    }
+
+    try {
+        const { data } = await api.post('/user/update', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+
+        if (data?.data?.user) {
+            localStorage.setItem('user', JSON.stringify(data.data.user));
+        }
+
+        console.log('Profile updated:', data);
+    } catch (error) {
+        console.error('Failed to update profile:', error);
     }
 };
 </script>
