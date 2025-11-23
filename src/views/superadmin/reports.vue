@@ -11,15 +11,12 @@
     </div>
     
     <div class="space-y-4">
-      <div 
+      <ReportBox 
         v-for="(report, index) in reports" 
         :key="index"
-        @click="viewReport(index)"
-        class="bg-gray-100 border border-blue-200 rounded-lg p-4 cursor-pointer hover:bg-gray-200 transition-colors"
-      >
-        <h3 class="text-lg font-bold text-gray-900 mb-2">{{ report.title }}</h3>
-        <p class="text-sm text-gray-700">{{ report.description }}</p>
-      </div>
+        :report="report"
+        @click="viewReport"
+      />
     </div>
   </div>
 </template>
@@ -27,6 +24,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import ReportBox from '../../components/reports/reportBox.vue'
 
 const router = useRouter()
 
@@ -55,8 +53,7 @@ const reports = ref<Report[]>([
   }
 ])
 
-const viewReport = (index: number) => {
-  const report = reports.value[index]
+const viewReport = (report: Report) => {
   router.push({ name: 'superAdmin.reportDetail', params: { id: report.id } })
 }
 

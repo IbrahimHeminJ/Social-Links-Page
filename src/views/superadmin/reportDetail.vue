@@ -56,12 +56,12 @@
       </div>
 
       <!-- Action -->
-      <div>
-        <label class="block text-sm font-medium text-gray-900 mb-2">Action</label>
-        <div class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900">
-          {{ getActionLabel(reportData.action) }}
-        </div>
-      </div>
+      <Select
+        v-model="reportData.action"
+        label="Action"
+        placeholder="Select an action"
+        :options="actionOptions"
+      />
 
       <!-- Reason for action -->
         <Text label="Reason for action" v-model="reportData.reason" type="text" placeholder="Enter reason for action" />
@@ -69,12 +69,6 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-center gap-4 pt-4">
-        <button
-          @click="viewReportHistory"
-          class="px-6 py-3 bg-gray-600 text-white font-bold rounded hover:bg-gray-700 transition-colors"
-        >
-          Report History
-        </button>
         <button
           @click="handleResolve"
           class="px-8 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors"
@@ -90,6 +84,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Text from '../../components/inputs/text.vue'
+import Select from '../../components/inputs/select.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -115,6 +110,11 @@ const reportData = ref<ReportData>({
   action: 'delete-user',
   reason: ''
 })
+
+const actionOptions = [
+  { label: 'Delete user', value: 'delete-user' },
+  { label: 'Normal', value: 'normal' }
+]
 
 // Load report data (in real app, fetch from API using route.params.id)
 onMounted(() => {

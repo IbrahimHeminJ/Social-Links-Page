@@ -14,30 +14,23 @@
     </div>
     
     <div class="space-y-4">
-      <div 
+      <ReportBox 
         v-for="(report, index) in reportHistory" 
         :key="index"
-        @click="viewReport(report.id)"
-        class="bg-gray-100 border border-blue-200 rounded-lg p-4 cursor-pointer hover:bg-gray-200 transition-colors"
-      >
-        <h3 class="text-lg font-bold text-gray-900 mb-2">{{ report.title }}</h3>
-        <p class="text-sm text-gray-700 mb-2">{{ report.description }}</p>
-        <div class="flex items-center gap-4 text-xs text-gray-500">
-          <span>Reported by: {{ report.reporterEmail }}</span>
-          <span>•</span>
-          <span>{{ formatDate(report.createdAt) }}</span>
-        </div>
-      </div>
+        :report="report"
+        @click="viewReport"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+import ReportBox from '../../components/reports/reportBox.vue'
 
 const router = useRouter()
-const route = useRoute()
+// const route = useRoute() // Will be used when API is implemented to fetch report history by ID
 
 interface ReportHistoryItem {
   id: number
@@ -51,8 +44,8 @@ const reportHistory = ref<ReportHistoryItem[]>([])
 
 // Load report history (in real app, fetch from API using route.params.id)
 onMounted(() => {
-  const reportId = route.params.id
-  // TODO: Fetch report history from API
+  // const reportId = route.params.id // Will be used when API is implemented
+  // TODO: Fetch report history from API using route.params.id
   // For now, using sample data
   reportHistory.value = [
     {
@@ -86,19 +79,8 @@ onMounted(() => {
   ]
 })
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const viewReport = (reportId: number) => {
-  router.push({ name: 'superAdmin.reportDetail', params: { id: reportId } })
+const viewReport = (report: { id: number }) => {
+  router.push({ name: 'superAdmin.reportDetail', params: { id: report.id } })
 }
 
 const goBack = () => {
