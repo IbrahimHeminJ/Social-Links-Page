@@ -14,11 +14,6 @@ const props = defineProps<Props>();
 
 const searchQuery = ref("");
 
-const handleSearch = () => {
-  // Handle search functionality
-  console.log("Searching for:", searchQuery.value);
-};
-
 const handleMenuClick = () => {
   // Only toggle on mobile screens
   if (window.innerWidth < 768) {

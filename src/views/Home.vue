@@ -153,7 +153,7 @@ const numberOfUsers = ref(getNumberOfUsers());
         </p>
       </div>
     </section>
-
+    
     <!-- Features -->
     <section class="mt-12 md:mt-16">
       <h2 class="font-bold text-lg text-center mb-6">Features we provide</h2>

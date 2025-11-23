@@ -22,8 +22,8 @@ const AdminRoutes: RouteRecordRaw[] = [
         component: Profile,
         meta: {
             title: 'Admin Dashboard',
-            // requiresAuth: true,
-            // requiresAdmin: true,
+            requiresAuth: true,
+            requiresAdmin: true,
         },
     },
     {
@@ -32,8 +32,8 @@ const AdminRoutes: RouteRecordRaw[] = [
         component: About,
         meta: {
             title: 'Admin Dashboard',
-            // requiresAuth: true,
-            // requiresAdmin: true,
+            requiresAuth: true,
+            requiresAdmin: true,
         },
     },
     {
@@ -42,8 +42,8 @@ const AdminRoutes: RouteRecordRaw[] = [
         component: Policies,
         meta: {
             title: 'Admin Dashboard',
-            // requiresAuth: true,
-            // requiresAdmin: true,
+            requiresAuth: true,
+            requiresAdmin: true,
         },
     },
     {
@@ -52,8 +52,8 @@ const AdminRoutes: RouteRecordRaw[] = [
         component: Themes,
         meta: {
             title: 'Admin Dashboard',
-            // requiresAuth: true,
-            // requiresAdmin: true,
+            requiresAuth: true,
+            requiresAdmin: true,
         },
     },
     

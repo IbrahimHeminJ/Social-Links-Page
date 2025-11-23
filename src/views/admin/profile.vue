@@ -4,12 +4,14 @@ import defaultProfile from '../../assets/images/4.jpg';
 import Text from '../../components/inputs/text.vue';
 import TextHeading from '../../components/textHeading.vue';
 import Submit from '../../components/buttons/submit.vue';
+import AuthService from '../../services/authService.ts';
 
+const user = ref(AuthService.getStoredUser())
 const profileData = reactive({
-    username: '',
-    name: '',
-    email: '',
-    phoneNumber: '',
+    username: user.value?.username || '',
+    name: user.value?.name || '',
+    email: user.value?.email || '',
+    phoneNumber: user.value?.phone || '',
 });
 
 const handleSave = () => {
