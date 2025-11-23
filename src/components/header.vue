@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+import SearchBar from "./inputs/searchBar.vue";
 
 interface Props {
   toggleSidebar?: () => void;
 }
-
+const router = useRouter();
+const goToExplore = () => {
+  router.push({ name: 'explore' });
+};
 const props = defineProps<Props>();
 
 const searchQuery = ref("");
@@ -45,22 +50,13 @@ const handleMenuClick = () => {
           class="size-[19px]"
         />
       </div>
-      <div class="relative max-md:hidden">
-        <span class="absolute left-5 top-1/2 transform -translate-y-1/2">
-          <img
-            src="../assets/icons/search.svg"
-            alt="search"
-            class="size-[21px]"
-          />
-        </span>
-        <input
-          v-model="searchQuery"
-          @keyup.enter="handleSearch"
-          type="text"
-          placeholder="Explore Community"
-          class="bg-gray-100 text-gray-900 placeholder-gray-500 pl-13 pr-4 text-2xl rounded-[60px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 w-[388px] h-16"
-        />
-      </div>
+      
+        <SearchBar
+        v-model="searchQuery"
+        placeholder="Explore Community"
+        class="w-full md:max-w-md mt-3"
+        @click="goToExplore" />
+git
       <img
         src="../assets/icons/moon.svg"
         alt="logo"

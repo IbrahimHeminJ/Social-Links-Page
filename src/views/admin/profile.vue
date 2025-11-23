@@ -72,6 +72,8 @@ const handleImageChange = (event: Event) => {
             </div>
             
         </div>
-        <submit text="Save Changes" @click="handleSave"/>
+        <div class="w-[150px] mx-auto">
+            <Submit text="Save Changes" @click="handleSave"/>
+        </div>
     </form>
 </template>

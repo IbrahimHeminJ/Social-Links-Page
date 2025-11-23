@@ -130,6 +130,7 @@ const numberOfUsers = ref(getNumberOfUsers());
       </div>
     </section>
 
+
     <!-- About us -->
     <section class="mt-12 md:mt-16 text-center">
       <h2 class="font-bold text-lg mb-4">About us</h2>
