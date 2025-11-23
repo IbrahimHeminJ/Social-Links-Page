@@ -116,6 +116,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../store/auth';
 import Text from '../../components/inputs/text.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 
@@ -127,9 +128,9 @@ const phoneNumber = ref('')
 const selectedTag = ref('')
 const profileImage = ref('')
 
-
-const fileInput = ref(null)
+const fileInput = ref<HTMLInputElement | null>(null)
 const router = useRouter()
+const authStore = useAuthStore()
 
 const goToLogin = () => {
   router.push({ name: 'login' })
@@ -139,18 +140,67 @@ const triggerFileUpload = () => {
   fileInput.value?.click()
 }
 
-const handleFileUpload = (event) => {
-  const file = event.target.files[0]
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
   if (file) {
     const reader = new FileReader()
     reader.onload = (e) => {
-      profileImage.value = e.target.result
+      profileImage.value = e.target?.result as string
     }
     reader.readAsDataURL(file)
   }
 }
 
-const handleSignup = () => {
-  console.log('Signup clicked')
+const handleSignup = async () => {
+  // Clear any previous errors
+  authStore.clearError()
+
+  // Trim whitespace from all fields
+  const trimmedUsername = username.value.trim()
+  const trimmedEmail = email.value.trim()
+  const trimmedPassword = password.value.trim()
+  const trimmedName = name.value.trim()
+
+  // Validate required fields
+  if (!trimmedUsername || !trimmedEmail || !trimmedPassword || !trimmedName) {
+    alert('Please fill in all required fields')
+    return
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(trimmedEmail)) {
+    alert('Please enter a valid email address')
+    return
+  }
+
+  // Debug: Log the data being sent
+  console.log('Signup data:', {
+    username: trimmedUsername,
+    email: trimmedEmail,
+    password: trimmedPassword ? '***' : '',
+    name: trimmedName,
+    phone: phoneNumber.value || undefined,
+    tag: selectedTag.value || undefined,
+  })
+
+  // Call signup action
+  const result = await authStore.signup({
+    username: trimmedUsername,
+    email: trimmedEmail,
+    password: trimmedPassword,
+    name: trimmedName,
+    phone: phoneNumber.value?.trim() || undefined,
+    tag: selectedTag.value || undefined,
+  })
+
+  if (result.success) {
+    // Signup successful, redirect to home
+    router.push({ name: 'home' })
+  } else {
+    // Signup failed, show error
+    alert(result.error || 'Signup failed')
+  }
 }
 </script>

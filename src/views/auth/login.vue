@@ -1,24 +1,62 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../../store/auth'
 import Text from '../../components/inputs/text.vue';
 import Submit from '../../components/buttons/submit.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 
 const router = useRouter()
+const authStore = useAuthStore()
 
-  const loginData = ref({
-    username: '',
-    password: ''
+const loginData = ref({
+  username: '',
+  password: ''
+})
+
+const goToSignup = () => {
+  router.push({ name: 'signup' })
+}
+
+const handleLogin = async () => {
+  // Clear any previous errors
+  authStore.clearError()
+
+  // Trim whitespace
+  const trimmedUsername = loginData.value.username.trim()
+  const trimmedPassword = loginData.value.password.trim()
+
+  // Validate inputs
+  if (!trimmedUsername || !trimmedPassword) {
+    alert('Please fill in all fields')
+    return
+  }
+
+  // Prepare login data - backend accepts userCredential (can be email or username)
+  const loginPayload = {
+    userCredential: trimmedUsername,
+    password: trimmedPassword
+  }
+
+  // Debug: Log what's being sent
+  console.log('Login data being sent:', {
+    userCredential: trimmedUsername,
+    password: '***'
   })
-  const goToSignup = () => {
-    router.push({ name: 'signup' })
+
+  // Call login action
+  const result = await authStore.login(loginPayload)
+
+  if (result.success) {
+    // Login successful, redirect to home
+    router.push({ name: 'home' })
+  } else {
+    // Login failed, show error
+    // Error is already stored in authStore.error
+    // You can display it using an alert or toast component
+    alert(result.error || 'Login failed')
   }
-  
-  const handleLogin = () => {
-    console.log(loginData.value)
-    console.log('Login clicked')
-  }
+}
 
 </script>
 <template>
@@ -37,7 +75,7 @@ const router = useRouter()
     <div class="w-full max-w-md">
 
       <!-- Username/Email Field -->
-      <Text v-model="loginData.username" label="Username or Email" placeholder="Enter your username" type="text" class="mb-6" />
+      <Text v-model="loginData.username" label="Username or Email" placeholder="Enter your username or email" type="text" class="mb-6" />
 
       <!-- Password Field -->
       <Text v-model="loginData.password" label="Password" placeholder="Enter your password" type="password" class="mb-6" />
