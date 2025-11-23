@@ -15,7 +15,7 @@ const AdminRoutes: RouteRecordRaw[] = [
             requiresAuth: true,
             requiresAdmin: true,
         },
-    },g
+    },
     {
         path: '/admin/profile',
         name: 'admin.profile',
