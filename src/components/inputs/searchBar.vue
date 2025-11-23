@@ -8,6 +8,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'search', value: string): void
+  (e: 'focus'): void
+  (e: 'blur'): void
 }>();
 
 const onInput = (event: Event) => {
@@ -40,6 +42,8 @@ const onKeyup = (event: KeyboardEvent) => {
       :value="modelValue"
       @input="onInput"
       @keyup="onKeyup"
+      @focus="emit('focus')"
+      @blur="emit('blur')"
     />
   </div>
 </template>

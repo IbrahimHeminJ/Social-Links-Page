@@ -2,13 +2,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Icon from '../assets/icons/icon.svg';
-import SearchBar from '../components/inputs/searchBar.vue';
+
 
 const router = useRouter();
 const route = useRoute();
 
-const searchQuery = ref((route.query.q as string) ?? '');
 
 const goToSearch = () => {
   router.push({ name: 'explore-search' });
@@ -86,10 +84,7 @@ const categories = [
   },
 ];
 
-const handleSearch = (value: string) => {
-  // later: call backend / filter categories
-  console.log('Explore search:', value);
-};
+
 
 const goToProfile = (user: (typeof categories)[number]['users'][number]) => {
   router.push({
@@ -101,24 +96,10 @@ const goToProfile = (user: (typeof categories)[number]['users'][number]) => {
 </script>
 
 <template>
-  <main
-    class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10"
-  >
-    <!-- Top logo bar -->
-    <header class="pt-6 pb-4 border-b border-gray-200 flex items-center">
-      <img :src="Icon" alt="Social Links Logo" class="w-25 h-auto" />
-    </header>
+    <section class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10">
 
-    <!-- Search -->
-    <section class="mt-6">
-      <SearchBar
-        v-model="searchQuery"
-        placeholder="Explore Community"
-        @click="goToSearch"
-      />
+    <p class="mt-6 text-lg font-medium">or explore here</p>
 
-      <p class="mt-6 text-lg font-medium">or explore here</p>
-    </section>
 
     <!-- Categories -->
     <section class="mt-6 space-y-10">
@@ -159,5 +140,5 @@ const goToProfile = (user: (typeof categories)[number]['users'][number]) => {
         </div>
       </div>
     </section>
-  </main>
+  </section>
 </template>
