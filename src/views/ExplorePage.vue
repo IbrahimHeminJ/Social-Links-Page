@@ -7,6 +7,7 @@ import ExploreCategories from '../views/ExploreCategories.vue';
 import SearchTags from './SearchTags.vue';
 
 const route = useRoute();
+const router = useRouter();
 const searchQuery = ref((route.query.q as string) ?? '');
 const searchMode = ref(false);
 
@@ -14,14 +15,17 @@ const handleSearch = (value: string) => {
   // later: call backend / filter categories
   console.log('Explore search:', value);
 };
+const goToHome = () => {
+  router.push({ name: 'home' });
+};
 
 
 </script>
 <template>
   <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10">
     <!-- Top logo bar -->
-    <header class="pt-6 pb-4 border-b border-gray-200 flex items-center">
-      <img :src="Icon" alt="Social Links Logo" class="w-25 h-auto" />
+    <header class="pt-6 pb-4 border-b border-gray-200 flex items-center" >
+      <img :src="Icon" alt="Social Links Logo" class="w-25 h-auto" @click="goToHome"/>
     </header>
 
     <!-- Search -->

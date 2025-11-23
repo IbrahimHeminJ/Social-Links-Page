@@ -7,6 +7,7 @@ import Hyperlink from '../../components/buttons/hyperlink.vue';
 
 const router = useRouter()
 
+
   const loginData = ref({
     username: '',
     password: ''
@@ -42,7 +43,6 @@ const router = useRouter()
       <!-- Password Field -->
       <Text v-model="loginData.password" label="Password" placeholder="Enter your password" type="password" class="mb-6" />
   
-
       <!-- Login Button -->
       <Submit text="Login" @click="handleLogin" class="h-[50px] mb-6" />
 
