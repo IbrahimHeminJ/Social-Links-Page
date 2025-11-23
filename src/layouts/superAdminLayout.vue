@@ -28,7 +28,7 @@ const toggleSidebar = () => {
       <AdminSidebar v-if="!isAuthenticated && isSidebarOpen" class="md:hidden" />
     </Transition>
 
-    <div class="md:ml-[263px] flex flex-col w-full">
+    <div class="md:ml-[263px] flex flex-col w-full overflow-hidden">
       <Header :toggleSidebar="toggleSidebar" />
       <main class="min-h-[calc(100vh-120px)]">
         <router-view />

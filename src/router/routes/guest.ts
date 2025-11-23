@@ -31,7 +31,7 @@ const guestRoutes: RouteRecordRaw[] = [
         },
     },
     {
-        path: '/social-links',
+        path: '/social-links/:id',
         name: 'social-links',
         component: SocialLinks,
         meta: {

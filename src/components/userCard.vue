@@ -21,8 +21,10 @@ const goToProfile = () => {
 
 <template>
   <article
+    @click="goToProfile"
     class="w-[175px] bg-[#f7f7f7] border border-[#0094ff] rounded-3xl
-           flex flex-col items-center text-center py-6 px-4 shadow-sm"
+           flex flex-col items-center text-center py-6 px-4 shadow-sm cursor-pointer
+           hover:shadow-md transition-shadow"
   >
     <img
       :src="avatar"

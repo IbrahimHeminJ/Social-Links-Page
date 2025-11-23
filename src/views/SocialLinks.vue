@@ -21,31 +21,50 @@
       <!-- Profile Section -->
       <div class="px-4 md:px-6 pb-4 flex flex-col items-center">
         <img 
-          src="../../assets/images/man.png" 
+          :src="userProfileImage || '../../assets/images/man.png'" 
           alt="Profile" 
           class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2 object-cover"
           :class="profileBorderClass"
         >
-        <h2 class="text-xl md:text-2xl font-bold mb-2" :class="textColorClass">Zheer Salam</h2>
+        <h2 class="text-xl md:text-2xl font-bold mb-2" :class="textColorClass">{{ userName || `User ID: ${userId}` }}</h2>
         <p class="text-sm md:text-base text-center" :class="subtitleColorClass">
-          Friend of Suhaeb Fazil and Ibrahim Hemin
+          {{ userDescription || 'No description available' }}
         </p>
       </div>
 
       <!-- Social Links Section -->
       <div class="px-4 md:px-6 pb-6 space-y-3">
-        <button
+        <!-- Loading state -->
+        <div v-if="isLoading" class="text-center py-8">
+          <p :class="textColorClass">Loading links...</p>
+        </div>
+
+        <!-- Error state -->
+        <div v-else-if="error" class="text-center py-8">
+          <p class="text-red-500">{{ error }}</p>
+        </div>
+
+        <!-- No links -->
+        <div v-else-if="socialLinks.length === 0" class="text-center py-8">
+          <p :class="textColorClass">No links available</p>
+        </div>
+
+        <!-- Links -->
+        <a
+          v-else
           v-for="(link, index) in socialLinks"
           :key="index"
-          @click="handleLinkClick(link.link)"
-          class="w-full p-3 md:p-4 shadow-lg transition-all duration-200 hover:scale-105 border-2"
-          style="border-radius: 15px;"
+          :href="link.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="w-full p-3 md:p-4 shadow-lg transition-all duration-200 hover:scale-105 border-2 block cursor-pointer"
+          style="border-radius: 15px; text-decoration: none;"
           :class="[getButtonClasses(), getButtonBorderClass()]"
         >
             <!-- First Row: Icon and Title -->
             <div class="flex items-center gap-x-3 mb-1">
               <img 
-                :src="getIconPath()" 
+                :src="getIconPath(link.icon)" 
                 :alt="link.platform" 
                 class="w-6 h-6 md:w-8 md:h-8"
               >
@@ -57,7 +76,7 @@
             <p class="text-xs md:text-sm mt-1 flex flex-row items-start" :class="getButtonSubtextClass()">
               {{ link.description }}
             </p>
-          </button>
+          </a>
       </div>
       
       <ReportWindow
@@ -84,13 +103,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import facebookIcon from '../assets/icons/facebook.svg'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import ReportWindow from '../components/reports/reportWindow.vue'
 
+// Import all available icons statically for Vite
+import facebookIcon from '../assets/icons/facebook.svg'
+import linkedinIcon from '../assets/icons/linkedin.svg'
+import youtubeIcon from '../assets/icons/youtube.svg'
+import twitterIcon from '../assets/icons/twitter.svg'
+import instagramIcon from '../assets/icons/instagram.svg'
+import githubIcon from '../assets/icons/github.svg'
+import discordIcon from '../assets/icons/discord.svg'
+import api from '../services/api'
+
 const router = useRouter()
+const route = useRoute()
 const showReport = ref(false);
+
+// Get user ID from route params
+const userId = computed(() => route.params.id as string || '')
+
+// Loading and error states
+const isLoading = ref(false)
+const error = ref<string | null>(null)
+
+// User profile data
+const userName = ref<string>('')
+const userDescription = ref<string>('')
+const userProfileImage = ref<string>('')
 
 const handleSubmitReport = (payload: {
   title: string;
@@ -107,38 +148,154 @@ interface SocialLink {
   description: string
   link: string
   platform: string
+  icon: string
 }
 
 // Theme variable: 1 = Facebook, 2 = LinkedIn, 3 = YouTube, 4 = Graphic Designer
-// This will come from DB in the future, for now it's manual
-const themeNumber = ref(3) // Default theme (1 = Facebook)
+// This comes from the API
+const themeNumber = ref(1) // Will be replaced with theme ID from API
 
-const socialLinks = ref<SocialLink[]>([
-  {
-    title: 'Facebook',
-    description: 'This is a preset theme for Facebook lovers',
-    link: 'https://facebook.com',
-    platform: 'facebook'
-  },
-  {
-    title: 'Youtube',
-    description: 'This is a preset theme for Facebook lovers',
-    link: 'https://youtube.com',
-    platform: 'youtube'
-  },
-  {
-    title: 'Facebook',
-    description: 'This is a preset theme for Facebook lovers',
-    link: 'https://facebook.com',
-    platform: 'facebook'
-  },
-  {
-    title: 'Facebook',
-    description: 'This is a preset theme for Facebook lovers',
-    link: 'https://facebook.com',
-    platform: 'facebook'
+const socialLinks = ref<SocialLink[]>([])
+
+// Fetch user info to get theme ID
+const fetchUserInfo = async () => {
+  if (!userId.value) {
+    console.log('No user ID provided')
+    return
   }
-])
+
+  try {
+    // Fetch user by ID directly
+    console.log('Fetching user info for ID:', userId.value)
+    const userResponse = await api.get(`/users/${userId.value}`)
+    
+    console.log('========== USER API RESPONSE ==========')
+    console.log('Full response:', userResponse)
+    console.log('Response data:', userResponse.data)
+    console.log('========================================')
+    
+    // Parse response structure: { message, data: { id, name, ..., theme: { id, theme_id, theme_type } } }
+    const userData = userResponse.data?.data || {}
+    
+    console.log('========== USER DATA ==========')
+    console.log('User data object:', userData)
+    console.log('Theme object:', userData.theme)
+    if (userData.theme) {
+      console.log('Theme.theme_id:', userData.theme.theme_id)
+    }
+    console.log('===============================')
+    
+    // Get theme_id from theme object
+    const themeId = userData.theme?.theme_id
+    console.log('Extracted Theme ID (theme_id):', themeId)
+    
+    if (themeId !== undefined && themeId !== null) {
+      themeNumber.value = parseInt(themeId)
+      console.log('✅ Theme number set to:', themeNumber.value)
+    } else {
+      console.log('❌ No theme_id found in API response')
+      themeNumber.value = 1 // Default to theme 1
+    }
+  } catch (err: any) {
+    console.error('❌ Error fetching user info for theme:', err)
+    console.error('Error response:', err.response)
+    console.error('Error data:', err.response?.data)
+    themeNumber.value = 1 // Default to theme 1 on error
+  }
+}
+
+// Fetch user's button links from API (includes user info in response)
+const fetchUserLinks = async () => {
+  if (!userId.value) {
+    error.value = 'User ID is required'
+    return
+  }
+
+  try {
+    isLoading.value = true
+    error.value = null
+
+    const response = await api.get(`/user/${userId.value}/button-links`)
+    
+    console.log('Button Links API Response:', response.data)
+    
+    // Parse API response structure
+    const linksData = response.data.data || []
+    
+    if (linksData.length > 0) {
+      // Extract user info from first item (all items have same user)
+      const firstItem = linksData[0]
+      const userData = firstItem.relationship?.user?.data || {}
+      
+      userName.value = userData.name || ''
+      userDescription.value = userData.description || userData.subtitle || ''
+      userProfileImage.value = userData.profile_image || '../../assets/images/man.png'
+      
+      console.log('User info:', { 
+        userName: userName.value, 
+        userDescription: userDescription.value,
+        userProfileImage: userProfileImage.value,
+        themeNumber: themeNumber.value
+      })
+      
+      // Map buttons from relationship.button_link
+      // Sort by order field
+      const sortedLinks = [...linksData].sort((a, b) => (a.order || 0) - (b.order || 0))
+      
+      socialLinks.value = sortedLinks
+        .filter((item: any) => item.relationship?.button_link?.is_visible === 1) // Only show visible buttons
+        .map((item: any) => {
+          const buttonLink = item.relationship.button_link || {}
+          return {
+            title: buttonLink.title || '',
+            description: buttonLink.description || '',
+            link: buttonLink.link || '#',
+            platform: buttonLink.icon || 'default',
+            icon: buttonLink.icon || 'default'
+          }
+        })
+      
+      console.log('Mapped social links:', socialLinks.value)
+    } else {
+      // No links found, but try to get user info if available
+      userName.value = ''
+      userDescription.value = ''
+      userProfileImage.value = '../../assets/images/man.png'
+      socialLinks.value = []
+    }
+  } catch (err: any) {
+    console.error('Error fetching user links:', err)
+    error.value = err.response?.data?.message || 'Failed to fetch user links'
+    socialLinks.value = []
+    userName.value = ''
+    userDescription.value = ''
+    userProfileImage.value = '../../assets/images/man.png'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Fetch user data - fetch user info first to get theme, then fetch button links
+const fetchUserData = async () => {
+  // Fetch user info first to get theme
+  await fetchUserInfo()
+  // Then fetch button links
+  await fetchUserLinks()
+}
+
+// Fetch user data when component mounts or route changes
+onMounted(() => {
+  if (userId.value) {
+    fetchUserData()
+  }
+})
+
+// Watch for route changes (user ID changes)
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    fetchUserData()
+  }
+})
 
 const themeClasses = computed(() => {
   switch (themeNumber.value) {
@@ -225,13 +382,35 @@ const getButtonSubtextClass = () => {
   return 'text-white/90'
 }
 
-const getIconPath = () => {
-  // For testing: use facebook.svg for all links
-  return facebookIcon
+// Icon map for static imports (Vite requires static imports)
+const iconMap: Record<string, string> = {
+  facebook: facebookIcon,
+  linkedin: linkedinIcon,
+  youtube: youtubeIcon,
+  twitter: twitterIcon,
+  instagram: instagramIcon,
+  github: githubIcon,
+  discord: discordIcon,
+  // Add more icons here as they become available
+  // soundcloud: soundcloudIcon,
+  // snapchat: snapchatIcon,
 }
 
-const handleLinkClick = (url: string) => {
-  window.open(url, '_blank')
+const getIconPath = (iconName?: string) => {
+  if (!iconName) {
+    return facebookIcon // Default icon
+  }
+  
+  // Convert icon name to lowercase and trim whitespace
+  let normalizedIcon = iconName.toLowerCase().trim()
+  
+  // Remove .svg extension if already present
+  if (normalizedIcon.endsWith('.svg')) {
+    normalizedIcon = normalizedIcon.replace(/\.svg$/, '')
+  }
+  
+  // Return icon from map or default to facebook
+  return iconMap[normalizedIcon] || facebookIcon
 }
 
 const goToHome = () => {
