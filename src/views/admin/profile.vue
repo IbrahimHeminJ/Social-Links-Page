@@ -12,6 +12,10 @@ const profileData = reactive({
     phoneNumber: '',
 });
 
+const handleSave = () => {
+    // Logic to save profile changes
+    console.log('Profile data saved:', profileData);
+};
 const profileImage = ref(defaultProfile);
 const fileInput = ref<HTMLInputElement | null>(null);
 
@@ -68,6 +72,6 @@ const handleImageChange = (event: Event) => {
             </div>
             
         </div>
-        <submit>Save Changes</submit>
+        <submit text="Save Changes" @click="handleSave"/>
     </form>
 </template>
