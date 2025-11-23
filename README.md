@@ -293,7 +293,7 @@ flowchart LR
 flowchart LR
     R1[User Submits a Report] --> R2[Save into Reports Table]
     R2 --> R3[Admin Review]
-    R3 --> R4[Update Status (RESOLVED / REJECTED) + ReasonOfAction]
+    R3 --> R4["Update Status (RESOLVED / REJECTED) + ReasonOfAction"]
 
 ```
 
