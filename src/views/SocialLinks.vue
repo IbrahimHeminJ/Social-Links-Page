@@ -1,37 +1,28 @@
 <template>
-  <div 
-    class="min-h-screen w-full flex items-center justify-center p-4 md:p-6"
-    :class="themeClasses"
-  >
+  <div class="min-h-screen w-full flex items-center justify-center p-4 md:p-6" :class="themeClasses">
     <div class="w-full max-w-md relative">
       <!-- Language Switcher - Top Right -->
       <div class="absolute top-0 right-0 z-10">
         <LanguageSwitcher />
       </div>
-      
+
       <!-- Header -->
       <div class="px-4 md:px-6 pt-2 md:pt-3 flex items-center justify-between mb-4">
-        
-        <button 
-          @click="goToHome"
-          class="text-white hover:opacity-80 transition-opacity"
-          aria-label="Go to home"
-        >
+
+        <button @click="goToHome" class="text-white hover:opacity-80 transition-opacity" aria-label="Go to home">
           <svg class="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+            <path
+              d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
           </svg>
         </button>
       </div>
 
       <!-- Profile Section -->
       <div class="px-4 md:px-6 pb-4 flex flex-col items-center">
-        <img 
-          :src="userProfileImage || '/src/assets/images/man.png'" 
-          alt="Profile" 
-          class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2 object-cover"
-          :class="profileBorderClass"
-        >
-        <h2 class="text-xl md:text-2xl font-bold mb-2" :class="textColorClass">{{ userName || `User ID: ${userId}` }}</h2>
+        <img :src="userProfileImage || '/src/assets/images/man.png'" alt="Profile"
+          class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2 object-cover" :class="profileBorderClass">
+        <h2 class="text-xl md:text-2xl font-bold mb-2" :class="textColorClass">{{ userName || `User ID: ${userId}` }}
+        </h2>
         <p class="text-sm md:text-base text-center" :class="subtitleColorClass">
           {{ userDescription || 'No description available' }}
         </p>
@@ -55,46 +46,33 @@
         </div>
 
         <!-- Links -->
-        <a
-          v-else
-          v-for="(link, index) in socialLinks"
-          :key="index"
-          :href="link.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="w-full p-3 md:p-4 shadow-lg transition-all duration-200 hover:scale-105 border-2 block cursor-pointer"
-          style="border-radius: 15px; text-decoration: none;"
-          :class="[getButtonClasses(), getButtonBorderClass()]"
-        >
-            <!-- First Row: Icon and Title -->
-            <div class="flex items-center gap-x-3 mb-1">
-              <img 
-                :src="getIconPath(link.icon)" 
-                :alt="link.platform" 
-                class="w-6 h-6 md:w-8 md:h-8"
-              >
-              <p class="font-bold text-lg md:text-base" :class="getButtonTextClass()">
-                {{ link.title }}
-              </p>
-            </div>
-            <!-- Second Row: Description -->
-            <p class="text-xs md:text-sm mt-1 flex flex-row items-start" :class="getButtonSubtextClass()">
-              {{ link.description }}
+        <button v-else v-for="(link, index) in socialLinks" :key="index" type="button" @click="openLink(link.link)"
+          class="w-full p-3 md:p-4 shadow-lg transition-all duration-200 hover:scale-105 border-2 block cursor-pointer text-left"
+          style="border-radius: 15px; text-decoration: none;" :class="[getButtonClasses(), getButtonBorderClass()]">
+          <!-- First Row: Icon and Title -->
+          <div class="flex items-center gap-x-3 mb-1">
+            <img :src="getIconPath(link.icon)" :alt="link.platform" class="w-6 h-6 md:w-8 md:h-8">
+            <p class="font-bold text-lg md:text-base" :class="getButtonTextClass()">
+              {{ link.title }}
             </p>
-          </a>
+          </div>
+          <!-- Second Row: Description -->
+          <p class="text-xs md:text-sm mt-1 flex flex-row items-start" :class="getButtonSubtextClass()">
+            {{ link.description }}
+          </p>
+        </button>
+
       </div>
-      
-      <ReportWindow
-        :show="showReport"
-        @close="showReport = false"
-        @submit="handleSubmitReport"
-      />  
+
+      <ReportWindow :show="showReport" @close="showReport = false" @submit="handleSubmitReport" />
       <!-- Footer -->
       <div class="px-4 md:px-6 pb-4 md:pb-6 flex items-center justify-between">
         <!-- Report User -->
         <div @click="handleReportClick" class="flex items-center gap-x-2 cursor-pointer">
           <svg class="w-5 h-5 md:w-6 md:h-6" :class="textColorClass" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd" />
           </svg>
           <p class="text-xs md:text-sm" :class="textColorClass">{{ t('socialLinks.reportUser') }}</p>
         </div>
@@ -127,6 +105,15 @@ import githubIcon from '../assets/icons/github.svg'
 import discordIcon from '../assets/icons/discord.svg'
 import api from '../services/api'
 
+const openLink = (rawUrl: string) => {
+  if (!rawUrl) return
+
+  // ensure it has protocol
+  const url = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`
+
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
@@ -150,9 +137,9 @@ const handleReportClick = () => {
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
     // Redirect to login with return URL
-    router.push({ 
-      name: 'login', 
-      query: { redirect: route.fullPath } 
+    router.push({
+      name: 'login',
+      query: { redirect: route.fullPath }
     })
     return
   }
@@ -169,9 +156,9 @@ const handleSubmitReport = async (payload: {
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
     alert(t('socialLinks.pleaseLoginToReport'))
-    router.push({ 
-      name: 'login', 
-      query: { redirect: route.fullPath } 
+    router.push({
+      name: 'login',
+      query: { redirect: route.fullPath }
     })
     return
   }
@@ -196,7 +183,7 @@ const handleSubmitReport = async (payload: {
   try {
     console.log("Submitting report:", payload);
     console.log("Reporting user ID:", userId.value);
-    
+
     // Call the API to submit the report
     const response = await api.post('/user/report', {
       user_id: userId.value, // The user being reported
@@ -204,12 +191,12 @@ const handleSubmitReport = async (payload: {
       description: payload.description,
       report_type: payload.type
     });
-    
+
     console.log("Report submitted successfully:", response.data);
-    
+
     // Show success message
     alert('Report submitted successfully. Thank you for your feedback.');
-    
+
     // Close the report window
     showReport.value = false;
   } catch (err: any) {
@@ -246,15 +233,15 @@ const fetchUserInfo = async () => {
     // Fetch user by ID directly
     console.log('Fetching user info for ID:', userId.value)
     const userResponse = await api.get(`/users/${userId.value}`)
-    
+
     console.log('========== USER API RESPONSE ==========')
     console.log('Full response:', userResponse)
     console.log('Response data:', userResponse.data)
     console.log('========================================')
-    
+
     // Parse response structure: { message, data: { id, name, ..., profile_image, theme: { id, theme_id, theme_type } } }
     const userData = userResponse.data?.data || {}
-    
+
     console.log('========== USER DATA ==========')
     console.log('User data object:', userData)
     console.log('Profile image:', userData.profile_image)
@@ -263,14 +250,14 @@ const fetchUserInfo = async () => {
       console.log('Theme.theme_id:', userData.theme.theme_id)
     }
     console.log('===============================')
-    
+
     // Get user info from /users/{id} endpoint (independent of button links)
     // Set profile_image, name, and description from user data
     if (userData.profile_image) {
       userProfileImage.value = userData.profile_image
       console.log('✅ Profile image set to:', userProfileImage.value)
     }
-    
+
     // Set name and description if available (so they work even without button links)
     if (userData.name) {
       userName.value = userData.name
@@ -278,11 +265,11 @@ const fetchUserInfo = async () => {
     if (userData.description || userData.subtitle) {
       userDescription.value = userData.description || userData.subtitle || ''
     }
-    
+
     // Get theme_id from theme object
     const themeId = userData.theme?.theme_id
     console.log('Extracted Theme ID (theme_id):', themeId)
-    
+
     if (themeId !== undefined && themeId !== null) {
       themeNumber.value = parseInt(themeId)
       console.log('✅ Theme number set to:', themeNumber.value)
@@ -310,34 +297,34 @@ const fetchUserLinks = async () => {
     error.value = null
 
     const response = await api.get(`/user/${userId.value}/button-links`)
-    
+
     console.log('Button Links API Response:', response.data)
-    
+
     // Parse API response structure
     const linksData = response.data.data || []
-    
+
     if (linksData.length > 0) {
       // Extract user info from first item (all items have same user)
       const firstItem = linksData[0]
       const userData = firstItem.relationship?.user?.data || {}
-      
+
       userName.value = userData.name || ''
       userDescription.value = userData.description || userData.subtitle || ''
-      
+
       // Note: profile_image is now fetched from /users/{id} endpoint in fetchUserInfo()
       // So we don't need to set it here from button-links endpoint
-      
-      console.log('User info:', { 
-        userName: userName.value, 
+
+      console.log('User info:', {
+        userName: userName.value,
         userDescription: userDescription.value,
         userProfileImage: userProfileImage.value,
         themeNumber: themeNumber.value
       })
-      
+
       // Map buttons from relationship.button_link
       // Sort by order field
       const sortedLinks = [...linksData].sort((a, b) => (a.order || 0) - (b.order || 0))
-      
+
       socialLinks.value = sortedLinks
         .filter((item: any) => item.relationship?.button_link?.is_visible === 1) // Only show visible buttons
         .map((item: any) => {
@@ -350,7 +337,7 @@ const fetchUserLinks = async () => {
             icon: buttonLink.icon || 'default'
           }
         })
-      
+
       console.log('Mapped social links:', socialLinks.value)
     } else {
       // No links found, but user info (name, description, profile_image) 
@@ -407,21 +394,21 @@ const themeClasses = computed(() => {
 })
 
 const textColorClass = computed(() => {
-  return themeNumber.value === 2 
-    ? 'text-gray-900' 
+  return themeNumber.value === 2
+    ? 'text-gray-900'
     : 'text-white'
 })
 
 const subtitleColorClass = computed(() => {
-  return themeNumber.value === 2 
-    ? 'text-gray-600' 
+  return themeNumber.value === 2
+    ? 'text-gray-600'
     : 'text-white/90'
 })
 
 
 const profileBorderClass = computed(() => {
-  return themeNumber.value === 2 
-    ? 'border-gray-300' 
+  return themeNumber.value === 2
+    ? 'border-gray-300'
     : 'border-white/20'
 })
 
@@ -429,15 +416,15 @@ const getButtonClasses = () => {
   if (themeNumber.value === 2) { // LinkedIn - white background
     return 'bg-white'
   }
-  
+
   if (themeNumber.value === 3) { // YouTube - horizontal gradient buttons (right to left)
     return 'bg-gradient-to-l from-red-600 to-red-800'
   }
-  
+
   if (themeNumber.value === 4) { // Graphic Designer - horizontal gradient buttons (right to left)
     return 'bg-gradient-to-l from-purple-600 via-blue-500 to-purple-700'
   }
-  
+
   // Theme 1: Facebook - horizontal gradient buttons (right to left)
   return 'bg-gradient-to-l from-[#1877F2] to-[#42A5F5]'
 }
@@ -446,19 +433,19 @@ const getButtonBorderClass = () => {
   if (themeNumber.value === 1) { // Facebook - blue gradient border (right to left)
     return 'border-gradient-facebook'
   }
-  
+
   if (themeNumber.value === 2) { // LinkedIn - blue gradient border (right to left)
     return 'border-gradient-linkedin'
   }
-  
+
   if (themeNumber.value === 3) { // YouTube - gradient border (right to left)
     return 'border-gradient-youtube'
   }
-  
+
   if (themeNumber.value === 4) { // Graphic Designer - gradient border (opposite direction)
     return 'border-gradient-graphic'
   }
-  
+
   return ''
 }
 
@@ -494,15 +481,15 @@ const getIconPath = (iconName?: string) => {
   if (!iconName) {
     return facebookIcon // Default icon
   }
-  
+
   // Convert icon name to lowercase and trim whitespace
   let normalizedIcon = iconName.toLowerCase().trim()
-  
+
   // Remove .svg extension if already present
   if (normalizedIcon.endsWith('.svg')) {
     normalizedIcon = normalizedIcon.replace(/\.svg$/, '')
   }
-  
+
   // Return icon from map or default to facebook
   return iconMap[normalizedIcon] || facebookIcon
 }
@@ -598,4 +585,3 @@ const goToHome = () => {
   z-index: -1;
 }
 </style>
-
