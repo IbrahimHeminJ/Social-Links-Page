@@ -12,6 +12,7 @@ Sending a single link or qr code that contains all desired social medias is all 
 ## System users
 * Admin
 * Normal User
+* Guest
 
 ## Target User
 Our Targeted Users are a wide rang of people, such as Influencers, content creator, tech enthusiast and Anyone in needs for the feature.   
@@ -147,7 +148,7 @@ This is the **central table** — everything else connects to users.
 * `username`, `email`, `name`, `phoneNo`: Basic user info
 * `profileImage`: Blob for the user’s avatar
 * `passwordHashed`: Hashed password (good security practice)
-* `role`: Enum for roles (e.g., admin, user, moderator)
+* `role`: Enum for roles (e.g., admin, user, guest)
 * `created_at`, `updated_at`: Timestamps for account tracking
 * `isDeleted`, `isPremium`: Status flags
 * `failedLoginAttempts`: For login security
