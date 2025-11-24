@@ -1,5 +1,9 @@
 <!-- src/components/SearchBar.vue -->
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps<{
   modelValue: string
   placeholder?: string
@@ -32,7 +36,7 @@ const onKeyup = (event: KeyboardEvent) => {
     <input
       type="text"
       class="flex-1 bg-transparent outline-none text-sm placeholder:text-gray-500"
-      :placeholder="placeholder ?? 'Explore Community'"
+      :placeholder="placeholder ?? t('home.exploreCommunity')"
       :value="modelValue"
       @input="onInput"
       @keyup="onKeyup"
@@ -46,7 +50,7 @@ const onKeyup = (event: KeyboardEvent) => {
       class="ml-2 px-4 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold hover:bg-[#0094ff]/90 transition-colors"
       type="button"
     >
-      Search
+      {{ t('common.search') }}
     </button>
   </div>
 </template>

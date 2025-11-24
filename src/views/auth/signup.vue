@@ -1,10 +1,14 @@
 <template>
-  <div class="w-full bg-white flex flex-col items-center justify-center px-4 pt-0">
+  <div class="w-full bg-white flex flex-col items-center justify-center px-4 pt-0 relative">
+    <!-- Language Switcher - Top Right -->
+    <div class="absolute top-4 right-4">
+      <LanguageSwitcher />
+    </div>
     <!-- Logo and Title Row -->
     <div class="flex flex-col md:flex-row items-center justify-center ">
       <img src="../../assets/icons/icon.svg" alt="logo" class="w-40 h-40 md:w-56 md:h-56 mb-4 md:mb-0 md:mr-8">
       <div class="hidden md:block w-px h-20 bg-gray-300 mr-8"></div>
-      <h2 class="text-2xl md:text-4xl text-gray-700 text-center md:text-left">Let's make an account for you</h2>
+      <h2 class="text-2xl md:text-4xl text-gray-700 text-center md:text-left">{{ t('auth.signup') }}</h2>
     </div>
 
     <!-- Signup Form -->
@@ -13,22 +17,22 @@
         <!-- Left Column -->
         <div class="space-y-8">
           <!-- Username Field -->
-          <Text v-model="username" label="Username" placeholder="e.g. Mustafa" type="text" class="mb-6" />
+          <Text v-model="username" :label="t('auth.username')" :placeholder="t('auth.enterUsername')" type="text" class="mb-6" />
           
 
           <!-- Email Field -->
-           <Text v-model="email" label="Email" placeholder="e.g. Mustafa@example.com" type="email" class="mb-6" />
+           <Text v-model="email" :label="t('auth.email')" :placeholder="t('auth.enterEmail')" type="email" class="mb-6" />
           
 
           <!-- Password Field -->
-          <Text v-model="password" label="Password" placeholder="e.g. 123456789" type="password" class="mb-6" />
+          <Text v-model="password" :label="t('auth.password')" :placeholder="t('auth.enterPassword')" type="password" class="mb-6" />
           
         </div>
 
         <!-- Middle Column -->
         <div class="">
           <!-- Name Field -->
-          <Text v-model="name" label="Name" placeholder="e.g. Mustafa" type="text" class="mb-6" />
+          <Text v-model="name" :label="t('auth.name')" :placeholder="t('auth.enterName')" type="text" class="mb-6" />
         
 
           <!-- Phone Number Field -->
@@ -37,7 +41,7 @@
           <!-- Tag Field -->
 
           <div>
-            <label class="block text-gray-700 text-sm font-medium mb-2">Tag</label>
+            <label class="block text-gray-700 text-sm font-medium mb-2">{{ t('profile.tag') }}</label>
             
             <select
               v-model="selectedTag"
@@ -45,17 +49,27 @@
               style="border-bottom-color: #009AFF;"
             >
               <option value="">None</option>
-              <option value="developer">Developer</option>
-              <option value="designer">Designer</option>
-              <option value="writer">Writer</option>
-              <option value="photographer">Photographer</option>
-              <option value="musician">Musician</option>
-              <option value="artist">Artist</option>
-              <option value="student">Student</option>
-              <option value="entrepreneur">Entrepreneur</option>
+              <option value="music">Music</option>
+              <option value="photography">Photography</option>
+              <option value="education">Education</option>
+              <option value="programming">Programming</option>
+              <option value="marketing">Marketing</option>
+              <option value="volunteer">Volunteer</option>
+              <option value="sports">Sports</option>
+              <option value="mobile_apps">Mobile Apps</option>
+              <option value="doctor">Doctor</option>
+              <option value="therapist">Therapist</option>
+              <option value="web_development">Web Development</option>
+              <option value="influencer">Influencer</option>
+              <option value="travel">Travel</option>
+              <option value="filmmaker">Filmmaker</option>
+              <option value="gaming">Gaming</option>
+              <option value="activist">Activist</option>
+              <option value="scientist">Scientist</option>
+              <option value="coach">Coach</option>
             </select>
             <p class="text-gray-600 text-xs mb-3 pt-2">
-              Your tag describes your specialty, major, or hobbies.
+              {{ t('profile.tagDescription') }}
             </p>
           </div>
         </div>
@@ -100,14 +114,14 @@
           class="cursor-pointer bg-[#009AFF] text-white font-bold rounded-[10px] hover:bg-[#009AFF]/80 transition-colors py-3 px-4 mb-4"
           style="width: 100%; max-width: 300px;"
         >
-          Signup
+          {{ t('common.signup') }}
         </button>
       </div>
 
       <!-- Login Link -->
       <div class="text-center">
-        <span class="text-gray-600 text-sm">have an account? </span>
-        <Hyperlink text="Login Here" @click="goToLogin" />
+        <span class="text-gray-600 text-sm">{{ t('auth.haveAccount') }} </span>
+        <Hyperlink :text="t('auth.loginHere')" @click="goToLogin" />
       </div>
     </div>
   </div>
@@ -117,8 +131,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../store/auth';
+import { useI18n } from 'vue-i18n';
 import Text from '../../components/inputs/text.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+
+const { t } = useI18n()
 
 const username = ref('')
 const email = ref('')
@@ -127,6 +145,30 @@ const name = ref('')
 const phoneNumber = ref('')
 const selectedTag = ref('')
 const profileImage = ref('')
+const profileImageFile = ref<File | null>(null)
+
+// Map tag names to tag IDs from database
+// Based on the tags table: music=1, photography=2, education=3, programming=4, etc.
+const tagNameToIdMap: Record<string, number> = {
+  'music': 1,
+  'photography': 2,
+  'education': 3,
+  'programming': 4,
+  'marketing': 5,
+  'volunteer': 6,
+  'sports': 7,
+  'mobile_apps': 8,
+  'doctor': 9,
+  'therapist': 10,
+  'web_development': 11,
+  'influencer': 12,
+  'travel': 13,
+  'filmmaker': 14,
+  'gaming': 15,
+  'activist': 16,
+  'scientist': 17,
+  'coach': 18,
+}
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const router = useRouter()
@@ -144,6 +186,9 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   if (file) {
+    // Store the file object for upload
+    profileImageFile.value = file
+    // Create preview
     const reader = new FileReader()
     reader.onload = (e) => {
       profileImage.value = e.target?.result as string
@@ -163,8 +208,8 @@ const handleSignup = async () => {
   const trimmedName = name.value.trim()
 
   // Validate required fields
-  if (!trimmedUsername || !trimmedEmail || !trimmedPassword || !trimmedName) {
-    alert('Please fill in all required fields')
+  if (!trimmedUsername || !trimmedEmail || !trimmedPassword || !trimmedName || !phoneNumber.value?.trim()) {
+    alert('Please fill in all required fields (username, email, password, name, phone number)')
     return
   }
 
@@ -175,24 +220,43 @@ const handleSignup = async () => {
     return
   }
 
+  // Validate password length (>= 8 characters)
+  if (trimmedPassword.length < 8) {
+    alert('Password must be at least 8 characters long')
+    return
+  }
+
+  // Convert tag name to tag ID
+  let tagIds: number[] | undefined = undefined
+  if (selectedTag.value) {
+    const tagId = tagNameToIdMap[selectedTag.value]
+    if (tagId !== undefined) {
+      tagIds = [tagId]
+    }
+  }
+
   // Debug: Log the data being sent
   console.log('Signup data:', {
     username: trimmedUsername,
     email: trimmedEmail,
     password: trimmedPassword ? '***' : '',
     name: trimmedName,
-    phone: phoneNumber.value || undefined,
-    tag: selectedTag.value || undefined,
+    phone_no: phoneNumber.value?.trim(),
+    profile_image: profileImageFile.value ? 'File selected' : 'No file',
+    tags: tagIds,
+    selectedTag: selectedTag.value,
+    tagId: tagIds && tagIds.length > 0 ? tagIds[0] : undefined,
   })
 
-  // Call signup action
+  // Call signup action with FormData
   const result = await authStore.signup({
     username: trimmedUsername,
     email: trimmedEmail,
     password: trimmedPassword,
     name: trimmedName,
-    phone: phoneNumber.value?.trim() || undefined,
-    tag: selectedTag.value || undefined,
+    phone_no: phoneNumber.value.trim(),
+    profile_image: profileImageFile.value || undefined,
+    tags: tagIds, // Send array of tag IDs (integers)
   })
 
   if (result.success) {

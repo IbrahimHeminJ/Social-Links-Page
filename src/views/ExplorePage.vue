@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import SearchBar from '../components/inputs/searchBar.vue';
 import Icon from '../assets/icons/icon.svg';
 import ExploreCategories from '../views/ExploreCategories.vue';
 import UserCard from '../components/userCard.vue';
+import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 import api from '../services/api';
+
+const { t } = useI18n()
 
 const route = useRoute();
 const router = useRouter();
@@ -105,7 +109,7 @@ const handleSearch = async (value: string) => {
     
   } catch (err: any) {
     console.error('Search error:', err);
-    searchError.value = err.response?.data?.message || 'Failed to search users';
+    searchError.value = err.response?.data?.message || t('explore.failedToSearch');
     searchResults.value = [];
   } finally {
     isSearching.value = false;
@@ -182,7 +186,12 @@ const clearSearch = () => {
 
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10">
+  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10 relative">
+    <!-- Language Switcher - Top Right -->
+    <div class="absolute top-6 right-4 z-10">
+      <LanguageSwitcher />
+    </div>
+    
     <!-- Top logo bar -->
     <header class="pt-6 pb-4 border-b border-gray-200">
       <img :src="Icon" alt="Social Links Logo" class="w-25 h-auto cursor-pointer" @click="goToHome"/>
@@ -194,7 +203,7 @@ const clearSearch = () => {
         <div class="flex-1">
           <SearchBar 
             v-model="searchQuery" 
-            placeholder="Explore Community" 
+            :placeholder="t('explore.searchPlaceholder')"
             @focus="handleSearchFocus"
             @blur="handleSearchBlur"
             @search="handleSearch" 
@@ -205,18 +214,18 @@ const clearSearch = () => {
           @click="clearSearch"
           class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm font-medium"
         >
-          Clear
+          {{ t('explore.clear') }}
         </button>
       </div>
     </section>
 
     <!-- Search Results -->
     <section v-if="hasSearched" class="mt-6">
-      <h2 class="text-xl font-semibold mb-4">Search Results for "{{ searchQuery }}"</h2>
+      <h2 class="text-xl font-semibold mb-4">{{ t('explore.searchResults') }} "{{ searchQuery }}"</h2>
       
       <!-- Loading state -->
       <div v-if="isSearching" class="text-center py-12">
-        <p class="text-gray-600">Searching...</p>
+        <p class="text-gray-600">{{ t('explore.searching') }}</p>
       </div>
 
       <!-- Error state -->
@@ -226,7 +235,7 @@ const clearSearch = () => {
 
       <!-- No results -->
       <div v-else-if="searchResults.length === 0" class="text-center py-12">
-        <p class="text-gray-600">No users found matching your search</p>
+        <p class="text-gray-600">{{ t('explore.noUsersFound') }}</p>
       </div>
 
       <!-- Results grouped by tags -->
@@ -240,7 +249,7 @@ const clearSearch = () => {
                      hover:brightness-110 transition"
               @click="goToAllUsers(category.title)"
             >
-              View All
+              {{ t('explore.viewAll') }}
             </button>
           </div>
 
@@ -263,12 +272,12 @@ const clearSearch = () => {
     <!-- Tags Selection (show when search input is focused and not searched) -->
     <section v-if="searchMode && !hasSearched" class="mt-6">
       <p class="text-xl font-medium text-center">
-        Or Choose from here
+        {{ t('explore.orChooseFromHere') }}
       </p>
 
       <!-- Loading state -->
       <div v-if="isLoadingTags" class="mt-6 text-center py-8">
-        <p class="text-gray-600">Loading tags...</p>
+        <p class="text-gray-600">{{ t('explore.loadingTags') }}</p>
       </div>
 
       <!-- Tags grid -->

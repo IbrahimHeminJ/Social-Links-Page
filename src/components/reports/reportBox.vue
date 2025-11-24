@@ -6,7 +6,7 @@
     <h3 class="text-lg font-bold text-gray-900 mb-2">{{ report.title }}</h3>
     <p class="text-sm text-gray-700" :class="{ 'mb-2': showMetadata }">{{ report.description }}</p>
     <div v-if="showMetadata" class="flex items-center gap-4 text-xs text-gray-500">
-      <span v-if="report.reporterEmail">Reported by: {{ report.reporterEmail }}</span>
+      <span v-if="report.reporterEmail">{{ t('reports.reportedBy') }} {{ report.reporterEmail }}</span>
       <span v-if="report.reporterEmail && report.createdAt">•</span>
       <span v-if="report.createdAt">{{ formatDate(report.createdAt) }}</span>
     </div>
@@ -15,6 +15,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 interface Report {
   id: number

@@ -3,7 +3,12 @@
     class="min-h-screen w-full flex items-center justify-center p-4 md:p-6"
     :class="themeClasses"
   >
-    <div class="w-full max-w-md">
+    <div class="w-full max-w-md relative">
+      <!-- Language Switcher - Top Right -->
+      <div class="absolute top-0 right-0 z-10">
+        <LanguageSwitcher />
+      </div>
+      
       <!-- Header -->
       <div class="px-4 md:px-6 pt-2 md:pt-3 flex items-center justify-between mb-4">
         
@@ -21,7 +26,7 @@
       <!-- Profile Section -->
       <div class="px-4 md:px-6 pb-4 flex flex-col items-center">
         <img 
-          :src="userProfileImage || '../../assets/images/man.png'" 
+          :src="userProfileImage || '/src/assets/images/man.png'" 
           alt="Profile" 
           class="w-20 h-20 md:w-24 md:h-24 rounded-full mb-4 border-2 object-cover"
           :class="profileBorderClass"
@@ -36,7 +41,7 @@
       <div class="px-4 md:px-6 pb-6 space-y-3">
         <!-- Loading state -->
         <div v-if="isLoading" class="text-center py-8">
-          <p :class="textColorClass">Loading links...</p>
+          <p :class="textColorClass">{{ t('socialLinks.loadingLinks') }}</p>
         </div>
 
         <!-- Error state -->
@@ -46,7 +51,7 @@
 
         <!-- No links -->
         <div v-else-if="socialLinks.length === 0" class="text-center py-8">
-          <p :class="textColorClass">No links available</p>
+          <p :class="textColorClass">{{ t('socialLinks.noLinksAvailable') }}</p>
         </div>
 
         <!-- Links -->
@@ -87,11 +92,11 @@
       <!-- Footer -->
       <div class="px-4 md:px-6 pb-4 md:pb-6 flex items-center justify-between">
         <!-- Report User -->
-        <div @click="showReport = true" class="flex items-center gap-x-2">
+        <div @click="handleReportClick" class="flex items-center gap-x-2 cursor-pointer">
           <svg class="w-5 h-5 md:w-6 md:h-6" :class="textColorClass" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
           </svg>
-          <p class="text-xs md:text-sm" :class="textColorClass">Report User</p>
+          <p class="text-xs md:text-sm" :class="textColorClass">{{ t('socialLinks.reportUser') }}</p>
         </div>
         <!-- Social Links Page Generator -->
         <div class="flex items-center gap-x-2">
@@ -105,7 +110,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '../store/auth'
 import ReportWindow from '../components/reports/reportWindow.vue'
+import LanguageSwitcher from '../components/LanguageSwitcher.vue'
+
+const { t } = useI18n()
 
 // Import all available icons statically for Vite
 import facebookIcon from '../assets/icons/facebook.svg'
@@ -119,7 +129,9 @@ import api from '../services/api'
 
 const router = useRouter()
 const route = useRoute()
+const authStore = useAuthStore()
 const showReport = ref(false);
+const isSubmittingReport = ref(false);
 
 // Get user ID from route params
 const userId = computed(() => route.params.id as string || '')
@@ -133,14 +145,80 @@ const userName = ref<string>('')
 const userDescription = ref<string>('')
 const userProfileImage = ref<string>('')
 
-const handleSubmitReport = (payload: {
+const handleReportClick = () => {
+  // Check if user is authenticated
+  authStore.syncAuthState()
+  if (!authStore.isAuthenticated) {
+    // Redirect to login with return URL
+    router.push({ 
+      name: 'login', 
+      query: { redirect: route.fullPath } 
+    })
+    return
+  }
+  // User is authenticated, show report window
+  showReport.value = true
+}
+
+const handleSubmitReport = async (payload: {
   title: string;
   description: string;
   type: string;
 }) => {
-  console.log("Report payload:", payload);
-  // call backend here
-  showReport.value = false;
+  // Double check authentication before submitting
+  authStore.syncAuthState()
+  if (!authStore.isAuthenticated) {
+    alert(t('socialLinks.pleaseLoginToReport'))
+    router.push({ 
+      name: 'login', 
+      query: { redirect: route.fullPath } 
+    })
+    return
+  }
+
+  if (!userId.value) {
+    alert(t('socialLinks.userIdRequired'))
+    return
+  }
+
+  // Validate required fields
+  if (!payload.title.trim() || !payload.description.trim()) {
+    alert('Please fill in both title and description')
+    return
+  }
+
+  if (isSubmittingReport.value) {
+    return // Prevent multiple submissions
+  }
+
+  isSubmittingReport.value = true
+
+  try {
+    console.log("Submitting report:", payload);
+    console.log("Reporting user ID:", userId.value);
+    
+    // Call the API to submit the report
+    const response = await api.post('/user/report', {
+      user_id: userId.value, // The user being reported
+      title: payload.title,
+      description: payload.description,
+      report_type: payload.type
+    });
+    
+    console.log("Report submitted successfully:", response.data);
+    
+    // Show success message
+    alert('Report submitted successfully. Thank you for your feedback.');
+    
+    // Close the report window
+    showReport.value = false;
+  } catch (err: any) {
+    console.error("Error submitting report:", err);
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to submit report. Please try again.';
+    alert(errorMessage);
+  } finally {
+    isSubmittingReport.value = false
+  }
 };
 
 interface SocialLink {
@@ -157,7 +235,7 @@ const themeNumber = ref(1) // Will be replaced with theme ID from API
 
 const socialLinks = ref<SocialLink[]>([])
 
-// Fetch user info to get theme ID
+// Fetch user info to get theme ID and profile image
 const fetchUserInfo = async () => {
   if (!userId.value) {
     console.log('No user ID provided')
@@ -174,16 +252,32 @@ const fetchUserInfo = async () => {
     console.log('Response data:', userResponse.data)
     console.log('========================================')
     
-    // Parse response structure: { message, data: { id, name, ..., theme: { id, theme_id, theme_type } } }
+    // Parse response structure: { message, data: { id, name, ..., profile_image, theme: { id, theme_id, theme_type } } }
     const userData = userResponse.data?.data || {}
     
     console.log('========== USER DATA ==========')
     console.log('User data object:', userData)
+    console.log('Profile image:', userData.profile_image)
     console.log('Theme object:', userData.theme)
     if (userData.theme) {
       console.log('Theme.theme_id:', userData.theme.theme_id)
     }
     console.log('===============================')
+    
+    // Get user info from /users/{id} endpoint (independent of button links)
+    // Set profile_image, name, and description from user data
+    if (userData.profile_image) {
+      userProfileImage.value = userData.profile_image
+      console.log('✅ Profile image set to:', userProfileImage.value)
+    }
+    
+    // Set name and description if available (so they work even without button links)
+    if (userData.name) {
+      userName.value = userData.name
+    }
+    if (userData.description || userData.subtitle) {
+      userDescription.value = userData.description || userData.subtitle || ''
+    }
     
     // Get theme_id from theme object
     const themeId = userData.theme?.theme_id
@@ -229,7 +323,9 @@ const fetchUserLinks = async () => {
       
       userName.value = userData.name || ''
       userDescription.value = userData.description || userData.subtitle || ''
-      userProfileImage.value = userData.profile_image || '../../assets/images/man.png'
+      
+      // Note: profile_image is now fetched from /users/{id} endpoint in fetchUserInfo()
+      // So we don't need to set it here from button-links endpoint
       
       console.log('User info:', { 
         userName: userName.value, 
@@ -257,19 +353,17 @@ const fetchUserLinks = async () => {
       
       console.log('Mapped social links:', socialLinks.value)
     } else {
-      // No links found, but try to get user info if available
-      userName.value = ''
-      userDescription.value = ''
-      userProfileImage.value = '../../assets/images/man.png'
+      // No links found, but user info (name, description, profile_image) 
+      // should already be set from fetchUserInfo() which is called first
+      // So we don't clear them - they are independent of button links
       socialLinks.value = []
     }
   } catch (err: any) {
     console.error('Error fetching user links:', err)
     error.value = err.response?.data?.message || 'Failed to fetch user links'
     socialLinks.value = []
-    userName.value = ''
-    userDescription.value = ''
-    userProfileImage.value = '../../assets/images/man.png'
+    // Don't clear user info (name, description, profile_image) on error
+    // They are set from fetchUserInfo() and should remain even if button links fail
   } finally {
     isLoading.value = false
   }

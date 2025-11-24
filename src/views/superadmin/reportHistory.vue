@@ -8,12 +8,21 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Back
+        {{ t('reports.back') }}
       </button>
-      <h1 class="text-2xl font-bold text-gray-900">Report History</h1>
+      <h1 class="text-2xl font-bold text-gray-900">{{ t('reports.reportHistory') }}</h1>
     </div>
     
-    <div class="space-y-4">
+    <div v-if="loading" class="text-center py-8">
+      <p class="text-gray-600">{{ t('reports.loadingReportHistory') }}</p>
+    </div>
+    <div v-else-if="error" class="text-center py-8">
+      <p class="text-red-600">{{ error }}</p>
+    </div>
+    <div v-else-if="reportHistory.length === 0" class="text-center py-8">
+      <p class="text-gray-600">{{ t('reports.noReportHistoryFound') }}</p>
+    </div>
+    <div v-else class="space-y-4">
       <ReportBox 
         v-for="(report, index) in reportHistory" 
         :key="index"
@@ -27,56 +36,87 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import ReportBox from '../../components/reports/reportBox.vue'
+import api from '../../services/api'
 
+const { t } = useI18n()
 const router = useRouter()
-// const route = useRoute() // Will be used when API is implemented to fetch report history by ID
 
 interface ReportHistoryItem {
   id: number
   title: string
   description: string
-  reporterEmail: string
-  createdAt: string
+  reporterEmail?: string
+  createdAt?: string
+  [key: string]: any // Allow additional fields from API
 }
 
 const reportHistory = ref<ReportHistoryItem[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-// Load report history (in real app, fetch from API using route.params.id)
+const fetchReportHistory = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    const response = await api.get('/admin/reports/resolved')
+    console.log('Report History API Response:', response.data)
+    
+    // Handle different response structures
+    const rawReports = response.data?.data || response.data || []
+    
+    // Map API response to expected format, filter out null/undefined
+    // The API returns reports with nested data structure: { id: 1, data: { title, description, ... } }
+    reportHistory.value = rawReports
+      .filter((report: any) => report != null && report.data != null) // Remove null/undefined reports
+      .map((report: any) => {
+        const reportData = report.data || report // Handle both nested and flat structures
+        
+        // Extract title from nested data structure
+        const title = reportData.title || 
+                     reportData.report_type || 
+                     reportData.reportType ||
+                     reportData.type || 
+                     t('reports.untitledReport')
+        
+        // Extract description - use reason_of_action if description is null
+        const description = reportData.description || 
+                           reportData.reason_of_action ||
+                           reportData.reasonOfAction ||
+                           reportData.message || 
+                           reportData.content || 
+                           reportData.body || 
+                           reportData.text || 
+                           reportData.details ||
+                           reportData.note ||
+                           t('reports.noDescriptionAvailable')
+        
+        return {
+          id: report.id,
+          title: String(title),
+          description: String(description),
+          reporterEmail: reportData.email_of_reporter || reportData.emailOfReporter || reportData.reporter_email,
+          createdAt: reportData.created_at || reportData.createdAt,
+          reportType: reportData.report_type || reportData.reportType,
+          reportStatus: reportData.report_status || reportData.reportStatus,
+          handledBy: reportData.handled_by || reportData.handledBy,
+          reasonOfAction: reportData.reason_of_action || reportData.reasonOfAction,
+          ...reportData // Include all other fields from data
+        }
+      })
+    
+    console.log('Mapped Report History:', reportHistory.value)
+  } catch (err: any) {
+    error.value = err.response?.data?.message || t('reports.failedToFetchReportHistory')
+    console.error('Error fetching report history:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
-  // const reportId = route.params.id // Will be used when API is implemented
-  // TODO: Fetch report history from API using route.params.id
-  // For now, using sample data
-  reportHistory.value = [
-    {
-      id: 1,
-      title: 'Harmful Links',
-      description: "This user's page contains a harmful links that direct to scam websites",
-      reporterEmail: 'user1@example.com',
-      createdAt: '2024-01-15T10:30:00Z'
-    },
-    {
-      id: 2,
-      title: 'Spam Content',
-      description: "This user's page contains spam content and misleading information",
-      reporterEmail: 'user2@example.com',
-      createdAt: '2024-01-14T09:15:00Z'
-    },
-    {
-      id: 3,
-      title: 'Harmful Links',
-      description: "This user's page contains a harmful links that direct to scam websites",
-      reporterEmail: 'user3@example.com',
-      createdAt: '2024-01-13T14:20:00Z'
-    },
-    {
-      id: 4,
-      title: 'Inappropriate Content',
-      description: "This user's page contains inappropriate content that violates community guidelines",
-      reporterEmail: 'user4@example.com',
-      createdAt: '2024-01-12T11:45:00Z'
-    }
-  ]
+  fetchReportHistory()
 })
 
 const viewReport = (report: { id: number }) => {

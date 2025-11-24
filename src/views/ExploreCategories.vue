@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import UserCard from '../components/userCard.vue';
 import { useRouter } from 'vue-router';
 import api from '../services/api';
+
+const { t } = useI18n()
 
 const router = useRouter();
 
@@ -86,7 +89,7 @@ const fetchUsers = async () => {
     categories.value = categoriesList;
   } catch (err: any) {
     console.error('Error fetching users:', err);
-    error.value = err.response?.data?.message || 'Failed to fetch users';
+    error.value = err.response?.data?.message || t('users.failedToFetchUsers');
   } finally {
     isLoading.value = false;
   }
@@ -99,16 +102,16 @@ onMounted(() => {
 
 <template>
   <div class="space-y-10">
-    <p class="text-lg font-medium">or explore here</p>
+    <p class="text-lg font-medium">{{ t('explore.orExploreHere') }}</p>
 
     <!-- Loading state -->
     <div v-if="isLoading" class="text-center py-8">
-      <p class="text-gray-600">Loading users...</p>
+      <p class="text-gray-600">{{ t('explore.loadingUsers') }}</p>
     </div>
 
     <!-- Error state -->
     <div v-else-if="error" class="text-center py-8">
-      <p class="text-red-600">Error: {{ error }}</p>
+      <p class="text-red-600">{{ t('explore.error') }}: {{ error }}</p>
     </div>
 
     <!-- Categories -->
@@ -121,7 +124,7 @@ onMounted(() => {
                    hover:brightness-110 transition"
             @click="goToAllUsers(category.title)"
           >
-            View All
+            {{ t('explore.viewAll') }}
           </button>
         </div>
 
@@ -141,7 +144,7 @@ onMounted(() => {
 
       <!-- No categories message -->
       <div v-if="categories.length === 0" class="text-center py-8">
-        <p class="text-gray-600">No users found</p>
+        <p class="text-gray-600">{{ t('users.noUsersFound') }}</p>
       </div>
     </template>
   </div>

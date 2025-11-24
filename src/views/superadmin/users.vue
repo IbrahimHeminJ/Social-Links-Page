@@ -1,6 +1,16 @@
 <template>
   <div class="p-4 md:p-6">
-    <h1 class="text-2xl font-bold mb-6 text-gray-900">Users Management</h1>
+    <h1 class="text-2xl font-bold mb-6 text-gray-900">{{ t('superAdmin.usersManagement') }}</h1>
+    
+    <!-- Error Message -->
+    <div v-if="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+      <p class="text-red-600">{{ error }}</p>
+    </div>
+    
+    <!-- Loading State -->
+    <div v-if="isLoading" class="text-center py-8">
+      <p class="text-gray-600">{{ t('users.loadingUsers') }}</p>
+    </div>
     
     <!-- Delete Confirmation Modal -->
     <div 
@@ -11,7 +21,7 @@
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 mb-4 text-center">
-            Are you sure to <span class="text-red-600 font-semibold">delete</span> this User?
+            {{ t('users.deleteUserConfirm') }}
           </h3>
           
           <div v-if="userToDeleteData" class="mb-6">
@@ -25,42 +35,48 @@
               @click="confirmDelete"
               class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
             >
-              Yes
+              {{ t('common.yes') }}
             </button>
             <button
               @click="closeDeleteModal"
               class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
             >
-              Cancel
+              {{ t('common.cancel') }}
             </button>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Users Table -->
+    <div v-if="!isLoading" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Updated At</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.image') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.id') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.username') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.name') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.email') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.phone') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.updatedAt') }}</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ t('users.action') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-if="users.length === 0">
+              <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                {{ t('users.noUsersFound') }}
+              </td>
+            </tr>
             <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
               <td class="px-4 py-3 whitespace-nowrap">
                 <img 
                   :src="user.image" 
                   :alt="user.username"
                   class="w-10 h-10 rounded-full object-cover"
+                  @error="(e: any) => e.target.src = '/src/assets/images/man.png'"
                 />
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ user.id }}</td>
@@ -68,27 +84,26 @@
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{{ user.name }}</td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ user.email }}</td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ user.phone || '-' }}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ formatDate(user.createdAt) }}</td>
-              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ formatDate(user.updatedAt) }}</td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">{{ user.updatedAt ? formatDate(user.updatedAt) : '-' }}</td>
               <td class="px-4 py-3 whitespace-nowrap text-sm">
                 <div class="flex items-center gap-x-2">
                   <button 
                     @click="handleView(user.id)"
                     class="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                   >
-                    View
+                    {{ t('common.view') }}
                   </button>
                   <button 
                     @click="handleEdit(user.id)"
                     class="px-3 py-1 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
                   >
-                    Edit
+                    {{ t('common.edit') }}
                   </button>
                   <button 
                     @click="handleDelete(user.id)"
                     class="px-3 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                   >
-                    Delete
+                    {{ t('common.delete') }}
                   </button>
                 </div>
               </td>
@@ -101,8 +116,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import api from '../../services/api'
+
+const { t } = useI18n()
 
 const router = useRouter()
 
@@ -117,39 +136,9 @@ interface User {
   updatedAt: string
 }
 
-// Sample data - replace with API call later
-const users = ref<User[]>([
-  {
-    id: 1,
-    username: 'john_doe',
-    name: 'John Doe',
-    email: 'john@example.com',
-    phone: '+1234567890',
-    image: '/src/assets/images/man.png',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-20T14:20:00Z'
-  },
-  {
-    id: 2,
-    username: 'jane_smith',
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    phone: '+0987654321',
-    image: '/src/assets/images/man.png',
-    createdAt: '2024-01-16T09:15:00Z',
-    updatedAt: '2024-01-19T16:45:00Z'
-  },
-  {
-    id: 3,
-    username: 'bob_wilson',
-    name: 'Bob Wilson',
-    email: 'bob@example.com',
-    phone: null,
-    image: '/src/assets/images/man.png',
-    createdAt: '2024-01-17T11:00:00Z',
-    updatedAt: '2024-01-18T10:30:00Z'
-  }
-])
+const users = ref<User[]>([])
+const isLoading = ref(false)
+const error = ref<string | null>(null)
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
@@ -166,9 +155,61 @@ const showDeleteModal = ref(false)
 const userToDelete = ref<number | null>(null)
 const userToDeleteData = ref<User | null>(null)
 
+// Fetch users from API
+const fetchUsers = async () => {
+  try {
+    isLoading.value = true
+    error.value = null
+    
+    const response = await api.get('/users')
+    
+    // The API returns users grouped by tags
+    // Structure: { data: { "tag_name": [{ id, tag, users: [...] }], ... } }
+    const data = response.data?.data || {}
+    
+    // Extract all users from all tags and deduplicate by ID
+    const usersMap = new Map<number, any>()
+    
+    // Iterate through all tag groups
+    Object.values(data).forEach((tagArray: any) => {
+      if (Array.isArray(tagArray)) {
+        // Iterate through each tag object in the array
+        tagArray.forEach((tagObj: any) => {
+          // Extract users from this tag
+          if (tagObj.users && Array.isArray(tagObj.users)) {
+            tagObj.users.forEach((user: any) => {
+              // Only add if not already in map (deduplicate by ID)
+              if (!usersMap.has(user.id)) {
+                usersMap.set(user.id, user)
+              }
+            })
+          }
+        })
+      }
+    })
+    
+    // Convert map to array and map to our User interface
+    users.value = Array.from(usersMap.values()).map((user: any) => ({
+      id: user.id,
+      username: user.username || '',
+      name: user.name || '',
+      email: user.email || '',
+      phone: user.phone_no || user.phone || null,
+      image: user.profile_image || user.image || '/src/assets/images/man.png',
+      createdAt: user.created_at || user.createdAt || '',
+      updatedAt: user.updated_at || user.updatedAt || ''
+    }))
+  } catch (err: any) {
+    console.error('Error fetching users:', err)
+    error.value = err.response?.data?.message || t('users.failedToFetchUsers')
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const handleView = (userId: number) => {
-  // Navigate to social-links route
-  router.push({ name: 'social-links' })
+  // Navigate to social-links route with user ID
+  router.push({ name: 'social-links', params: { id: userId } })
 }
 
 const handleEdit = (userId: number) => {
@@ -191,13 +232,27 @@ const closeDeleteModal = () => {
   userToDeleteData.value = null
 }
 
-const confirmDelete = () => {
-  if (userToDelete.value) {
-    // TODO: Implement delete functionality
-    console.log('Delete user:', userToDelete.value)
-    // After delete, close modal and refresh list
+const confirmDelete = async () => {
+  if (!userToDelete.value) return
+  
+  try {
+    await api.delete(`/admin/users/${userToDelete.value}`)
+    
+    // Remove user from list
+    users.value = users.value.filter(u => u.id !== userToDelete.value)
+    
+    // Close modal
+    closeDeleteModal()
+  } catch (err: any) {
+    console.error('Error deleting user:', err)
+    error.value = err.response?.data?.message || t('users.failedToDeleteUser')
     closeDeleteModal()
   }
 }
+
+// Fetch users when component mounts
+onMounted(() => {
+  fetchUsers()
+})
 </script>
 

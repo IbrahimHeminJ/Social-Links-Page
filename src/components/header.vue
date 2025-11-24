@@ -1,18 +1,55 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "../store/auth";
 import SearchBar from "./inputs/searchBar.vue";
+import LanguageSwitcher from "./LanguageSwitcher.vue";
+import ProfileSwitcher from "./ProfileSwitcher.vue";
 
 interface Props {
   toggleSidebar?: () => void;
 }
 const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
+
 const goToExplore = () => {
   router.push({ name: 'explore' });
 };
 const props = defineProps<Props>();
 
 const searchQuery = ref("");
+
+// Sync auth state on mount to ensure user data is loaded
+onMounted(() => {
+  authStore.syncAuthState();
+});
+
+// Check if current route is admin or super admin route
+const isAdminOrSuperAdminRoute = computed(() => {
+  const routeName = route.name as string
+  return routeName?.startsWith('admin.') || routeName?.startsWith('superAdmin.')
+})
+
+// Profile switcher visibility logic:
+// If role is 'user' → DON'T show it
+// If role is 'admin' (superadmin in DB) → Always show it in both dashboards
+const showProfileSwitcher = computed(() => {
+  const role = authStore.userRole
+  
+  // If role is 'user' → DON'T show it
+  if (role === 'user') {
+    return false
+  }
+  
+  // If role is 'admin' (superadmin in DB) → Always show it in both dashboards
+  if (role === 'admin') {
+    return isAdminOrSuperAdminRoute.value
+  }
+  
+  // All other cases → don't show
+  return false
+})
 
 const handleMenuClick = () => {
   // Only toggle on mobile screens
@@ -46,17 +83,22 @@ const handleMenuClick = () => {
         />
       </div>
       
-        <SearchBar
+      <SearchBar
         v-model="searchQuery"
-        placeholder="Explore Community"
         class="w-full md:max-w-md mt-3"
         @click="goToExplore" />
-git
-      <img
-        src="../assets/icons/moon.svg"
-        alt="logo"
-        class="size-[21px] max-md:hidden"
-      />
+      
+      <!-- Profile Switcher (for users with role 'user' or 'admin' in admin/superAdmin routes) -->
+      <ProfileSwitcher v-if="showProfileSwitcher" />
+      
+      <div class="flex items-center gap-3">
+        <LanguageSwitcher />
+        <img
+          src="../assets/icons/moon.svg"
+          alt="logo"
+          class="size-[21px] max-md:hidden"
+        />
+      </div>
     </nav>
   </header>
 </template>

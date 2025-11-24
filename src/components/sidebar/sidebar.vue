@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
 const route = useRoute()
+const { t } = useI18n()
 </script>
 <template> 
   <div
@@ -16,27 +19,27 @@ const route = useRoute()
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.links' }"
         >
-            <router-link :to="{ name: 'admin.links' }">Links</router-link>
+            <router-link :to="{ name: 'admin.links' }">{{ t('admin.links') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.profile' }"
         >
-            <router-link :to="{ name: 'admin.profile' }">Profile</router-link>
+            <router-link :to="{ name: 'admin.profile' }">{{ t('admin.profile') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.themes' }"
         >
-            <router-link :to="{ name: 'admin.themes' }">Themes</router-link>
+            <router-link :to="{ name: 'admin.themes' }">{{ t('admin.themes') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.about' }"
         >
-            <router-link :to="{ name: 'admin.about' }">About</router-link>
+            <router-link :to="{ name: 'admin.about' }">{{ t('admin.about') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'admin.policies' }"
         >
-            <router-link :to="{ name: 'admin.policies' }">Policies</router-link>
+            <router-link :to="{ name: 'admin.policies' }">{{ t('admin.policies') }}</router-link>
         </li>
       </ul> 
     </div>

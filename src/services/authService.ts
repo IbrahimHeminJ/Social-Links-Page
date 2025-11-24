@@ -10,8 +10,9 @@ export interface SignupData {
   name: string
   email: string
   password: string
-  phone?: string
-  tag?: string
+  phone_no: string
+  profile_image?: File | null
+  tags?: number[] | string[] // Array of tag IDs or tag names
 }
 
 export interface User {
@@ -49,10 +50,44 @@ class AuthService {
   }
 
   /**
-   * Register new user
+   * Register new user (multipart/form-data for file upload)
    */
   async signup(data: SignupData): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/signup', data)
+    // Create FormData for multipart/form-data
+    const formData = new FormData()
+    
+    formData.append('username', data.username)
+    formData.append('name', data.name)
+    formData.append('email', data.email)
+    formData.append('password', data.password)
+    formData.append('phone_no', data.phone_no)
+    
+    // Add profile image if provided
+    if (data.profile_image) {
+      formData.append('profile_image', data.profile_image)
+    }
+    
+    // Add tags as array of integers (tag IDs)
+    // Laravel expects array indices to start from 1, not 0
+    if (data.tags && data.tags.length > 0) {
+      // Convert all tags to integers (they should already be numbers, but ensure they are)
+      const tagIds = data.tags.map(tag => {
+        const tagId = typeof tag === 'number' ? tag : parseInt(String(tag), 10)
+        return isNaN(tagId) ? null : tagId
+      }).filter((id): id is number => id !== null)
+      
+      // Start index from 1 as Laravel expects
+      tagIds.forEach((tagId, index) => {
+        formData.append(`tags[${index + 1}]`, String(tagId))
+      })
+    }
+    
+    // Use multipart/form-data content type
+    const response = await api.post<AuthResponse>('/register', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
     return response.data
   }
 

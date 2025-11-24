@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import Footer from '../components/footer.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
+import { useI18n } from 'vue-i18n';
 import Icon from '../assets/icons/icon.svg';
+import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 
 import SearchBar from '../components/inputs/searchBar.vue';
+
+const { t } = useI18n()
 
 const searchQuery = ref('');
 const router = useRouter();
@@ -34,24 +38,24 @@ const handleUserClick = () => {
 const goToExplore = () => {
   router.push({ name: 'explore' });
 };
-const features = [
+const features = computed(() => [
   {
     icon: "🌐",
-    text: "Centralize all your links in one personalized page",
+    text: t('home.feature1'),
   },
   {
     icon: "🎨",
-    text: "Customizable themes and styles",
+    text: t('home.feature2'),
   },
   {
     icon: "⚡",
-    text: "Instant link preview and updates",
+    text: t('home.feature3'),
   },
   {
     icon: "📱",
-    text: "Fully responsive and optimized for all devices",
+    text: t('home.feature4'),
   },
-];
+]);
 
 const getNumberOfUsers = () => {
 
@@ -65,13 +69,15 @@ const numberOfUsers = ref(getNumberOfUsers());
     <!-- Top bar (login/user icon + logout + theme toggle) -->
     <header class="flex items-center justify-between py-2 border-b border-gray-200 mb-6">
       <div class="flex items-center gap-3">
-        <button 
-          v-if="!authStore.isAuthenticated"
-          @click="goToLogin"
-          class="px-5 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold shadow-sm hover:bg-[#0094ff]/90 transition-colors cursor-pointer"
-        >
-          Login
-        </button>
+        <LanguageSwitcher />
+        <template v-if="!authStore.isAuthenticated">
+          <button 
+            @click="goToLogin"
+            class="px-5 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold shadow-sm hover:bg-[#0094ff]/90 transition-colors cursor-pointer"
+          >
+            {{ t('common.login') }}
+          </button>
+        </template>
         <template v-else>
           <button 
             @click="handleUserClick"
@@ -87,7 +93,7 @@ const numberOfUsers = ref(getNumberOfUsers());
             @click="handleLogout"
             class="px-5 py-1.5 rounded-full bg-red-600 text-white text-sm font-semibold shadow-sm hover:bg-red-700 transition-colors cursor-pointer"
           >
-            Logout
+            {{ t('common.logout') }}
           </button>
         </template>
       </div>
@@ -118,14 +124,14 @@ const numberOfUsers = ref(getNumberOfUsers());
         <!-- Search -->
         <SearchBar
         v-model="searchQuery"
-        placeholder="Explore Community"
+        :placeholder="t('home.exploreCommunity')"
         class="w-full md:max-w-md mt-3"
         @click="goToExplore" />
 
         <!-- Explore text -->
         <div class="mt-2">
-          <h1 class="font-bold text-base lg:text-lg">Explore Community</h1>
-          <p class="font-semibold text-xs lg:text-sm mt-1">{{ numberOfUsers }} people</p>
+          <h1 class="font-bold text-base lg:text-lg">{{ t('home.exploreCommunity') }}</h1>
+          <p class="font-semibold text-xs lg:text-sm mt-1">{{ numberOfUsers }} {{ t('home.people') }}</p>
         </div>
       </div>
     </section>
@@ -133,30 +139,22 @@ const numberOfUsers = ref(getNumberOfUsers());
 
     <!-- About us -->
     <section class="mt-12 md:mt-16 text-center">
-      <h2 class="font-bold text-lg mb-4">About us</h2>
+      <h2 class="font-bold text-lg mb-4">{{ t('home.aboutUs') }}</h2>
 
       <div class="max-w-3xl mx-auto space-y-4 text-sm leading-relaxed">
         <p>
-          The Social Links Page Generator is a simple yet powerful tool designed to help
-          users create a personalized landing page that organizes all their important
-          links in one place. Whether you’re a content creator, freelancer, business, or
-          student, this tool allows you to build a shareable profile that connects all
-          your online identities — from social media and portfolios to websites and
-          contact links.
+          {{ t('home.aboutUsDescription1') }}
         </p>
 
         <p>
-          With an intuitive interface and customizable design, users can easily add, edit,
-          or remove links, choose their preferred themes, and instantly preview their
-          page. The generator automatically produces a clean, mobile-friendly page that
-          can be shared anywhere.
+          {{ t('home.aboutUsDescription2') }}
         </p>
       </div>
     </section>
     
     <!-- Features -->
     <section class="mt-12 md:mt-16">
-      <h2 class="font-bold text-lg text-center mb-6">Features we provide</h2>
+      <h2 class="font-bold text-lg text-center mb-6">{{ t('home.featuresWeProvide') }}</h2>
 
       <!-- Feature cards: 1 col on mobile, 2 on sm, 4 on lg -->
       <!-- Feature cards -->
@@ -172,11 +170,11 @@ const numberOfUsers = ref(getNumberOfUsers());
 
       <!-- Bullet list -->
       <ul class="list-disc list-inside space-y-1 text-sm leading-relaxed max-w-xl mx-auto">
-        <li>🌐 Centralize all your links in one personalized page</li>
-        <li>🎨 Customizable themes and styles</li>
-        <li>⚡ Instant link preview and updates</li>
-        <li>🔒 Secure and lightweight backend</li>
-        <li>📱 Fully responsive and optimized for all devices</li>
+        <li>🌐 {{ t('home.feature1') }}</li>
+        <li>🎨 {{ t('home.feature2') }}</li>
+        <li>⚡ {{ t('home.feature3') }}</li>
+        <li>🔒 {{ t('home.feature5') }}</li>
+        <li>📱 {{ t('home.feature4') }}</li>
       </ul>
     </section>
   </main>

@@ -15,7 +15,7 @@
     </div>
     <div>
       <img
-        @click="handleDelete"
+        @click.stop="handleDelete"
         src="../assets/icons/garbage.svg"
         alt="garbage"
         class="w-[17px] h-[21.86px] cursor-pointer"

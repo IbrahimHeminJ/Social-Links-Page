@@ -132,21 +132,68 @@ export const useAuthStore = defineStore('auth', () => {
       isLoading.value = true
       error.value = null
 
+      console.log('Signup API Request:', data)
       const response = await authService.signup(data)
       
+      console.log('Signup API Response:', response)
+      
       // Extract token and user (handle different response formats)
+      // Check response.data first (Laravel wraps in data)
       const authToken = response.data?.access_token || response.access_token || response.token || null
       const userData = response.data?.user || response.user || null
       
-      // Store token and user
-      token.value = authToken
-      user.value = userData
+      console.log('Extracted token:', authToken ? '***' : null)
+      console.log('Extracted user:', userData)
+      
+      // Store token
       if (authToken) {
+        token.value = authToken
         localStorage.setItem('authToken', authToken)
       }
-      if (userData) {
+      
+      // Always fetch complete user data after signup to get role (same as login flow)
+      // The signup response might not include role due to conditional logic in UserResource
+      if (authToken) {
+        console.log('Fetching complete user data after signup to get role...')
+        try {
+          const fetchedUser = await authService.getCurrentUser()
+          
+          // Handle UserResource wrapper (Laravel resource wraps data in 'data' field)
+          const completeUser = fetchedUser.data || fetchedUser
+          
+          // Debug: Log the complete user object
+          console.log('Complete user object with role after signup:', completeUser)
+          console.log('User role value:', completeUser.role)
+          console.log('User role type:', typeof completeUser.role)
+          console.log('All user fields:', Object.keys(completeUser))
+          
+          user.value = completeUser as User
+          localStorage.setItem('user', JSON.stringify(completeUser))
+        } catch (err) {
+          console.error('Failed to fetch user data after signup, using signup response:', err)
+          // Fallback: Use user data from signup response if available
+          if (userData && typeof userData === 'object') {
+            // Handle both direct user object and wrapped in data property
+            const actualUser = (userData as any).data || userData
+            if (actualUser.id) {
+              user.value = actualUser as User
+              localStorage.setItem('user', JSON.stringify(actualUser))
+            }
+          }
+        }
+      } else if (userData) {
+        // If no token but we have user data (shouldn't happen, but handle it)
+        user.value = userData as User
         localStorage.setItem('user', JSON.stringify(userData))
       }
+
+      console.log('Signup successful - Auth state:', {
+        token: token.value ? '***' : null,
+        user: user.value,
+        isAuthenticated: isAuthenticated.value,
+        storedToken: localStorage.getItem('authToken') ? '***' : null,
+        storedUser: localStorage.getItem('user')
+      })
 
       return { success: true }
     } catch (err: any) {
@@ -160,7 +207,8 @@ export const useAuthStore = defineStore('auth', () => {
         err.response?.data?.error || 
         err.response?.data?.msg ||
         err.response?.data?.errors?.email?.[0] || // Laravel validation format
-        err.response?.data?.errors?.email || // Alternative Laravel format
+        err.response?.data?.errors?.username?.[0] || // Laravel validation format
+        err.response?.data?.errors?.password?.[0] || // Laravel validation format
         err.message
       
       // Use API error if available, otherwise use default

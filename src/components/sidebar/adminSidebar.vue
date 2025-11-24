@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+
 const route = useRoute()
+const { t } = useI18n()
 </script>
 <template> 
   <div
@@ -16,17 +19,17 @@ const route = useRoute()
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'superAdmin.users' }"
         >
-            <router-link :to="{ name: 'superAdmin.users' }">Users</router-link>
+            <router-link :to="{ name: 'superAdmin.users' }">{{ t('superAdmin.users') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'superAdmin.profile' }"
         >
-            <router-link :to="{ name: 'superAdmin.profile' }">Profile</router-link>
+            <router-link :to="{ name: 'superAdmin.profile' }">{{ t('admin.profile') }}</router-link>
         </li>
         <li class="font-medium px-4 rounded-full"
         :class="{ 'bg-[#009AFF4A]': route.name === 'superAdmin.reports' }"
         >
-            <router-link :to="{ name: 'superAdmin.reports' }">Reports</router-link>
+            <router-link :to="{ name: 'superAdmin.reports' }">{{ t('superAdmin.reports') }}</router-link>
         </li>
       </ul> 
     </div>
