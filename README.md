@@ -345,8 +345,6 @@ Here we list the main limitations of the current version of the Social Links Pag
 6. No Media Hosting  
 - The system does not host user media files; users can only reference external images or content through links.
 
-7. Single Language Only  
-- The system is currently available only in English and does not support multiple languages or localization.
 
 ## Improvements
 Here we list some possible improvements and future enhancements for the Social Links Page system:
@@ -369,8 +367,6 @@ Here we list some possible improvements and future enhancements for the Social L
 6. SEO and Meta-Tag Management  
 - The system can provide SEO settings so that users can customize meta titles, descriptions and social preview images for their public pages.
 
-7. Media Upload and Hosting  
-- The system can be improved by allowing users to upload and host images or small media files (for example profile banners) instead of only using external links.
 
 8. Multi-Language Support  
 - The system can add localization so that the interface can be used in multiple languages depending on the user’s preference.
