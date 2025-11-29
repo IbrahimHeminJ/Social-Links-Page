@@ -65,12 +65,12 @@ const numberOfUsers = ref(getNumberOfUsers());
 
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-12">
     <!-- Header component -->
     <Header class="mb-6" />
 
     <!-- HERO: illustration + logo + search (mobile-first → 2 columns on md+) -->
-    <section class="mt-6 md:mt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+    <section class="mt-8 md:mt-12 flex flex-col md:flex-row md:items-center md:justify-between gap-10">
       <!-- Illustration -->
       <div class="md:w-1/2 flex justify-center md:justify-start">
         <img src="/src/assets/images/man.png" alt="Explore community illustration"
@@ -104,10 +104,10 @@ const numberOfUsers = ref(getNumberOfUsers());
 
 
     <!-- About us -->
-    <section class="mt-8 md:mt-10 text-center">
-      <h2 class="font-bold text-lg mb-3">{{ t('home.aboutUs') }}</h2>
+    <section class="mt-12 md:mt-16 text-center">
+      <h2 class="font-bold text-lg mb-4">{{ t('home.aboutUs') }}</h2>
 
-      <div class="max-w-4xl mx-auto space-y-3 text-sm leading-relaxed">
+      <div class="max-w-3xl mx-auto space-y-4 text-sm leading-relaxed">
         <p>
           {{ t('home.aboutUsDescription1') }}
         </p>
@@ -119,12 +119,12 @@ const numberOfUsers = ref(getNumberOfUsers());
     </section>
     
     <!-- Features -->
-    <section class="mt-8 md:mt-10">
-      <h2 class="font-bold text-lg text-center mb-4">{{ t('home.featuresWeProvide') }}</h2>
+    <section class="mt-12 md:mt-16">
+      <h2 class="font-bold text-lg text-center mb-6">{{ t('home.featuresWeProvide') }}</h2>
 
       <!-- Feature cards: 1 col on mobile, 2 on sm, 4 on lg -->
       <!-- Feature cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 max-w-4xl mx-auto">
         <div v-for="(item, index) in features" :key="index"
           class="rounded-2xl border border-gray-100 shadow-md py-8 px-4 flex flex-col items-center text-center text-sm bg-white">
           <div class="text-3xl mb-3">{{ item.icon }}</div>
@@ -135,7 +135,7 @@ const numberOfUsers = ref(getNumberOfUsers());
       </div>
 
       <!-- Bullet list -->
-      <ul class="list-disc list-inside space-y-1 text-sm leading-relaxed max-w-2xl mx-auto">
+      <ul class="list-disc list-inside space-y-1 text-sm leading-relaxed max-w-xl mx-auto">
         <li>🌐 {{ t('home.feature1') }}</li>
         <li>🎨 {{ t('home.feature2') }}</li>
         <li>⚡ {{ t('home.feature3') }}</li>
