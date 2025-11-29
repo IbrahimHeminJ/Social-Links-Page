@@ -56,6 +56,10 @@ const handleMenuClick = () => {
   }
 };
 
+const goToHome = () => {
+  router.push({ name: 'home' });
+};
+
 const goToLogin = () => {
   router.push({ name: 'login' });
 };
@@ -122,7 +126,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <header class="rounded-2xl px-6 py-3 min-md:h-[70px] h-[50px] shadow-sm mt-4">
+  <header class="rounded-2xl px-6 py-3 min-md:h-[70px] h-[50px] shadow-sm mt-4 mb-4 bg-white">
     <nav class="flex justify-between items-center h-full">
       <!-- Left: Logo and Mobile Menu -->
       <div class="flex items-center gap-x-5">
@@ -135,7 +139,8 @@ onUnmounted(() => {
         <img
           src="../assets/icons/icon.svg"
           alt="logo"
-          class="w-[87.44px] h-[30.31px]"
+          class="w-[87.44px] h-[30.31px] cursor-pointer hover:opacity-80 transition-opacity"
+          @click="goToHome"
         />
       </div>
 
