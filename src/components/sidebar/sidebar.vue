@@ -31,16 +31,7 @@ const { t } = useI18n()
         >
             <router-link :to="{ name: 'admin.themes' }">{{ t('admin.themes') }}</router-link>
         </li>
-        <li class="font-medium px-4 rounded-full"
-        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.about' }"
-        >
-            <router-link :to="{ name: 'admin.about' }">{{ t('admin.about') }}</router-link>
-        </li>
-        <li class="font-medium px-4 rounded-full"
-        :class="{ 'bg-[#009AFF4A]': route.name === 'admin.policies' }"
-        >
-            <router-link :to="{ name: 'admin.policies' }">{{ t('admin.policies') }}</router-link>
-        </li>
+        
       </ul> 
     </div>
     <div>
