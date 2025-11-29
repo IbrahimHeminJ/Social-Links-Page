@@ -38,7 +38,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import ReportBox from '../../components/reports/reportBox.vue'
-import api from '../../services/api'
+import { superAdminReportsService } from '../../services/superAdmin'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -60,52 +60,7 @@ const fetchReportHistory = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await api.get('/admin/reports/resolved')
-    console.log('Report History API Response:', response.data)
-    
-    // Handle different response structures
-    const rawReports = response.data?.data || response.data || []
-    
-    // Map API response to expected format, filter out null/undefined
-    // The API returns reports with nested data structure: { id: 1, data: { title, description, ... } }
-    reportHistory.value = rawReports
-      .filter((report: any) => report != null && report.data != null) // Remove null/undefined reports
-      .map((report: any) => {
-        const reportData = report.data || report // Handle both nested and flat structures
-        
-        // Extract title from nested data structure
-        const title = reportData.title || 
-                     reportData.report_type || 
-                     reportData.reportType ||
-                     reportData.type || 
-                     t('reports.untitledReport')
-        
-        // Extract description - use reason_of_action if description is null
-        const description = reportData.description || 
-                           reportData.reason_of_action ||
-                           reportData.reasonOfAction ||
-                           reportData.message || 
-                           reportData.content || 
-                           reportData.body || 
-                           reportData.text || 
-                           reportData.details ||
-                           reportData.note ||
-                           t('reports.noDescriptionAvailable')
-        
-        return {
-          id: report.id,
-          title: String(title),
-          description: String(description),
-          reporterEmail: reportData.email_of_reporter || reportData.emailOfReporter || reportData.reporter_email,
-          createdAt: reportData.created_at || reportData.createdAt,
-          reportType: reportData.report_type || reportData.reportType,
-          reportStatus: reportData.report_status || reportData.reportStatus,
-          handledBy: reportData.handled_by || reportData.handledBy,
-          reasonOfAction: reportData.reason_of_action || reportData.reasonOfAction,
-          ...reportData // Include all other fields from data
-        }
-      })
-    
+    reportHistory.value = await superAdminReportsService.getResolvedReports()
     console.log('Mapped Report History:', reportHistory.value)
   } catch (err: any) {
     error.value = err.response?.data?.message || t('reports.failedToFetchReportHistory')

@@ -119,7 +119,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import api from '../../services/api'
+import { superAdminUsersService } from '../../services/superAdmin'
 
 const { t } = useI18n()
 
@@ -161,43 +161,18 @@ const fetchUsers = async () => {
     isLoading.value = true
     error.value = null
     
-    const response = await api.get('/users')
+    const fetchedUsers = await superAdminUsersService.getAllUsers()
     
-    // The API returns users grouped by tags
-    // Structure: { data: { "tag_name": [{ id, tag, users: [...] }], ... } }
-    const data = response.data?.data || {}
-    
-    // Extract all users from all tags and deduplicate by ID
-    const usersMap = new Map<number, any>()
-    
-    // Iterate through all tag groups
-    Object.values(data).forEach((tagArray: any) => {
-      if (Array.isArray(tagArray)) {
-        // Iterate through each tag object in the array
-        tagArray.forEach((tagObj: any) => {
-          // Extract users from this tag
-          if (tagObj.users && Array.isArray(tagObj.users)) {
-            tagObj.users.forEach((user: any) => {
-              // Only add if not already in map (deduplicate by ID)
-              if (!usersMap.has(user.id)) {
-                usersMap.set(user.id, user)
-              }
-            })
-          }
-        })
-      }
-    })
-    
-    // Convert map to array and map to our User interface
-    users.value = Array.from(usersMap.values()).map((user: any) => ({
+    // Map to our User interface
+    users.value = fetchedUsers.map((user) => ({
       id: user.id,
-      username: user.username || '',
-      name: user.name || '',
-      email: user.email || '',
-      phone: user.phone_no || user.phone || null,
-      image: user.profile_image || user.image || '/src/assets/images/man.png',
-      createdAt: user.created_at || user.createdAt || '',
-      updatedAt: user.updated_at || user.updatedAt || ''
+      username: user.username,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      image: user.image || '/src/assets/images/man.png',
+      createdAt: user.createdAt || user.created_at || '',
+      updatedAt: user.updatedAt || user.updated_at || ''
     }))
   } catch (err: any) {
     console.error('Error fetching users:', err)
@@ -236,7 +211,7 @@ const confirmDelete = async () => {
   if (!userToDelete.value) return
   
   try {
-    await api.delete(`/admin/users/${userToDelete.value}`)
+    await superAdminUsersService.deleteUser(userToDelete.value)
     
     // Remove user from list
     users.value = users.value.filter(u => u.id !== userToDelete.value)

@@ -128,7 +128,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Text from '../../components/inputs/text.vue'
 import Select from '../../components/inputs/select.vue'
-import api from '../../services/api'
+import { superAdminReportsService } from '../../services/superAdmin'
 
 const { t } = useI18n()
 
@@ -184,32 +184,26 @@ const fetchReportDetail = async () => {
     
     console.log('Fetching report detail for ID:', reportId)
     
-    // Fetch report detail using the direct endpoint
-    const response = await api.get(`/admin/reports/${reportId}`)
-    console.log('Report Detail API Response:', response.data)
+    const reportDetail = await superAdminReportsService.getReportById(reportId)
     
-    // Handle nested data structure - the API returns { id: 1, data: { ... } }
-    const report = response.data?.data || response.data
-    const reportDataObj = report.data || report
-    
-    // Map the API response to our ReportData interface
+    // Map to our ReportData interface
     // Title and description are read-only (from API)
     // Action and reason are editable (not pre-filled)
     reportData.value = {
-      id: report.id || Number(reportId),
-      type: reportDataObj.report_type || reportDataObj.reportType || '',
-      title: reportDataObj.title || 'Untitled Report',
-      description: reportDataObj.description || 'No description provided', // Use description only, don't use reason_of_action
-      reporterEmail: reportDataObj.email_of_reporter || reportDataObj.emailOfReporter || reportDataObj.reporter_email || '',
-      reportedUser: reportDataObj.reported_user || reportDataObj.reportedUser || reportDataObj.user_id || reportDataObj.userId || '',
-      reportType: reportDataObj.report_type || reportDataObj.reportType || '',
+      id: reportDetail.id,
+      type: reportDetail.type || reportDetail.reportType || '',
+      title: reportDetail.title || 'Untitled Report',
+      description: reportDetail.description || 'No description provided',
+      reporterEmail: reportDetail.reporterEmail || '',
+      reportedUser: reportDetail.reportedUser || '',
+      reportType: reportDetail.reportType || '',
       action: '', // Empty - admin will fill this
       reason: '', // Empty - admin will fill this
-      reportStatus: reportDataObj.report_status || reportDataObj.reportStatus,
-      handledBy: reportDataObj.handled_by || reportDataObj.handledBy,
-      reasonOfAction: reportDataObj.reason_of_action || reportDataObj.reasonOfAction, // This is the previous reason, not the new one
-      createdAt: reportDataObj.created_at || reportDataObj.createdAt,
-      updatedAt: reportDataObj.updated_at || reportDataObj.updatedAt
+      reportStatus: reportDetail.reportStatus,
+      handledBy: reportDetail.handledBy,
+      reasonOfAction: reportDetail.reasonOfAction,
+      createdAt: reportDetail.createdAt,
+      updatedAt: reportDetail.updatedAt
     }
     
     console.log('Mapped Report Data:', reportData.value)
@@ -299,8 +293,8 @@ const handleResolve = async () => {
       reason: reportData.value.reason
     })
     
-    // Call API to resolve the report (using POST since PUT is not supported)
-    const response = await api.post(`/admin/reports/${reportId}`, {
+    // Call service to resolve the report
+    await superAdminReportsService.resolveReport(reportId, {
       delete_user: deleteUser,
       reason_of_action: reportData.value.reason.trim()
     })

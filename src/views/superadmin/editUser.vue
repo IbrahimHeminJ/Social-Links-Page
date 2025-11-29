@@ -106,7 +106,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Text from '../../components/inputs/text.vue'
 import Select from '../../components/inputs/select.vue'
-import api from '../../services/api'
+import { superAdminUsersService } from '../../services/superAdmin'
 import defaultProfile from '../../assets/images/man.png'
 
 const router = useRouter()
@@ -234,11 +234,8 @@ const fetchUserData = async () => {
     errorMessage.value = ''
 
     // Fetch user data from API
-    const response = await api.get(`/users/${userId}`)
-    console.log('Fetched user data for editing:', response.data)
-
-    // Parse response data
-    const userData = response.data?.data || response.data || {}
+    const userData = await superAdminUsersService.getUserById(userId)
+    console.log('Fetched user data for editing:', userData)
 
     // Pre-fill form with user data
     formData.value = {
@@ -340,14 +337,17 @@ const handleSubmit = async () => {
       tag: formData.value.tag
     })
 
-    // Update user via API
-    const response = await api.post(`/users/${userId}`, formDataToSend, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+    // Update user via service
+    const response = await superAdminUsersService.updateUser(userId, {
+      username: formData.value.username.trim(),
+      name: formData.value.name.trim(),
+      email: formData.value.email.trim(),
+      phone_no: formData.value.phone.trim(),
+      profile_image: selectedImageFile.value || undefined,
+      tags: formData.value.tag ? [tagNameToIdMap[formData.value.tag]].filter(Boolean) : undefined
     })
 
-    console.log('User updated successfully:', response.data)
+    console.log('User updated successfully:', response)
     successMessage.value = 'User updated successfully!'
 
     // Update password if provided
