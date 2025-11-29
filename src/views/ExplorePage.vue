@@ -2,11 +2,10 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import Header from '../components/header.vue';
 import SearchBar from '../components/inputs/searchBar.vue';
-import Icon from '../assets/icons/icon.svg';
 import ExploreCategories from '../views/ExploreCategories.vue';
 import UserCard from '../components/userCard.vue';
-import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 import api from '../services/api';
 
 const { t } = useI18n()
@@ -116,9 +115,6 @@ const handleSearch = async (value: string) => {
   }
 };
 
-const goToHome = () => {
-  router.push({ name: 'home' });
-};
 
 // Fetch available tags from API
 const fetchAvailableTags = async () => {
@@ -186,16 +182,9 @@ const clearSearch = () => {
 
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10 relative">
-    <!-- Language Switcher - Top Right -->
-    <div class="absolute top-6 right-4 z-10">
-      <LanguageSwitcher />
-    </div>
-    
-    <!-- Top logo bar -->
-    <header class="pt-6 pb-4 border-b border-gray-200">
-      <img :src="Icon" alt="Social Links Logo" class="w-25 h-auto cursor-pointer" @click="goToHome"/>
-    </header>
+  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10">
+    <!-- Header Component -->
+    <Header class="mb-6" />
 
     <!-- Search -->
     <section class="mt-6" >

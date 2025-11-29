@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Footer from '../components/footer.vue';
+import Header from '../components/header.vue';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../store/auth';
 import { useI18n } from 'vue-i18n';
 import Icon from '../assets/icons/icon.svg';
-import LanguageSwitcher from '../components/LanguageSwitcher.vue';
 
 import SearchBar from '../components/inputs/searchBar.vue';
 
@@ -65,43 +65,9 @@ const numberOfUsers = ref(getNumberOfUsers());
 
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pt-4 pb-12">
-    <!-- Top bar (login/user icon + logout + theme toggle) -->
-    <header class="flex items-center justify-between py-2 border-b border-gray-200 mb-6">
-      <div class="flex items-center gap-3">
-        <LanguageSwitcher />
-        <template v-if="!authStore.isAuthenticated">
-          <button 
-            @click="goToLogin"
-            class="px-5 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold shadow-sm hover:bg-[#0094ff]/90 transition-colors cursor-pointer"
-          >
-            {{ t('common.login') }}
-          </button>
-        </template>
-        <template v-else>
-          <button 
-            @click="handleUserClick"
-            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center"
-            title="Go to dashboard"
-          >
-            <!-- User Icon SVG -->
-            <svg class="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          <button 
-            @click="handleLogout"
-            class="px-5 py-1.5 rounded-full bg-red-600 text-white text-sm font-semibold shadow-sm hover:bg-red-700 transition-colors cursor-pointer"
-          >
-            {{ t('common.logout') }}
-          </button>
-        </template>
-      </div>
-
-      <button class="p-2 rounded-full hover:bg-gray-100 transition text-xl" aria-label="Toggle theme">
-        <img src="/src/assets/icons/moon.svg" alt="Toggle Theme" class="w-6 h-auto" />
-      </button>
-    </header>
+  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-12">
+    <!-- Header component -->
+    <Header class="mb-6" />
 
     <!-- HERO: illustration + logo + search (mobile-first → 2 columns on md+) -->
     <section class="mt-8 md:mt-12 flex flex-col md:flex-row md:items-center md:justify-between gap-10">
