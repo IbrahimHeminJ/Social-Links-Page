@@ -177,7 +177,7 @@ import twitterIcon from '../assets/icons/twitter.svg'
 import instagramIcon from '../assets/icons/instagram.svg'
 import githubIcon from '../assets/icons/github.svg'
 import discordIcon from '../assets/icons/discord.svg'
-import api from '../services/api'
+import { userService, userLinksService, userReportService } from '../services/user'
 
 const openLink = (rawUrl: string) => {
   if (!rawUrl) return
@@ -243,9 +243,16 @@ const handleSubmitReport = async (payload: {
     return
   }
 
-  // Validate required fields
-  if (!payload.title.trim() || !payload.description.trim()) {
-    alert('Please fill in both title and description')
+  // Validate report payload
+  const validationError = userReportService.validateReport({
+    user_id: userId.value,
+    title: payload.title,
+    description: payload.description,
+    report_type: payload.type
+  })
+
+  if (validationError) {
+    alert(validationError)
     return
   }
 
@@ -256,8 +263,8 @@ const handleSubmitReport = async (payload: {
   isSubmittingReport.value = true
 
   try {
-    // Call the API to submit the report
-    await api.post('/user/report', {
+    // Call the service to submit the report
+    await userReportService.submitReport({
       user_id: userId.value, // The user being reported
       title: payload.title,
       description: payload.description,
@@ -299,10 +306,7 @@ const fetchUserInfo = async () => {
 
   try {
     // Fetch user by ID directly
-    const userResponse = await api.get(`/users/${userId.value}`)
-
-    // Parse response structure: { message, data: { id, name, ..., profile_image, theme: { id, theme_id, theme_type } } }
-    const userData = userResponse.data?.data || {}
+    const userData = await userService.getUserById(userId.value)
 
     // Get user info from /users/{id} endpoint (independent of button links)
     // Set profile_image, name, and description from user data
@@ -330,7 +334,7 @@ const fetchUserInfo = async () => {
     const themeId = userData.theme?.theme_id
 
     if (themeId !== undefined && themeId !== null) {
-      themeNumber.value = parseInt(themeId)
+      themeNumber.value = parseInt(String(themeId))
     } else {
       themeNumber.value = 1 // Default to theme 1
     }
@@ -350,49 +354,42 @@ const fetchUserLinks = async () => {
     isLoading.value = true
     error.value = null
 
-    const response = await api.get(`/user/${userId.value}/button-links`)
+    // Get visible button links sorted by order
+    const visibleLinks = await userLinksService.getVisibleButtonLinks(userId.value)
 
-    // Parse API response structure
-    const linksData = response.data.data || []
+    if (visibleLinks.length > 0) {
+      // Extract user data from button links (if available)
+      const userButtonLinks = await userLinksService.getUserButtonLinks(userId.value)
+      const extractedUserData = userLinksService.extractUserData(userButtonLinks)
 
-    if (linksData.length > 0) {
-      // Extract user info from first item (all items have same user)
-      const firstItem = linksData[0]
-      const userData = firstItem.relationship?.user?.data || {}
-
-      userName.value = userData.name || ''
-      userDescription.value = userData.description || userData.subtitle || ''
-      
-      // Set user tag if available (check all possible field names from API)
-      if (!userTag.value) {
-        if (userData.usertag) {
-          userTag.value = userData.usertag
-        } else if (userData.tag) {
-          userTag.value = userData.tag
-        } else if (userData.role) {
-          userTag.value = userData.role
+      if (extractedUserData) {
+        if (!userName.value) {
+          userName.value = extractedUserData.name || ''
+        }
+        if (!userDescription.value) {
+          userDescription.value = extractedUserData.description || ''
+        }
+        
+        // Set user tag if available (check all possible field names from API)
+        if (!userTag.value) {
+          if (extractedUserData.usertag) {
+            userTag.value = extractedUserData.usertag
+          } else if (extractedUserData.tag) {
+            userTag.value = extractedUserData.tag
+          } else if (extractedUserData.role) {
+            userTag.value = extractedUserData.role
+          }
         }
       }
 
-      // Note: profile_image is now fetched from /users/{id} endpoint in fetchUserInfo()
-      // So we don't need to set it here from button-links endpoint
-
-      // Map buttons from relationship.button_link
-      // Sort by order field
-      const sortedLinks = [...linksData].sort((a, b) => (a.order || 0) - (b.order || 0))
-
-      socialLinks.value = sortedLinks
-        .filter((item: any) => item.relationship?.button_link?.is_visible === 1) // Only show visible buttons
-        .map((item: any) => {
-          const buttonLink = item.relationship.button_link || {}
-          return {
-            title: buttonLink.title || '',
-            description: buttonLink.description || '',
-            link: buttonLink.link || '#',
-            platform: buttonLink.icon || 'default',
-            icon: buttonLink.icon || 'default'
-          }
-        })
+      // Map to SocialLink format
+      socialLinks.value = visibleLinks.map((link) => ({
+        title: link.title,
+        description: link.description,
+        link: link.link,
+        platform: link.platform,
+        icon: link.icon
+      }))
     } else {
       // No links found, but user info (name, description, profile_image) 
       // should already be set from fetchUserInfo() which is called first
@@ -762,14 +759,9 @@ const themeCorner3Class = computed(() => {
   }
 })
 
-// Format tag name function (same as ExplorePage)
+// Format tag name function (using service)
 const formatTagName = (tagName: string): string => {
-  return tagName
-    .split('_')
-    .map(word => word.replace(/\d+/g, ''))
-    .filter(word => word.length > 0)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+  return userService.formatTagName(tagName);
 };
 
 // Icon map for static imports (Vite requires static imports)
