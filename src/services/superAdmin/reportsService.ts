@@ -12,8 +12,8 @@ export interface Report {
   created_at?: string;
   reportType?: string;
   report_type?: string;
-  reportStatus?: string;
-  report_status?: string;
+  reportStatus?: number | string;
+  report_status?: number | string;
   handledBy?: string;
   handled_by?: string;
   reasonOfAction?: string;
@@ -101,8 +101,36 @@ class SuperAdminReportsService {
           report_type: reportData.report_type || reportData.reportType,
           reportStatus: reportData.report_status || reportData.reportStatus,
           report_status: reportData.report_status || reportData.reportStatus,
-          handledBy: reportData.handled_by || reportData.handledBy,
-          handled_by: reportData.handled_by || reportData.handledBy,
+          handledBy: (() => {
+            const handledByData = reportData.handled_by || reportData.handledBy;
+            if (!handledByData) return undefined;
+            // If it's an object with nested data structure, extract email
+            if (typeof handledByData === 'object' && handledByData !== null) {
+              if (handledByData.data && handledByData.data.email) {
+                return handledByData.data.email;
+              }
+              if (handledByData.email) {
+                return handledByData.email;
+              }
+            }
+            // If it's already a string (email), return as is
+            return typeof handledByData === 'string' ? handledByData : undefined;
+          })(),
+          handled_by: (() => {
+            const handledByData = reportData.handled_by || reportData.handledBy;
+            if (!handledByData) return undefined;
+            // If it's an object with nested data structure, extract email
+            if (typeof handledByData === 'object' && handledByData !== null) {
+              if (handledByData.data && handledByData.data.email) {
+                return handledByData.data.email;
+              }
+              if (handledByData.email) {
+                return handledByData.email;
+              }
+            }
+            // If it's already a string (email), return as is
+            return typeof handledByData === 'string' ? handledByData : undefined;
+          })(),
           reasonOfAction:
             reportData.reason_of_action || reportData.reasonOfAction,
           reason_of_action:
@@ -130,6 +158,138 @@ class SuperAdminReportsService {
           ...reportData, // Include all other fields from data
         };
       });
+  }
+
+  /**
+   * Get a single report by ID
+   * @param reportId - Report ID
+   * @returns Report detail
+   */
+  async getReportById(reportId: string | number): Promise<ReportDetail> {
+    const response = await api.get<{ message?: string; data: any }>(
+      `/admin/reports/${reportId}`
+    );
+    const rawReport = response.data?.data || response.data;
+
+    if (!rawReport) {
+      throw new Error("Report not found");
+    }
+
+    const reportData = rawReport.data || rawReport;
+
+    // Extract title from nested data structure
+    const title =
+      reportData.title ||
+      reportData.report_type ||
+      reportData.reportType ||
+      reportData.type ||
+      "Untitled Report";
+
+    // Extract description
+    const description =
+      reportData.description ||
+      reportData.reason_of_action ||
+      reportData.reasonOfAction ||
+      reportData.message ||
+      reportData.content ||
+      reportData.body ||
+      reportData.text ||
+      reportData.details ||
+      reportData.note ||
+      "No description available";
+
+    return {
+      id: rawReport.id || reportData.id || Number(reportId),
+      title: String(title),
+      description: String(description),
+      reporterEmail:
+        reportData.email_of_reporter ||
+        reportData.emailOfReporter ||
+        reportData.reporter_email,
+      email_of_reporter:
+        reportData.email_of_reporter ||
+        reportData.emailOfReporter ||
+        reportData.reporter_email,
+      emailOfReporter:
+        reportData.email_of_reporter ||
+        reportData.emailOfReporter ||
+        reportData.reporter_email,
+      reporter_email:
+        reportData.email_of_reporter ||
+        reportData.emailOfReporter ||
+        reportData.reporter_email,
+      createdAt: reportData.created_at || reportData.createdAt,
+      created_at: reportData.created_at || reportData.createdAt,
+      updatedAt: reportData.updated_at || reportData.updatedAt,
+      updated_at: reportData.updated_at || reportData.updatedAt,
+      reportType: reportData.report_type || reportData.reportType,
+      report_type: reportData.report_type || reportData.reportType,
+      reportStatus: typeof reportData.report_status === 'number' 
+        ? reportData.report_status 
+        : typeof reportData.reportStatus === 'number'
+        ? reportData.reportStatus
+        : reportData.report_status || reportData.reportStatus,
+      report_status: typeof reportData.report_status === 'number' 
+        ? reportData.report_status 
+        : typeof reportData.reportStatus === 'number'
+        ? reportData.reportStatus
+        : reportData.report_status || reportData.reportStatus,
+      handledBy: (() => {
+        const handledByData = reportData.handled_by || reportData.handledBy;
+        if (!handledByData) return undefined;
+        // If it's an object with nested data structure, extract email
+        if (typeof handledByData === 'object' && handledByData !== null) {
+          if (handledByData.data && handledByData.data.email) {
+            return handledByData.data.email;
+          }
+          if (handledByData.email) {
+            return handledByData.email;
+          }
+        }
+        // If it's already a string (email), return as is
+        return typeof handledByData === 'string' ? handledByData : undefined;
+      })(),
+      handled_by: (() => {
+        const handledByData = reportData.handled_by || reportData.handledBy;
+        if (!handledByData) return undefined;
+        // If it's an object with nested data structure, extract email
+        if (typeof handledByData === 'object' && handledByData !== null) {
+          if (handledByData.data && handledByData.data.email) {
+            return handledByData.data.email;
+          }
+          if (handledByData.email) {
+            return handledByData.email;
+          }
+        }
+        // If it's already a string (email), return as is
+        return typeof handledByData === 'string' ? handledByData : undefined;
+      })(),
+      reasonOfAction:
+        reportData.reason_of_action || reportData.reasonOfAction,
+      reason_of_action:
+        reportData.reason_of_action || reportData.reasonOfAction,
+      reportedUser:
+        reportData.reported_user ||
+        reportData.reportedUser ||
+        reportData.user_id ||
+        reportData.userId,
+      reported_user:
+        reportData.reported_user ||
+        reportData.reportedUser ||
+        reportData.user_id ||
+        reportData.userId,
+      user_id:
+        reportData.reported_user ||
+        reportData.reportedUser ||
+        reportData.user_id ||
+        reportData.userId,
+      userId:
+        reportData.reported_user ||
+        reportData.reportedUser ||
+        reportData.user_id ||
+        reportData.userId,
+      ...reportData, // Include all other fields from data
+    };
   }
 
   /**
@@ -209,8 +369,36 @@ class SuperAdminReportsService {
           report_type: reportData.report_type || reportData.reportType,
           reportStatus: reportData.report_status || reportData.reportStatus,
           report_status: reportData.report_status || reportData.reportStatus,
-          handledBy: reportData.handled_by || reportData.handledBy,
-          handled_by: reportData.handled_by || reportData.handledBy,
+          handledBy: (() => {
+            const handledByData = reportData.handled_by || reportData.handledBy;
+            if (!handledByData) return undefined;
+            // If it's an object with nested data structure, extract email
+            if (typeof handledByData === 'object' && handledByData !== null) {
+              if (handledByData.data && handledByData.data.email) {
+                return handledByData.data.email;
+              }
+              if (handledByData.email) {
+                return handledByData.email;
+              }
+            }
+            // If it's already a string (email), return as is
+            return typeof handledByData === 'string' ? handledByData : undefined;
+          })(),
+          handled_by: (() => {
+            const handledByData = reportData.handled_by || reportData.handledBy;
+            if (!handledByData) return undefined;
+            // If it's an object with nested data structure, extract email
+            if (typeof handledByData === 'object' && handledByData !== null) {
+              if (handledByData.data && handledByData.data.email) {
+                return handledByData.data.email;
+              }
+              if (handledByData.email) {
+                return handledByData.email;
+              }
+            }
+            // If it's already a string (email), return as is
+            return typeof handledByData === 'string' ? handledByData : undefined;
+          })(),
           reasonOfAction:
             reportData.reason_of_action || reportData.reasonOfAction,
           reason_of_action:

@@ -58,7 +58,7 @@ const SuperAdminRoutes: RouteRecordRaw[] = [
         },
     },
     {
-        path: '/super-admin/reports/:id/history',
+        path: '/super-admin/reports/history',
         name: 'superAdmin.reportHistory',
         component: ReportHistory,
         meta: {

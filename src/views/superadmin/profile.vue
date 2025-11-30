@@ -616,42 +616,120 @@ const handleSave = async () => {
       formData.append("profile_image", selectedImageFile.value);
     }
 
+    console.log("=== Updating profile ===");
+    console.log("Endpoint: POST /user/update");
+    console.log("FormData fields:", {
+      username: profileData.value.username,
+      name: profileData.value.name,
+      email: profileData.value.email,
+      phone_no: profileData.value.phone,
+      tags: tagsAsNumbers,
+      hasImage: !!selectedImageFile.value,
+    });
+
     const { data } = await api.post("/user/update", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
 
+    console.log("=== Profile update response ===");
+    console.log("Full response data:", data);
+    console.log("Response data.data:", data?.data);
+    console.log("Response data.data.user:", data?.data?.user);
+    console.log("Response data.data.data:", data?.data?.data);
+    console.log("Response data.user:", data?.user);
+
+    // Handle multiple possible response structures
+    // Structure 1: { data: { user: {...} } }
+    // Structure 2: { data: { data: { id, data: {...} } } } (UserResource format)
+    // Structure 3: { data: { id, data: {...} } } (UserResource format)
+    // Structure 4: { user: {...} }
+    // Structure 5: { data: {...} } (user data directly)
+
+    let updatedUser = null;
+    let updatedUserData = null;
+
+    // Try different response structures
     if (data?.data?.user) {
-      // Update local storage
-      localStorage.setItem("user", JSON.stringify(data.data.user));
+      updatedUser = data.data.user;
+      updatedUserData = updatedUser.data || updatedUser;
+    } else if (data?.data?.data) {
+      // UserResource format: { id, data: {...} }
+      updatedUser = data.data;
+      updatedUserData = updatedUser.data || updatedUser;
+    } else if (data?.data) {
+      // User data directly in data
+      updatedUser = data.data;
+      updatedUserData = updatedUser.data || updatedUser;
+    } else if (data?.user) {
+      updatedUser = data.user;
+      updatedUserData = updatedUser.data || updatedUser;
+    } else if (data) {
+      // Data is the user object itself
+      updatedUser = data;
+      updatedUserData = updatedUser.data || updatedUser;
+    }
+
+    console.log("=== Extracted user data ===");
+    console.log("Updated user:", updatedUser);
+    console.log("Updated user data:", updatedUserData);
+
+    if (updatedUserData) {
+      // Update local storage with the user data
+      const userForStorage = {
+        id: updatedUser?.id || updatedUserData.id,
+        username: updatedUserData.username,
+        name: updatedUserData.name,
+        email: updatedUserData.email,
+        phone_no: updatedUserData.phone_no || updatedUserData.phone,
+        profile_image: updatedUserData.profile_image || updatedUserData.image,
+        role: updatedUserData.role,
+        tags: updatedUserData.tags || [],
+      };
+      localStorage.setItem("user", JSON.stringify(userForStorage));
 
       // Update profile image if it was updated
-      if (data.data.user.profile_image) {
-        let updatedImageUrl = data.data.user.profile_image;
+      const updatedImageUrl =
+        updatedUserData.profile_image || updatedUserData.image;
+      if (updatedImageUrl) {
+        let processedImageUrl = updatedImageUrl;
 
         // Process the image URL similar to fetchUserData
         if (
-          updatedImageUrl.startsWith("http://") ||
-          updatedImageUrl.startsWith("https://")
+          processedImageUrl.startsWith("http://") ||
+          processedImageUrl.startsWith("https://")
         ) {
-          profileData.value.image = updatedImageUrl;
+          profileData.value.image = processedImageUrl;
         } else if (
-          updatedImageUrl.startsWith("/storage") ||
-          updatedImageUrl.startsWith("/")
+          processedImageUrl.startsWith("/storage") ||
+          processedImageUrl.startsWith("/")
         ) {
           if (import.meta.env.PROD) {
             const apiBaseUrl =
               import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
             const backendBase = apiBaseUrl.replace("/api", "");
-            profileData.value.image = `${backendBase}${updatedImageUrl}`;
+            profileData.value.image = `${backendBase}${processedImageUrl}`;
           } else {
-            profileData.value.image = updatedImageUrl;
+            profileData.value.image = processedImageUrl;
           }
         } else {
-          profileData.value.image = updatedImageUrl;
+          profileData.value.image = processedImageUrl;
         }
       }
+
+      // Refresh the profile data from the updated user data
+      const tagIds = extractTagIds(updatedUserData.tags || []);
+      profileData.value.username =
+        updatedUserData.username || profileData.value.username;
+      profileData.value.name = updatedUserData.name || profileData.value.name;
+      profileData.value.email =
+        updatedUserData.email || profileData.value.email;
+      profileData.value.phone =
+        updatedUserData.phone_no ||
+        updatedUserData.phone ||
+        profileData.value.phone;
+      profileData.value.tags = tagIds;
 
       successMessage.value = "Profile updated successfully!";
 
@@ -663,6 +741,8 @@ const handleSave = async () => {
       // Clear selected file
       selectedImageFile.value = null;
     } else {
+      console.warn("Could not extract user data from response");
+      console.warn("Response structure:", JSON.stringify(data, null, 2));
       errorMessage.value =
         "Profile update completed, but some information may not have been saved. Please refresh the page.";
     }
