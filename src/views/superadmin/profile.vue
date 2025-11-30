@@ -9,6 +9,7 @@
             :src="profileData.image"
             alt="Profile"
             class="w-48 h-48 rounded-full object-cover border-4 border-gray-200"
+            @error="handleImageError"
           />
           <button
             @click="triggerFileUpload"
@@ -40,7 +41,27 @@
 
       <!-- Right Section - Form -->
       <div class="flex-1">
-        <div class="space-y-6">
+        <!-- Error and Success Messages -->
+        <div v-if="errorMessage || successMessage" class="mb-4">
+          <div
+            v-if="errorMessage"
+            class="p-4 bg-red-50 border border-red-200 rounded-lg mb-4"
+          >
+            <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
+          </div>
+          <div
+            v-if="successMessage"
+            class="p-4 bg-green-50 border border-green-200 rounded-lg mb-4"
+          >
+            <p class="text-green-800 font-semibold">{{ successMessage }}</p>
+          </div>
+        </div>
+
+        <div v-if="isLoadingUser" class="text-center py-8">
+          <p class="text-gray-600">Loading profile data...</p>
+        </div>
+
+        <div v-else class="space-y-6">
           <!-- Username -->
           <Text
             v-model="profileData.username"
@@ -74,27 +95,122 @@
             placeholder="Enter phone number"
           />
 
-          <!-- Tag -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2"
-              >Tag</label
-            >
+          <!-- Tags (Multiple Selection) -->
+          <div v-if="isLoadingTags" class="text-gray-500 text-sm py-2">
+            Loading tags...
+          </div>
+          <div v-else class="flex flex-col gap-y-4">
+            <label>
+              <TextHeading>Tags</TextHeading>
+            </label>
             <p class="text-xs text-gray-600 mb-3">
-              Your tag describes your specialty or major or hobbies that you are
+              Your tags describe your specialty or major or hobbies that you are
               currently working on and you are using our services to display
               your social links
             </p>
-            <select
-              v-model="profileData.tag"
-              class="w-full px-4 py-3 bg-gray-100 border-b-2 border-blue-500 focus:outline-none focus:bg-white transition-colors appearance-none cursor-pointer"
+
+            <!-- Selected Tags as Badges -->
+            <div
+              v-if="profileData.tags && profileData.tags.length > 0"
+              class="flex flex-wrap gap-2 mb-2"
             >
-              <option value="">None</option>
-              <option value="developer">Developer</option>
-              <option value="designer">Designer</option>
-              <option value="content-creator">Content Creator</option>
-              <option value="business">Business</option>
-              <option value="student">Student</option>
-            </select>
+              <span
+                v-for="tagValue in profileData.tags"
+                :key="tagValue"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200"
+              >
+                <span>{{ getTagLabel(tagValue) }}</span>
+                <button
+                  type="button"
+                  @click="removeTag(tagValue)"
+                  class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors focus:outline-none"
+                  title="Remove tag"
+                >
+                  <svg
+                    class="w-3 h-3 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div v-else class="text-sm text-gray-500 mb-2">
+              No tags selected
+            </div>
+
+            <!-- Tags Dropdown -->
+            <div class="relative" ref="dropdownContainer">
+              <button
+                type="button"
+                @click="toggleTagsDropdown"
+                class="caret-[#009AFF] w-full px-4 h-[48px] rounded-[10px] bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors border-[#009AFF] border-b-2 focus:border-none flex items-center justify-between cursor-pointer"
+                :class="{ 'rounded-b-none': isTagsDropdownOpen }"
+              >
+                <span class="text-gray-400">Select tags</span>
+                <svg
+                  class="w-5 h-5 text-gray-500 transition-transform"
+                  :class="{ 'transform rotate-180': isTagsDropdownOpen }"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              <Transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95"
+              >
+                <div
+                  v-if="isTagsDropdownOpen"
+                  class="absolute z-50 w-full mt-1 bg-white border border-gray-300 border-t-0 rounded-b-[10px] shadow-lg max-h-64 overflow-auto"
+                  style="border-top: none"
+                >
+                  <button
+                    v-for="option in tagOptions"
+                    :key="option.value"
+                    type="button"
+                    @click="toggleTagSelection(option)"
+                    class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 transition-colors cursor-pointer text-left"
+                    :class="{
+                      'bg-blue-50': profileData.tags.includes(option.value),
+                    }"
+                  >
+                    <span class="flex-1">{{ option.label }}</span>
+                    <svg
+                      v-if="profileData.tags.includes(option.value)"
+                      class="w-5 h-5 text-[#009AFF]"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </Transition>
+            </div>
           </div>
         </div>
 
@@ -102,9 +218,10 @@
         <div class="mt-8 flex justify-center">
           <button
             @click="handleSave"
-            class="px-8 py-3 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors"
+            :disabled="isLoading"
+            class="px-8 py-3 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save changes
+            {{ isLoading ? "Saving..." : "Save changes" }}
           </button>
         </div>
       </div>
@@ -113,17 +230,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import Text from "../../components/inputs/text.vue";
+import TextHeading from "../../components/textHeading.vue";
+import authService from "../../services/authService";
+import { userService } from "../../services/user";
+import api from "../../services/api";
+import defaultProfile from "../../assets/images/man.png";
 
 const fileInput = ref<HTMLInputElement | null>(null);
+const dropdownContainer = ref<HTMLElement | null>(null);
+const isLoading = ref(false);
+const isLoadingUser = ref(false);
+const isLoadingTags = ref(false);
+const errorMessage = ref<string>("");
+const successMessage = ref<string>("");
+const selectedImageFile = ref<File | null>(null);
+const tagOptions = ref<Array<{ label: string; value: string }>>([]);
+const isTagsDropdownOpen = ref(false);
 
 interface ProfileData {
   username: string;
   name: string;
   email: string;
   phone: string;
-  tag: string;
+  tags: string[];
   image: string;
 }
 
@@ -132,22 +263,255 @@ const profileData = ref<ProfileData>({
   name: "",
   email: "",
   phone: "",
-  tag: "",
-  image: "/src/assets/images/man.png",
+  tags: [],
+  image: defaultProfile,
 });
 
-// Load profile data (in real app, fetch from API)
-onMounted(() => {
-  // TODO: Fetch profile data from API
-  profileData.value = {
-    username: "super_admin",
-    name: "Super Admin",
-    email: "admin@example.com",
-    phone: "+1234567890",
-    tag: "",
-    image: "/src/assets/images/man.png",
-  };
-});
+// Fetch tags from backend
+const fetchTags = async () => {
+  try {
+    isLoadingTags.value = true;
+    const tags = await userService.getTags();
+
+    tagOptions.value = tags.map((tag: any) => ({
+      label: tag.tag || tag.tag_name || tag.name || `Tag ${tag.id}`,
+      value: String(tag.id),
+    }));
+  } catch (err: any) {
+    console.error("Error fetching tags:", err);
+    errorMessage.value = "Failed to load tags. Please refresh the page.";
+  } finally {
+    isLoadingTags.value = false;
+  }
+};
+
+// Extract tag IDs from user tags - handles multiple tag structures
+const extractTagIds = (userTags: any[]): string[] => {
+  if (!Array.isArray(userTags) || userTags.length === 0) {
+    return [];
+  }
+
+  console.log("=== Extracting tag IDs ===");
+  console.log("User tags received:", userTags);
+  console.log("Tag options available:", tagOptions.value);
+
+  return userTags
+    .map((tag) => {
+      // First, try to get ID directly
+      let id = tag.id || tag.tag_id || tag.pivot?.tag_id;
+
+      // If no ID, try to match by tag string value
+      if (!id && tag.tag) {
+        const tagString = String(tag.tag).trim();
+
+        // Find matching tag option by label (tag string) - exact match
+        let matchingOption = tagOptions.value.find(
+          (option) => option.label.trim() === tagString
+        );
+
+        // If no exact match, try case-insensitive match
+        if (!matchingOption) {
+          matchingOption = tagOptions.value.find(
+            (option) =>
+              option.label.trim().toLowerCase() === tagString.toLowerCase()
+          );
+        }
+
+        if (matchingOption) {
+          id = matchingOption.value;
+          console.log(
+            `✅ Matched tag "${tag.tag}" to ID: ${id} (label: "${matchingOption.label}")`
+          );
+        } else {
+          console.warn(`⚠️ Could not find tag ID for tag string: "${tag.tag}"`);
+          console.log(
+            "Available tag labels:",
+            tagOptions.value.map((opt) => opt.label)
+          );
+        }
+      }
+
+      // If still no ID and tag is a string that might contain ID (e.g., "nonprofit_842")
+      if (!id && typeof tag.tag === "string") {
+        // Try to extract number from end of string (e.g., "nonprofit_842" -> "842")
+        const match = tag.tag.match(/_(\d+)$/);
+        if (match && match[1]) {
+          // Verify this ID exists in tagOptions
+          const extractedId = match[1];
+          if (tagOptions.value.some((opt) => opt.value === extractedId)) {
+            id = extractedId;
+            console.log(
+              `Extracted tag ID "${extractedId}" from tag string "${tag.tag}"`
+            );
+          }
+        }
+      }
+
+      return id ? String(id) : null;
+    })
+    .filter((id): id is string => id !== null);
+};
+
+// Get tag label by value
+const getTagLabel = (tagValue: string): string => {
+  const option = tagOptions.value.find((opt) => opt.value === tagValue);
+  return option?.label || tagValue;
+};
+
+// Toggle tags dropdown
+const toggleTagsDropdown = () => {
+  isTagsDropdownOpen.value = !isTagsDropdownOpen.value;
+};
+
+// Toggle tag selection
+const toggleTagSelection = (option: { label: string; value: string }) => {
+  const index = profileData.value.tags.indexOf(option.value);
+  if (index > -1) {
+    profileData.value.tags.splice(index, 1);
+  } else {
+    profileData.value.tags.push(option.value);
+  }
+};
+
+// Remove tag from badges
+const removeTag = (tagValue: string) => {
+  const index = profileData.value.tags.indexOf(tagValue);
+  if (index > -1) {
+    profileData.value.tags.splice(index, 1);
+  }
+};
+
+// Handle click outside tags dropdown
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    dropdownContainer.value &&
+    !dropdownContainer.value.contains(event.target as Node)
+  ) {
+    isTagsDropdownOpen.value = false;
+  }
+};
+
+// Fetch current user data from API
+const fetchUserData = async () => {
+  try {
+    isLoadingUser.value = true;
+    errorMessage.value = "";
+
+    console.log("=== Fetching current user data ===");
+    const rawUserData = await authService.getCurrentUser();
+
+    console.log("=== Raw user data from API ===");
+    console.log("Full user data object:", rawUserData);
+    console.log(
+      "User data keys:",
+      rawUserData ? Object.keys(rawUserData) : "No data"
+    );
+
+    // Handle nested structure: { id, data: { username, name, email, ... } }
+    // Similar to how UserResource returns data
+    const userData = rawUserData?.data || rawUserData;
+    const userId = rawUserData?.id || userData?.id;
+
+    console.log("=== Extracted user data ===");
+    console.log("User ID:", userId);
+    console.log("User data (after extraction):", userData);
+    console.log(
+      "User data keys:",
+      userData ? Object.keys(userData) : "No data"
+    );
+    console.log("Username:", userData?.username);
+    console.log("Name:", userData?.name);
+    console.log("Email:", userData?.email);
+    console.log("Phone:", userData?.phone_no || userData?.phone);
+    console.log("Profile Image:", userData?.profile_image || userData?.image);
+    console.log("Tags:", userData?.tags);
+    console.log("Tag (single):", userData?.tag);
+    console.log("Role:", userData?.role);
+
+    // Handle image URL - similar to users.vue
+    let imageUrl = userData.profile_image || userData.image || "";
+
+    if (imageUrl && imageUrl.trim() !== "") {
+      imageUrl = imageUrl.trim();
+
+      // If it's already a full URL (http/https), use it as is
+      if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+        console.log("Profile - Using full URL from asset():", imageUrl);
+      }
+      // If it's a relative path starting with /storage
+      else if (imageUrl.startsWith("/storage") || imageUrl.startsWith("/")) {
+        if (import.meta.env.PROD) {
+          const apiBaseUrl =
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+          const backendBase = apiBaseUrl.replace("/api", "");
+          if (!imageUrl.startsWith("http")) {
+            imageUrl = `${backendBase}${imageUrl}`;
+          }
+          console.log("Profile - Constructed production URL:", imageUrl);
+        } else {
+          console.log("Profile - Using relative URL (dev proxy):", imageUrl);
+        }
+      }
+      // If it starts with storage/ (no leading slash), add the slash
+      else if (imageUrl.startsWith("storage/")) {
+        imageUrl = `/${imageUrl}`;
+        if (import.meta.env.PROD) {
+          const apiBaseUrl =
+            import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+          const backendBase = apiBaseUrl.replace("/api", "");
+          imageUrl = `${backendBase}${imageUrl}`;
+        }
+        console.log("Profile - Fixed storage path:", imageUrl);
+      }
+      // Invalid format - use default
+      else {
+        console.warn(
+          "Profile - Invalid image URL format, using default:",
+          imageUrl
+        );
+        imageUrl = defaultProfile;
+      }
+    } else {
+      console.log("Profile - No image URL, using default");
+      imageUrl = defaultProfile;
+    }
+
+    // Extract tags - handle different tag structures
+    const tagIds = extractTagIds(userData.tags || []);
+    console.log("Extracted tag IDs:", tagIds);
+
+    profileData.value = {
+      username: userData.username || "",
+      name: userData.name || "",
+      email: userData.email || "",
+      phone: userData.phone_no || userData.phone || "",
+      tags: tagIds,
+      image: imageUrl,
+    };
+
+    console.log("=== Mapped profile data ===");
+    console.log("Profile data object:", profileData.value);
+    console.log("Username:", profileData.value.username);
+    console.log("Name:", profileData.value.name);
+    console.log("Email:", profileData.value.email);
+    console.log("Phone:", profileData.value.phone);
+    console.log("Tags:", profileData.value.tags);
+    console.log("Image URL:", profileData.value.image);
+    console.log("=== User data fetch completed ===");
+  } catch (err: any) {
+    console.error("=== Error fetching user data ===");
+    console.error("Error object:", err);
+    console.error("Error message:", err.message);
+    console.error("Error response:", err.response);
+    console.error("Error response status:", err.response?.status);
+    console.error("Error response data:", err.response?.data);
+    errorMessage.value =
+      err.response?.data?.message ||
+      "Failed to load profile data. Please try again.";
+  } finally {
+    isLoadingUser.value = false;
+  }
+};
 
 const triggerFileUpload = () => {
   fileInput.value?.click();
@@ -156,17 +520,184 @@ const triggerFileUpload = () => {
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
+
+  // Clear previous error messages
+  errorMessage.value = "";
+
   if (file) {
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      errorMessage.value = "Image size must be less than 2MB";
+      if (target) {
+        target.value = "";
+      }
+      selectedImageFile.value = null;
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      errorMessage.value = "Please select a valid image file";
+      if (target) {
+        target.value = "";
+      }
+      selectedImageFile.value = null;
+      return;
+    }
+
+    // Set the selected file
+    selectedImageFile.value = file;
+
+    // Update preview
     const reader = new FileReader();
     reader.onload = (e) => {
-      profileData.value.image = e.target?.result as string;
+      if (e.target?.result) {
+        profileData.value.image = e.target.result as string;
+      }
+    };
+    reader.onerror = () => {
+      console.error("Error reading file for preview");
+      errorMessage.value = "Error reading image file";
     };
     reader.readAsDataURL(file);
+  } else {
+    selectedImageFile.value = null;
   }
 };
 
-const handleSave = () => {
-  // TODO: Implement save functionality
-  console.log("Save profile:", profileData.value);
+const handleSave = async () => {
+  try {
+    isLoading.value = true;
+    errorMessage.value = "";
+    successMessage.value = "";
+
+    // Validate required fields
+    if (!profileData.value.username.trim()) {
+      errorMessage.value = "Username is required";
+      return;
+    }
+    if (!profileData.value.name.trim()) {
+      errorMessage.value = "Name is required";
+      return;
+    }
+    if (!profileData.value.email.trim()) {
+      errorMessage.value = "Email is required";
+      return;
+    }
+    if (!profileData.value.phone.trim()) {
+      errorMessage.value = "Phone number is required";
+      return;
+    }
+
+    // Create FormData for multipart/form-data
+    const formData = new FormData();
+    formData.append("name", profileData.value.name.trim());
+    formData.append("username", profileData.value.username.trim());
+    formData.append("email", profileData.value.email.trim());
+    formData.append("phone_no", profileData.value.phone.trim());
+
+    // Handle tags - send as array of tag IDs
+    const tagsAsNumbers = profileData.value.tags
+      .map((tag) => parseInt(tag))
+      .filter((tag) => !isNaN(tag) && tag > 0);
+
+    // Send tags as array - Laravel expects array indices starting from 1
+    tagsAsNumbers.forEach((tagId, index) => {
+      formData.append(`tags[${index + 1}]`, String(tagId));
+    });
+
+    // If no tags, send empty array
+    if (tagsAsNumbers.length === 0) {
+      formData.append("tags[]", "");
+    }
+
+    // Add profile image if a new one was selected
+    if (selectedImageFile.value) {
+      formData.append("profile_image", selectedImageFile.value);
+    }
+
+    const { data } = await api.post("/user/update", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (data?.data?.user) {
+      // Update local storage
+      localStorage.setItem("user", JSON.stringify(data.data.user));
+
+      // Update profile image if it was updated
+      if (data.data.user.profile_image) {
+        let updatedImageUrl = data.data.user.profile_image;
+
+        // Process the image URL similar to fetchUserData
+        if (
+          updatedImageUrl.startsWith("http://") ||
+          updatedImageUrl.startsWith("https://")
+        ) {
+          profileData.value.image = updatedImageUrl;
+        } else if (
+          updatedImageUrl.startsWith("/storage") ||
+          updatedImageUrl.startsWith("/")
+        ) {
+          if (import.meta.env.PROD) {
+            const apiBaseUrl =
+              import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+            const backendBase = apiBaseUrl.replace("/api", "");
+            profileData.value.image = `${backendBase}${updatedImageUrl}`;
+          } else {
+            profileData.value.image = updatedImageUrl;
+          }
+        } else {
+          profileData.value.image = updatedImageUrl;
+        }
+      }
+
+      successMessage.value = "Profile updated successfully!";
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        successMessage.value = "";
+      }, 3000);
+
+      // Clear selected file
+      selectedImageFile.value = null;
+    } else {
+      errorMessage.value =
+        "Profile update completed, but some information may not have been saved. Please refresh the page.";
+    }
+  } catch (err: any) {
+    console.error("Error updating profile:", err);
+    if (err.response?.data?.errors) {
+      const errors = err.response.data.errors;
+      const errorMessages = Object.values(errors).flat();
+      errorMessage.value = `Validation failed: ${errorMessages.join(", ")}`;
+    } else if (err.response?.data?.message) {
+      errorMessage.value = err.response.data.message;
+    } else {
+      errorMessage.value = "Failed to update profile. Please try again.";
+    }
+  } finally {
+    isLoading.value = false;
+  }
 };
+
+// Handle image loading errors
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement;
+  if (target.src !== defaultProfile) {
+    target.src = defaultProfile;
+  }
+};
+
+// Fetch user data when component mounts
+onMounted(async () => {
+  document.addEventListener("click", handleClickOutside);
+  await fetchTags();
+  await fetchUserData();
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
 </script>
