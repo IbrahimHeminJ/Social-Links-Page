@@ -201,6 +201,12 @@ const selectedItem = computed<LinkItem | null>(() => {
   return linkItems.value[selectedIndex.value] ?? null;
 });
 
+// Returns translated text or a readable fallback when the key is missing
+const translateOrFallback = (key: string, fallback: string) => {
+  const translated = t(key);
+  return translated === key ? fallback : translated;
+};
+
 // Fetch user's links from API (same structure as SocialLinks.vue)
 const fetchLinks = async () => {
   try {
@@ -220,7 +226,10 @@ const fetchLinks = async () => {
     }
 
     if (!userId) {
-      showToast({ type: "error", message: t("themes.userNotFound") });
+      showToast({
+        type: "error",
+        message: translateOrFallback("themes.userNotFound", "User not found."),
+      });
       linkItems.value = [];
       return;
     }
@@ -337,7 +346,10 @@ const viewSocialLinksPage = async () => {
     }
 
     if (!userId) {
-      showToast({ type: "error", message: t("themes.userNotFound") });
+      showToast({
+        type: "error",
+        message: translateOrFallback("themes.userNotFound", "User not found."),
+      });
       console.error("No user ID found");
       return;
     }
@@ -361,7 +373,13 @@ async function handleSubmit() {
 
     // Validate form
     if (!formData.title.trim() || !formData.link.trim() || !formData.platform) {
-      showToast({ type: "error", message: t("links.pleaseFillRequired") });
+      showToast({
+        type: "error",
+        message: translateOrFallback(
+          "links.pleaseFillRequired",
+          "Please fill in all required fields."
+        ),
+      });
       return;
     }
 
@@ -377,11 +395,23 @@ async function handleSubmit() {
     if (editingLinkId.value) {
       // Update existing link
       await adminLinksService.updateLink(editingLinkId.value, payload);
-      showToast({ type: "success", message: t("links.linkUpdated") });
+      showToast({
+        type: "success",
+        message: translateOrFallback(
+          "links.linkUpdated",
+          "Link updated successfully."
+        ),
+      });
     } else {
       // Create new link
       await adminLinksService.createLink(payload);
-      showToast({ type: "success", message: t("links.linkSaved") });
+      showToast({
+        type: "success",
+        message: translateOrFallback(
+          "links.linkSaved",
+          "Link saved successfully."
+        ),
+      });
     }
 
     // Refresh links from API
@@ -460,7 +490,10 @@ async function handleConfirmDelete() {
 
     showToast({
       type: "success",
-      message: t("links.linkDeleted") || "Link deleted successfully.",
+      message: translateOrFallback(
+        "links.linkDeleted",
+        "Link deleted successfully."
+      ),
     });
 
     // Optionally refresh from API to stay in sync

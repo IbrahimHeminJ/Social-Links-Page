@@ -47,7 +47,7 @@ watch(
 <template>
   <div
     v-if="toast.show"
-    class="fixed top-5 right-5 z-50 duration-300"
+    class="fixed bottom-5 left-1/2 transform -translate-x-1/2 z-50 duration-300"
   >
     <div
       class="flex items-start gap-3 p-4 rounded-xl shadow-lg border w-80"
