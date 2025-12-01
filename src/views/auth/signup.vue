@@ -6,11 +6,7 @@
     </div>
     <!-- Logo and Title Row -->
     <div class="flex flex-col md:flex-row items-center justify-center">
-      <img
-        src="../../assets/icons/icon.svg"
-        alt="logo"
-        class="w-40 h-40 md:w-56 md:h-56 mb-4 md:mb-0 md:mr-8"
-      />
+      <img src="../../assets/icons/icon.svg" alt="logo" class="w-40 h-40 md:w-56 md:h-56 mb-4 md:mb-0 md:mr-8" />
       <div class="hidden md:block w-px h-20 bg-gray-300 mr-8"></div>
       <h2 class="text-2xl md:text-4xl text-gray-700 text-center md:text-left">
         {{ t("auth.signup") }}
@@ -23,52 +19,25 @@
         <!-- Left Column -->
         <div class="space-y-8">
           <!-- Username Field -->
-          <Text
-            v-model="username"
-            :label="t('auth.username')"
-            :placeholder="t('auth.enterUsername')"
-            type="text"
-            class="mb-6"
-          />
+          <Text v-model="username" :label="t('auth.username')" :placeholder="t('auth.enterUsername')" type="text"
+            class="mb-6" />
 
           <!-- Email Field -->
-          <Text
-            v-model="email"
-            :label="t('auth.email')"
-            :placeholder="t('auth.enterEmail')"
-            type="email"
-            class="mb-6"
-          />
+          <Text v-model="email" :label="t('auth.email')" :placeholder="t('auth.enterEmail')" type="email"
+            class="mb-6" />
 
           <!-- Password Field -->
-          <Text
-            v-model="password"
-            :label="t('auth.password')"
-            :placeholder="t('auth.enterPassword')"
-            type="password"
-            class="mb-6"
-          />
+          <Text v-model="password" :label="t('auth.password')" :placeholder="t('auth.enterPassword')" type="password"
+            class="mb-6" />
         </div>
 
         <!-- Middle Column -->
         <div class="">
           <!-- Name Field -->
-          <Text
-            v-model="name"
-            :label="t('auth.name')"
-            :placeholder="t('auth.enterName')"
-            type="text"
-            class="mb-6"
-          />
+          <Text v-model="name" :label="t('auth.name')" :placeholder="t('auth.enterName')" type="text" class="mb-6" />
 
           <!-- Phone Number Field -->
-          <Text
-            v-model="phoneNumber"
-            label="Phone Number"
-            placeholder="e.g. +1234567890"
-            type="tel"
-            class="mb-6"
-          />
+          <Text v-model="phoneNumber" label="Phone Number" placeholder="e.g. +1234567890" type="tel" class="mb-6" />
 
           <!-- Tag Field (styled & functional like superadmin/profile.vue) -->
           <div>
@@ -186,6 +155,8 @@
         <Hyperlink :text="t('auth.loginHere')" @click="goToLogin" />
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -198,6 +169,7 @@ import Text from "../../components/inputs/text.vue";
 import Hyperlink from "../../components/buttons/hyperlink.vue";
 import LanguageSwitcher from "../../components/LanguageSwitcher.vue";
 import { userService } from "../../services/user";
+import ToastMessage from "../../components/alerts/toastMessage.vue";
 
 const { t } = useI18n();
 
@@ -217,6 +189,22 @@ const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 
 const router = useRouter();
 const authStore = useAuthStore();
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 // Fetch tags from backend (same style as profile.vue)
 const fetchTags = async () => {
@@ -315,20 +303,20 @@ const handleSignup = async () => {
     !trimmedName ||
     !phoneNumber.value?.trim()
   ) {
-    alert("Please fill in all required fields (username, email, password, name, phone number)");
+    showToast('error', 'Validation Error', "Please fill in all required fields (username, email, password, name, phone number)");
     return;
   }
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(trimmedEmail)) {
-    alert("Please enter a valid email address");
+    showToast('error', 'Validation Error', "Please enter a valid email address");
     return;
   }
 
   // Validate password length (>= 8 characters)
   if (trimmedPassword.length < 8) {
-    alert("Password must be at least 8 characters long");
+    showToast('error', 'Validation Error', "Password must be at least 8 characters long");
     return;
   }
 
@@ -357,12 +345,12 @@ const handleSignup = async () => {
 
   if (result.success) {
     // Signup successful, show success message
-    alert("Your account has been created successfully! Welcome aboard!");
+    showToast('success', 'Success', "Your account has been created successfully! Welcome aboard!");
     // Redirect to home
     router.push({ name: "home" });
   } else {
     // Signup failed, show error
-    alert(result.error || "Signup failed");
+    showToast('error', 'Signup Failed', result.error || "Signup failed");
   }
 };
 

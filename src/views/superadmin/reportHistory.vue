@@ -1,22 +1,9 @@
 <template>
   <div class="p-4 md:p-6">
     <div class="mb-6">
-      <button
-        @click="goBack"
-        class="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2"
-      >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
+      <button @click="goBack" class="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
         {{ t("reports.back") }}
       </button>
@@ -32,13 +19,10 @@
       <p class="text-gray-600">{{ t("reports.noReportHistoryFound") }}</p>
     </div>
     <div v-else class="space-y-4">
-      <ReportBox
-        v-for="(report, index) in reportHistory"
-        :key="index"
-        :report="report"
-        @click="viewReport"
-      />
+      <ReportBox v-for="(report, index) in reportHistory" :key="index" :report="report" @click="viewReport" />
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -48,6 +32,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReportBox from "../../components/reports/reportBox.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+import ToastMessage from "../../components/alerts/toastMessage.vue";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -64,12 +49,28 @@ interface ReportHistoryItem {
 const reportHistory = ref<ReportHistoryItem[]>([]);
 const loading = ref(false);
 
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
+
 const fetchReportHistory = async () => {
   loading.value = true;
   try {
     reportHistory.value = await superAdminReportsService.getResolvedReports();
   } catch (err: any) {
-    alert(err.response?.data?.message || t("reports.failedToFetchReportHistory"));
+    showToast('error', 'Error', err.response?.data?.message || t("reports.failedToFetchReportHistory"));
     console.error("Error fetching report history:", err);
   } finally {
     loading.value = false;

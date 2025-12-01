@@ -7,6 +7,7 @@ import Text from '../../components/inputs/text.vue';
 import Submit from '../../components/buttons/submit.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import ToastMessage from '../../components/alerts/toastMessage.vue';
 
 const { t } = useI18n()
 
@@ -17,6 +18,22 @@ const loginData = ref({
   username: '',
   password: ''
 })
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 const goToSignup = () => {
   router.push({ name: 'signup' })
@@ -32,7 +49,7 @@ const handleLogin = async () => {
 
   // Validate inputs
   if (!trimmedUsername || !trimmedPassword) {
-    alert(t('validation.required'))
+    showToast('error', 'Validation Error', t('validation.required'));
     return
   }
 
@@ -47,12 +64,12 @@ const handleLogin = async () => {
 
   if (result.success) {
     // Login successful, show success message
-    alert('Welcome back! You have been logged in successfully.')
+    showToast('success', 'Success', 'Welcome back! You have been logged in successfully.');
     // Redirect to home
     router.push({ name: 'home' })
   } else {
     // Login failed, show error
-    alert(result.error || 'Login failed')
+    showToast('error', 'Login Failed', result.error || 'Login failed');
   }
 }
 
@@ -92,5 +109,7 @@ const handleLogin = async () => {
         <Hyperlink :text="t('auth.signUpHere')" @click="goToSignup" />
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>

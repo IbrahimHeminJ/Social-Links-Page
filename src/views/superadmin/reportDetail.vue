@@ -138,6 +138,8 @@
         </button>
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -148,6 +150,7 @@ import { useI18n } from "vue-i18n";
 import Text from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+import ToastMessage from "../../components/alerts/toastMessage.vue";
 
 const { t } = useI18n();
 
@@ -185,6 +188,22 @@ const reportData = ref<ReportData>({
 
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 const actionOptions = [
   { label: t("reports.actions.deleteUser"), value: "delete-user" },
@@ -306,12 +325,12 @@ const formatDate = (dateString: string) => {
 const handleResolve = async () => {
   // Validate required fields
   if (!reportData.value.action) {
-    alert("Please select an action");
+    showToast('error', 'Validation Error', "Please select an action");
     return;
   }
 
   if (!reportData.value.reason || !reportData.value.reason.trim()) {
-    alert("Please enter a reason for the action");
+    showToast('error', 'Validation Error', "Please enter a reason for the action");
     return;
   }
 
@@ -328,7 +347,7 @@ const handleResolve = async () => {
     });
 
     // Show success message
-    alert("Report resolved successfully");
+    showToast('success', 'Success', "Report resolved successfully");
 
     // Navigate back to reports list
     goBack();
@@ -338,7 +357,7 @@ const handleResolve = async () => {
       err.response?.data?.message ||
       err.response?.data?.error ||
       "Failed to resolve report. Please try again.";
-    alert(errorMessage);
+    showToast('error', 'Error', errorMessage);
   }
 };
 

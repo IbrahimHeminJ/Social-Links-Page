@@ -5,37 +5,16 @@
       <div class="flex flex-col items-center md:items-start">
         <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
         <div class="relative">
-          <img
-            :src="profileData.image"
-            alt="Profile"
-            class="w-48 h-48 rounded-full object-cover border-4 border-gray-200"
-            @error="handleImageError"
-          />
-          <button
-            @click="triggerFileUpload"
-            class="absolute bottom-2 right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg"
-          >
-            <svg
-              class="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-              />
+          <img :src="profileData.image" alt="Profile"
+            class="w-48 h-48 rounded-full object-cover border-4 border-gray-200" @error="handleImageError" />
+          <button @click="triggerFileUpload"
+            class="absolute bottom-2 right-2 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
           </button>
-          <input
-            type="file"
-            ref="fileInput"
-            @change="handleFileUpload"
-            accept="image/*"
-            class="hidden"
-          />
+          <input type="file" ref="fileInput" @change="handleFileUpload" accept="image/*" class="hidden" />
         </div>
       </div>
 
@@ -47,37 +26,17 @@
 
         <div v-else class="space-y-6">
           <!-- Username -->
-          <Text
-            v-model="profileData.username"
-            label="username"
-            type="text"
-            placeholder="Enter username"
-          />
+          <Text v-model="profileData.username" label="username" type="text" placeholder="Enter username" />
 
           <!-- Name -->
-          <Text
-            v-model="profileData.name"
-            label="Name"
-            type="text"
-            placeholder="Enter name"
-          />
+          <Text v-model="profileData.name" label="Name" type="text" placeholder="Enter name" />
 
           <!-- Email -->
-          <Text
-            v-model="profileData.email"
-            label="Email"
-            type="email"
-            placeholder="Enter email"
-          />
+          <Text v-model="profileData.email" label="Email" type="email" placeholder="Enter email" />
 
           <!-- Phone No -->
 
-          <Text
-            v-model="profileData.phone"
-            label="Phone No"
-            type="tel"
-            placeholder="Enter phone number"
-          />
+          <Text v-model="profileData.phone" label="Phone No" type="tel" placeholder="Enter phone number" />
 
           <!-- Tags (Multiple Selection) -->
           <div v-if="isLoadingTags" class="text-gray-500 text-sm py-2">
@@ -94,34 +53,15 @@
             </p>
 
             <!-- Selected Tags as Badges -->
-            <div
-              v-if="profileData.tags && profileData.tags.length > 0"
-              class="flex flex-wrap gap-2 mb-2"
-            >
-              <span
-                v-for="tagValue in profileData.tags"
-                :key="tagValue"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200"
-              >
+            <div v-if="profileData.tags && profileData.tags.length > 0" class="flex flex-wrap gap-2 mb-2">
+              <span v-for="tagValue in profileData.tags" :key="tagValue"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200">
                 <span>{{ getTagLabel(tagValue) }}</span>
-                <button
-                  type="button"
-                  @click="removeTag(tagValue)"
+                <button type="button" @click="removeTag(tagValue)"
                   class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-blue-200 transition-colors focus:outline-none"
-                  title="Remove tag"
-                >
-                  <svg
-                    class="w-3 h-3 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                  title="Remove tag">
+                  <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </span>
@@ -132,64 +72,35 @@
 
             <!-- Tags Dropdown -->
             <div class="relative" ref="dropdownContainer">
-              <button
-                type="button"
-                @click="toggleTagsDropdown"
+              <button type="button" @click="toggleTagsDropdown"
                 class="caret-[#009AFF] w-full px-4 h-[48px] rounded-[10px] bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors border-[#009AFF] border-b-2 focus:border-none flex items-center justify-between cursor-pointer"
-                :class="{ 'rounded-b-none': isTagsDropdownOpen }"
-              >
+                :class="{ 'rounded-b-none': isTagsDropdownOpen }">
                 <span class="text-gray-400">Select tags</span>
-                <svg
-                  class="w-5 h-5 text-gray-500 transition-transform"
-                  :class="{ 'transform rotate-180': isTagsDropdownOpen }"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg class="w-5 h-5 text-gray-500 transition-transform"
+                  :class="{ 'transform rotate-180': isTagsDropdownOpen }" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
-              <Transition
-                enter-active-class="transition ease-out duration-200"
-                enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100"
-                leave-active-class="transition ease-in duration-150"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95"
-              >
-                <div
-                  v-if="isTagsDropdownOpen"
+              <Transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+                <div v-if="isTagsDropdownOpen"
                   class="absolute z-50 w-full mt-1 bg-white border border-gray-300 border-t-0 rounded-b-[10px] shadow-lg max-h-64 overflow-auto"
-                  style="border-top: none"
-                >
-                  <button
-                    v-for="option in tagOptions"
-                    :key="option.value"
-                    type="button"
+                  style="border-top: none">
+                  <button v-for="option in tagOptions" :key="option.value" type="button"
                     @click="toggleTagSelection(option)"
                     class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-100 transition-colors cursor-pointer text-left"
                     :class="{
                       'bg-blue-50': profileData.tags.includes(option.value),
-                    }"
-                  >
+                    }">
                     <span class="flex-1">{{ option.label }}</span>
-                    <svg
-                      v-if="profileData.tags.includes(option.value)"
-                      class="w-5 h-5 text-[#009AFF]"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fill-rule="evenodd"
+                    <svg v-if="profileData.tags.includes(option.value)" class="w-5 h-5 text-[#009AFF]"
+                      fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clip-rule="evenodd"
-                      />
+                        clip-rule="evenodd" />
                     </svg>
                   </button>
                 </div>
@@ -200,16 +111,15 @@
 
         <!-- Save Changes Button -->
         <div class="mt-8 flex justify-center">
-          <button
-            @click="handleSave"
-            :disabled="isLoading"
-            class="px-8 py-3 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <button @click="handleSave" :disabled="isLoading"
+            class="px-8 py-3 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {{ isLoading ? "Saving..." : "Save changes" }}
           </button>
         </div>
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -221,6 +131,7 @@ import authService from "../../services/authService";
 import { userService } from "../../services/user";
 import api from "../../services/api";
 import defaultProfile from "../../assets/images/man.png";
+import ToastMessage from "../../components/alerts/toastMessage.vue";
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const dropdownContainer = ref<HTMLElement | null>(null);
@@ -230,6 +141,22 @@ const isLoadingTags = ref(false);
 const selectedImageFile = ref<File | null>(null);
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 const isTagsDropdownOpen = ref(false);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 interface ProfileData {
   username: string;
@@ -261,7 +188,7 @@ const fetchTags = async () => {
     }));
   } catch (err: any) {
     console.error("Error fetching tags:", err);
-    alert("Failed to load tags. Please refresh the page.");
+    showToast('error', 'Error', "Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
   }
@@ -434,7 +361,7 @@ const fetchUserData = async () => {
     console.error("Error response:", err.response);
     console.error("Error response status:", err.response?.status);
     console.error("Error response data:", err.response?.data);
-    alert(err.response?.data?.message || "Failed to load profile data. Please try again.");
+    showToast('error', 'Error', err.response?.data?.message || "Failed to load profile data. Please try again.");
   } finally {
     isLoadingUser.value = false;
   }
@@ -451,7 +378,7 @@ const handleFileUpload = (event: Event) => {
   if (file) {
     // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
-      alert("Image size must be less than 2MB");
+      showToast('error', 'Validation Error', "Image size must be less than 2MB");
       if (target) {
         target.value = "";
       }
@@ -461,7 +388,7 @@ const handleFileUpload = (event: Event) => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select a valid image file");
+      showToast('error', 'Validation Error', "Please select a valid image file");
       if (target) {
         target.value = "";
       }
@@ -481,7 +408,7 @@ const handleFileUpload = (event: Event) => {
     };
     reader.onerror = () => {
       console.error("Error reading file for preview");
-      alert("Error reading image file");
+      showToast('error', 'Error', "Error reading image file");
     };
     reader.readAsDataURL(file);
   } else {
@@ -495,19 +422,19 @@ const handleSave = async () => {
 
     // Validate required fields
     if (!profileData.value.username.trim()) {
-      alert("Username is required");
+      showToast('error', 'Validation Error', "Username is required");
       return;
     }
     if (!profileData.value.name.trim()) {
-      alert("Name is required");
+      showToast('error', 'Validation Error', "Name is required");
       return;
     }
     if (!profileData.value.email.trim()) {
-      alert("Email is required");
+      showToast('error', 'Validation Error', "Email is required");
       return;
     }
     if (!profileData.value.phone.trim()) {
-      alert("Phone number is required");
+      showToast('error', 'Validation Error', "Phone number is required");
       return;
     }
 
@@ -631,14 +558,14 @@ const handleSave = async () => {
         profileData.value.phone;
       profileData.value.tags = tagIds;
 
-      alert("Profile updated successfully!");
+      showToast('success', 'Success', "Profile updated successfully!");
 
       // Clear selected file
       selectedImageFile.value = null;
     } else {
       console.warn("Could not extract user data from response");
       console.warn("Response structure:", JSON.stringify(data, null, 2));
-      alert("Profile update completed, but some information may not have been saved. Please refresh the page.");
+      showToast('info', 'Partial Update', "Profile update completed, but some information may not have been saved. Please refresh the page.");
     }
   } catch (err: any) {
     console.error("Error updating profile:", err);
@@ -650,8 +577,8 @@ const handleSave = async () => {
     } else if (err.response?.data?.message) {
       errorMsg = err.response.data.message;
     }
-    
-    alert(errorMsg);
+
+    showToast('error', 'Error', errorMsg);
   } finally {
     isLoading.value = false;
   }

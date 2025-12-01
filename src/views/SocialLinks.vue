@@ -61,7 +61,7 @@
                   <div v-if="userTag"
                     :class="`absolute -bottom-4 -right-4 px-4 py-2 bg-gradient-to-r ${themeGradientClass} rounded-full shadow-xl ${themeBadgeShadowClass} transform rotate-12 hover:rotate-0 transition-transform border-2 ${themeBadgeBorderClass}`">
                     <span class="text-white text-xs font-black uppercase tracking-wider">{{ formatTagName(userTag)
-                      }}</span>
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -201,6 +201,8 @@
     </div>
 
     <ReportWindow :show="showReport" @close="showReport = false" @submit="handleSubmitReport" />
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -211,6 +213,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../store/auth'
 import ReportWindow from '../components/reports/reportWindow.vue'
 import LanguageSwitcher from '../components/LanguageSwitcher.vue'
+import ToastMessage from '../components/alerts/toastMessage.vue'
 
 const { t } = useI18n()
 
@@ -238,6 +241,22 @@ const route = useRoute()
 const authStore = useAuthStore()
 const showReport = ref(false);
 const isSubmittingReport = ref(false);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 // Get user ID from route params
 const userId = computed(() => route.params.id as string || '')
@@ -275,7 +294,7 @@ const handleSubmitReport = async (payload: {
   // Double check authentication before submitting
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
-    alert(t('socialLinks.pleaseLoginToReport'))
+    showToast('error', 'Authentication Required', t('socialLinks.pleaseLoginToReport'));
     router.push({
       name: 'login',
       query: { redirect: route.fullPath }
@@ -284,7 +303,7 @@ const handleSubmitReport = async (payload: {
   }
 
   if (!userId.value) {
-    alert(t('socialLinks.userIdRequired'))
+    showToast('error', 'Missing Information', t('socialLinks.userIdRequired'));
     return
   }
 
@@ -297,7 +316,7 @@ const handleSubmitReport = async (payload: {
   })
 
   if (validationError) {
-    alert(validationError)
+    showToast('error', 'Validation Error', validationError);
     return
   }
 
@@ -317,13 +336,13 @@ const handleSubmitReport = async (payload: {
     });
 
     // Show success message
-    alert('Report submitted successfully. Thank you for your feedback.');
+    showToast('success', 'Success', 'Report submitted successfully. Thank you for your feedback.');
 
     // Close the report window
     showReport.value = false;
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to submit report. Please try again.';
-    alert(errorMessage);
+    showToast('error', 'Error', errorMessage);
   } finally {
     isSubmittingReport.value = false
   }

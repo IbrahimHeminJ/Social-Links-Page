@@ -10,11 +10,8 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div
-      v-if="showDeleteModal"
-      class="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50"
-      @click.self="closeDeleteModal"
-    >
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-opacity-30 flex items-center justify-center z-50"
+      @click.self="closeDeleteModal">
       <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 mb-4 text-center">
@@ -34,16 +31,12 @@
           </div>
 
           <div class="flex gap-3">
-            <button
-              @click="confirmDelete"
-              class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
-            >
+            <button @click="confirmDelete"
+              class="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors">
               {{ t("common.yes") }}
             </button>
-            <button
-              @click="closeDeleteModal"
-              class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-            >
+            <button @click="closeDeleteModal"
+              class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition-colors">
               {{ t("common.cancel") }}
             </button>
           </div>
@@ -52,52 +45,33 @@
     </div>
 
     <!-- Users Table -->
-    <div
-      v-if="!isLoading"
-      class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
-    >
+    <div v-if="!isLoading" class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.image") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.id") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.username") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.name") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.email") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.phone") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.updatedAt") }}
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.action") }}
               </th>
             </tr>
@@ -110,12 +84,8 @@
             </tr>
             <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
               <td class="px-4 py-3 whitespace-nowrap">
-                <img
-                  :src="user.image"
-                  :alt="user.username"
-                  class="w-10 h-10 rounded-full object-cover"
-                  @error="handleImageError"
-                />
+                <img :src="user.image" :alt="user.username" class="w-10 h-10 rounded-full object-cover"
+                  @error="handleImageError" />
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
                 {{ user.id }}
@@ -137,22 +107,16 @@
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm">
                 <div class="flex items-center gap-x-2">
-                  <button
-                    @click="handleView(user.id)"
-                    class="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                  >
+                  <button @click="handleView(user.id)"
+                    class="px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors">
                     {{ t("common.view") }}
                   </button>
-                  <button
-                    @click="handleEdit(user.id)"
-                    class="px-3 py-1 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors"
-                  >
+                  <button @click="handleEdit(user.id)"
+                    class="px-3 py-1 text-xs font-medium text-green-600 hover:text-green-800 hover:bg-green-50 rounded transition-colors">
                     {{ t("common.edit") }}
                   </button>
-                  <button
-                    @click="handleDelete(user.id)"
-                    class="px-3 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
-                  >
+                  <button @click="handleDelete(user.id)"
+                    class="px-3 py-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors">
                     {{ t("common.delete") }}
                   </button>
                 </div>
@@ -162,6 +126,8 @@
         </table>
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -171,6 +137,7 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { superAdminUsersService } from "../../services/superAdmin";
 import defaultProfile from "../../assets/images/man.png";
+import ToastMessage from "../../components/alerts/toastMessage.vue";
 
 const { t } = useI18n();
 
@@ -189,6 +156,22 @@ interface User {
 
 const users = ref<User[]>([]);
 const isLoading = ref(false);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -290,7 +273,7 @@ const fetchUsers = async () => {
     });
   } catch (err: any) {
     console.error("Error fetching users:", err);
-    alert(err.response?.data?.message || t("users.failedToFetchUsers"));
+    showToast('error', 'Error', err.response?.data?.message || t("users.failedToFetchUsers"));
   } finally {
     isLoading.value = false;
   }
@@ -332,13 +315,13 @@ const confirmDelete = async () => {
 
     // Show success message
     const deletedUserName = userToDeleteData.value?.name || "User";
-    alert(`${deletedUserName} has been deleted successfully.`);
+    showToast('success', 'Success', `${deletedUserName} has been deleted successfully.`);
 
     // Close modal
     closeDeleteModal();
   } catch (err: any) {
     console.error("Error deleting user:", err);
-    alert(err.response?.data?.message || t("users.failedToDeleteUser"));
+    showToast('error', 'Error', err.response?.data?.message || t("users.failedToDeleteUser"));
     closeDeleteModal();
   }
 };
