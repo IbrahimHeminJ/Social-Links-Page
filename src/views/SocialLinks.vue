@@ -1,19 +1,28 @@
 <template>
-      <div :class="`min-h-screen w-full bg-gradient-to-br ${themeBgClass} text-white relative overflow-hidden`">
+  <div :class="`min-h-screen w-full bg-gradient-to-br ${themeBgClass} text-white relative overflow-hidden`">
     <!-- Creative Animated Background - Theme Based -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
       <div :class="`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${themeBgOverlayClass}`"></div>
-      <div :class="`absolute top-1/4 -left-20 w-96 h-96 ${themeOrb1Class} rounded-full blur-3xl opacity-30 animate-float`"></div>
-      <div :class="`absolute bottom-1/4 -right-20 w-96 h-96 ${themeOrb2Class} rounded-full blur-3xl opacity-25 animate-float-delay`"></div>
-      <div :class="`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ${themeOrb3Class} rounded-full blur-3xl opacity-20 animate-pulse-slow`"></div>
-      <div :class="`absolute top-3/4 left-1/4 w-72 h-72 ${themeOrb4Class} rounded-full blur-3xl opacity-15 animate-float`"></div>
+      <div
+        :class="`absolute top-1/4 -left-20 w-96 h-96 ${themeOrb1Class} rounded-full blur-3xl opacity-30 animate-float`">
+      </div>
+      <div
+        :class="`absolute bottom-1/4 -right-20 w-96 h-96 ${themeOrb2Class} rounded-full blur-3xl opacity-25 animate-float-delay`">
+      </div>
+      <div
+        :class="`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ${themeOrb3Class} rounded-full blur-3xl opacity-20 animate-pulse-slow`">
+      </div>
+      <div
+        :class="`absolute top-3/4 left-1/4 w-72 h-72 ${themeOrb4Class} rounded-full blur-3xl opacity-15 animate-float`">
+      </div>
     </div>
 
     <!-- Main Container -->
     <div class="relative z-10 min-h-screen flex flex-col">
       <!-- Top Bar -->
       <div class="flex justify-between items-center p-6">
-        <button @click="goToHome" :class="`group relative px-4 py-2 overflow-hidden rounded-full border-2 border-white/20 ${themeHoverBorderClass} transition-all`">
+        <button @click="goToHome"
+          :class="`group relative px-4 py-2 overflow-hidden rounded-full border-2 border-white/20 ${themeHoverBorderClass} transition-all`">
           <span :class="`relative z-10 flex items-center gap-2 text-white ${themeTextHoverClass}`">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -34,17 +43,25 @@
             <div class="flex flex-col md:flex-row items-center md:items-start gap-8 mb-12">
               <div class="relative group">
                 <!-- Glowing Rings - Theme Based -->
-                <div :class="`absolute -inset-4 bg-gradient-to-r ${themeGradientRingsClass} rounded-full blur-2xl opacity-60 group-hover:opacity-90 transition-opacity animate-spin-slow`"></div>
-                <div :class="`absolute -inset-2 bg-gradient-to-r ${themeGradientClass} rounded-full blur-xl opacity-40 group-hover:opacity-70 transition-opacity animate-spin-reverse`"></div>
-                <div :class="`absolute -inset-6 bg-gradient-to-r ${themeGradientRingsClass} rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse-slow`"></div>
-                
+                <div
+                  :class="`absolute -inset-4 bg-gradient-to-r ${themeGradientRingsClass} rounded-full blur-2xl opacity-60 group-hover:opacity-90 transition-opacity animate-spin-slow`">
+                </div>
+                <div
+                  :class="`absolute -inset-2 bg-gradient-to-r ${themeGradientClass} rounded-full blur-xl opacity-40 group-hover:opacity-70 transition-opacity animate-spin-reverse`">
+                </div>
+                <div
+                  :class="`absolute -inset-6 bg-gradient-to-r ${themeGradientRingsClass} rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity animate-pulse-slow`">
+                </div>
+
                 <!-- Profile Image -->
                 <div class="relative">
                   <img :src="userProfileImage || '/src/assets/images/man.png'" alt="Profile"
                     :class="`relative w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 ${themeProfileBorderClass} shadow-2xl ${themeProfileShadowClass} transform group-hover:scale-105 transition-transform`">
                   <!-- Floating Badge - Theme Based -->
-                  <div v-if="userTag" :class="`absolute -bottom-4 -right-4 px-4 py-2 bg-gradient-to-r ${themeGradientClass} rounded-full shadow-xl ${themeBadgeShadowClass} transform rotate-12 hover:rotate-0 transition-transform border-2 ${themeBadgeBorderClass}`">
-                    <span class="text-white text-xs font-black uppercase tracking-wider">{{ formatTagName(userTag) }}</span>
+                  <div v-if="userTag"
+                    :class="`absolute -bottom-4 -right-4 px-4 py-2 bg-gradient-to-r ${themeGradientClass} rounded-full shadow-xl ${themeBadgeShadowClass} transform rotate-12 hover:rotate-0 transition-transform border-2 ${themeBadgeBorderClass}`">
+                    <span class="text-white text-xs font-black uppercase tracking-wider">{{ formatTagName(userTag)
+                      }}</span>
                   </div>
                 </div>
               </div>
@@ -52,11 +69,14 @@
               <!-- Name with Creative Typography - Theme Based -->
               <div class="flex-1 text-center md:text-left">
                 <h1 class="text-6xl md:text-8xl font-black mb-4 leading-none">
-                  <span :class="`block bg-gradient-to-r ${themeGradientClass} bg-clip-text text-transparent animate-gradient`">
+                  <span
+                    :class="`block bg-gradient-to-r ${themeGradientClass} bg-clip-text text-transparent animate-gradient`">
                     {{ userName || `User ID: ${userId}` }}
                   </span>
                 </h1>
-                <div :class="`h-1 w-32 bg-gradient-to-r ${themeGradientRingsClass} mx-auto md:mx-0 mb-6 shadow-lg ${themeUnderlineShadowClass}`"></div>
+                <div
+                  :class="`h-1 w-32 bg-gradient-to-r ${themeGradientRingsClass} mx-auto md:mx-0 mb-6 shadow-lg ${themeUnderlineShadowClass}`">
+                </div>
                 <p class="text-xl md:text-2xl text-gray-200 leading-relaxed max-w-2xl">
                   {{ userDescription || 'No description available' }}
                 </p>
@@ -69,9 +89,15 @@
             <!-- Loading state - Theme Based -->
             <div v-if="isLoading" class="text-center py-20">
               <div class="inline-block relative">
-                <div :class="`w-16 h-16 border-4 ${themeLoadingBorder1Class} border-t-transparent rounded-full animate-spin`"></div>
-                <div :class="`absolute inset-0 w-16 h-16 border-4 ${themeLoadingBorder2Class} border-b-transparent rounded-full animate-spin-reverse`"></div>
-                <div :class="`absolute inset-2 w-12 h-12 border-4 ${themeLoadingBorder3Class} border-l-transparent rounded-full animate-spin`"></div>
+                <div
+                  :class="`w-16 h-16 border-4 ${themeLoadingBorder1Class} border-t-transparent rounded-full animate-spin`">
+                </div>
+                <div
+                  :class="`absolute inset-0 w-16 h-16 border-4 ${themeLoadingBorder2Class} border-b-transparent rounded-full animate-spin-reverse`">
+                </div>
+                <div
+                  :class="`absolute inset-2 w-12 h-12 border-4 ${themeLoadingBorder3Class} border-l-transparent rounded-full animate-spin`">
+                </div>
               </div>
               <p class="mt-6 text-gray-300 text-lg">{{ t('socialLinks.loadingLinks') }}</p>
             </div>
@@ -88,41 +114,51 @@
 
             <!-- Creative Link Cards -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <a v-for="(link, index) in socialLinks" :key="index" 
-                @click="openLink(link.link)"
+              <a v-for="(link, index) in socialLinks" :key="index" @click="openLink(link.link)"
                 :style="{ animationDelay: `${index * 100}ms` }"
                 :class="`group relative block overflow-hidden rounded-3xl border-2 border-white/10 ${themeLinkHoverBorderClass} transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl ${themeLinkShadowClass} creative-link`"
                 style="text-decoration: none;">
-                
+
                 <!-- Animated Background Gradient - Theme Based -->
-                <div :class="`absolute inset-0 bg-gradient-to-br ${themeLinkGradientHoverClass} transition-all duration-500`"></div>
-                
+                <div
+                  :class="`absolute inset-0 bg-gradient-to-br ${themeLinkGradientHoverClass} transition-all duration-500`">
+                </div>
+
                 <!-- Content -->
                 <div class="relative p-8 bg-black/50 backdrop-blur-sm">
                   <div class="flex items-start gap-6">
                     <!-- Icon with Creative Design - Theme Based -->
                     <div class="relative flex-shrink-0">
-                      <div :class="`absolute inset-0 bg-gradient-to-br ${themeGradientRingsClass} rounded-2xl blur-md opacity-60 group-hover:opacity-90 transition-opacity`"></div>
-                      <div :class="`absolute -inset-1 bg-gradient-to-br ${themeGradientClass} rounded-2xl blur-sm opacity-30 group-hover:opacity-50 transition-opacity`"></div>
-                      <div :class="`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${themeGradientClass} border-2 ${themeBorderClass}/30 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg ${themeIconShadowClass}`">
-                        <img :src="getIconPath(link.icon)" :alt="link.platform" class="w-10 h-10 object-contain filter brightness-0 invert">
+                      <div
+                        :class="`absolute inset-0 bg-gradient-to-br ${themeGradientRingsClass} rounded-2xl blur-md opacity-60 group-hover:opacity-90 transition-opacity`">
+                      </div>
+                      <div
+                        :class="`absolute -inset-1 bg-gradient-to-br ${themeGradientClass} rounded-2xl blur-sm opacity-30 group-hover:opacity-50 transition-opacity`">
+                      </div>
+                      <div
+                        :class="`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${themeGradientClass} border-2 ${themeBorderClass}/30 flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg ${themeIconShadowClass}`">
+                        <img :src="getIconPath(link.icon)" :alt="link.platform"
+                          class="w-10 h-10 object-contain filter brightness-0 invert">
                       </div>
                     </div>
 
                     <!-- Text Content -->
                     <div class="flex-1 min-w-0">
-                      <h3 :class="`text-2xl font-black mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r ${themeGradientClass} group-hover:bg-clip-text transition-all`">
+                      <h3
+                        :class="`text-2xl font-black mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r ${themeGradientClass} group-hover:bg-clip-text transition-all`">
                         {{ link.title }}
                       </h3>
                       <p class="text-gray-300 text-sm leading-relaxed line-clamp-2 mb-4">
                         {{ link.description }}
                       </p>
-                      
+
                       <!-- Creative Arrow - Theme Based -->
-                      <div :class="`flex items-center gap-2 ${themeTextClass} opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300`">
+                      <div
+                        :class="`flex items-center gap-2 ${themeTextClass} opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300`">
                         <span class="text-xs font-bold uppercase tracking-widest">EXPLORE</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                            d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                       </div>
                     </div>
@@ -130,32 +166,43 @@
                 </div>
 
                 <!-- Decorative Corner Element - Theme Based -->
-                <div :class="`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${themeCorner1Class} transition-all`"></div>
-                <div :class="`absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr ${themeCorner2Class} transition-all`"></div>
-                <div :class="`absolute top-0 left-0 w-16 h-16 bg-gradient-to-br ${themeCorner3Class} transition-all`"></div>
+                <div :class="`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${themeCorner1Class} transition-all`">
+                </div>
+                <div
+                  :class="`absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr ${themeCorner2Class} transition-all`">
+                </div>
+                <div :class="`absolute top-0 left-0 w-16 h-16 bg-gradient-to-br ${themeCorner3Class} transition-all`">
+                </div>
               </a>
             </div>
           </div>
 
           <!-- Creative Footer - Theme Based -->
-          <div :class="`mt-12 flex items-center justify-between p-6 rounded-2xl border-2 ${themeFooterBorderClass} bg-black/40 backdrop-blur-sm shadow-xl ${themeFooterShadowClass}`">
-            <button @click="handleReportClick" :class="`group relative px-6 py-3 overflow-hidden rounded-full border-2 ${themeReportButtonBorderClass} transition-all shadow-lg ${themeReportButtonShadowClass}`">
+          <div
+            :class="`mt-12 flex items-center justify-between p-6 rounded-2xl border-2 ${themeFooterBorderClass} bg-black/40 backdrop-blur-sm shadow-xl ${themeFooterShadowClass}`">
+            <button @click="handleReportClick"
+              :class="`group relative px-6 py-3 overflow-hidden rounded-full border-2 ${themeReportButtonBorderClass} transition-all shadow-lg ${themeReportButtonShadowClass}`">
               <span :class="`relative z-10 flex items-center gap-2 ${themeTextClass} group-hover:text-white`">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  <path fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clip-rule="evenodd" />
                 </svg>
                 <span class="font-bold">{{ t('socialLinks.reportUser') }}</span>
               </span>
               <div :class="`absolute inset-0 bg-gradient-to-r ${themeReportButtonGradientClass} transition-all`"></div>
             </button>
-            
-            <img src="../assets/icons/icon.svg" alt="Logo" class="w-12 h-12 opacity-60 hover:opacity-100 transition-opacity">
+
+            <img src="../assets/icons/icon.svg" alt="Logo"
+              class="w-12 h-12 opacity-60 hover:opacity-100 transition-opacity">
           </div>
         </div>
       </div>
     </div>
 
     <ReportWindow :show="showReport" @close="showReport = false" @submit="handleSubmitReport" />
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -166,6 +213,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../store/auth'
 import ReportWindow from '../components/reports/reportWindow.vue'
 import LanguageSwitcher from '../components/LanguageSwitcher.vue'
+import ToastMessage from '../components/alerts/toastMessage.vue'
 
 const { t } = useI18n()
 
@@ -193,6 +241,22 @@ const route = useRoute()
 const authStore = useAuthStore()
 const showReport = ref(false);
 const isSubmittingReport = ref(false);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 // Get user ID from route params
 const userId = computed(() => route.params.id as string || '')
@@ -230,7 +294,7 @@ const handleSubmitReport = async (payload: {
   // Double check authentication before submitting
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
-    alert(t('socialLinks.pleaseLoginToReport'))
+    showToast('error', 'Authentication Required', t('socialLinks.pleaseLoginToReport'))
     router.push({
       name: 'login',
       query: { redirect: route.fullPath }
@@ -239,7 +303,7 @@ const handleSubmitReport = async (payload: {
   }
 
   if (!userId.value) {
-    alert(t('socialLinks.userIdRequired'))
+    showToast('error', 'Missing Information', t('socialLinks.userIdRequired'))
     return
   }
 
@@ -252,7 +316,7 @@ const handleSubmitReport = async (payload: {
   })
 
   if (validationError) {
-    alert(validationError)
+    showToast('error', 'Validation Error', validationError)
     return
   }
 
@@ -272,13 +336,13 @@ const handleSubmitReport = async (payload: {
     });
 
     // Show success message
-    alert('Report submitted successfully. Thank you for your feedback.');
+    showToast('success', 'Success', 'Report submitted successfully. Thank you for your feedback.');
 
     // Close the report window
     showReport.value = false;
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to submit report. Please try again.';
-    alert(errorMessage);
+    showToast('error', 'Error', errorMessage);
   } finally {
     isSubmittingReport.value = false
   }
@@ -369,7 +433,7 @@ const fetchUserLinks = async () => {
         if (!userDescription.value) {
           userDescription.value = extractedUserData.description || ''
         }
-        
+
         // Set user tag if available (check all possible field names from API)
         if (!userTag.value) {
           if (extractedUserData.usertag) {
