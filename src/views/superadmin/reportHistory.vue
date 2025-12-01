@@ -48,10 +48,8 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReportBox from "../../components/reports/reportBox.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 const router = useRouter();
 
 interface ReportHistoryItem {
@@ -71,10 +69,7 @@ const fetchReportHistory = async () => {
   try {
     reportHistory.value = await superAdminReportsService.getResolvedReports();
   } catch (err: any) {
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || t("reports.failedToFetchReportHistory"),
-    });
+    alert(err.response?.data?.message || t("reports.failedToFetchReportHistory"));
     console.error("Error fetching report history:", err);
   } finally {
     loading.value = false;

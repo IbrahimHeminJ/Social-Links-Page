@@ -236,10 +236,8 @@ import Text from "../../components/inputs/text.vue";
 import { superAdminUsersService } from "../../services/superAdmin";
 import { userService } from "../../services/user";
 import defaultProfile from "../../assets/images/man.png";
-import { useToast } from "../../composables/useToast";
 
 const router = useRouter();
-const { showToast } = useToast();
 const route = useRoute();
 const fileInput = ref<HTMLInputElement | null>(null);
 const dropdownContainer = ref<HTMLElement | null>(null);
@@ -291,10 +289,7 @@ const fetchTags = async () => {
     }));
   } catch (err: any) {
     console.error("Error fetching tags:", err);
-    showToast({
-      type: "error",
-      message: "Failed to load tags. Please refresh the page.",
-    });
+    alert("Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
   }
@@ -360,10 +355,7 @@ const fetchUserData = async () => {
     : route.params.id;
 
   if (!userId) {
-    showToast({
-      type: "error",
-      message: "User ID is required",
-    });
+    alert("User ID is required");
     return;
   }
 
@@ -440,10 +432,7 @@ const fetchUserData = async () => {
     };
   } catch (err: any) {
     console.error("Error fetching user data:", err);
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || "Failed to load user data. Please try again.",
-    });
+    alert(err.response?.data?.message || "Failed to load user data. Please try again.");
   } finally {
     isLoadingUser.value = false;
   }
@@ -505,10 +494,7 @@ const handleFileUpload = (event: Event) => {
 
   if (file) {
     if (file.size > 2 * 1024 * 1024) {
-      showToast({
-        type: "error",
-        message: "Image size must be less than 2MB",
-      });
+      alert("Image size must be less than 2MB");
       // Reset file input
       if (target) {
         target.value = "";
@@ -518,10 +504,7 @@ const handleFileUpload = (event: Event) => {
     }
 
     if (!file.type.startsWith("image/")) {
-      showToast({
-        type: "error",
-        message: "Please select a valid image file",
-      });
+      alert("Please select a valid image file");
       // Reset file input
       if (target) {
         target.value = "";
@@ -542,10 +525,7 @@ const handleFileUpload = (event: Event) => {
     };
     reader.onerror = () => {
       console.error("Error reading file for preview");
-      showToast({
-        type: "error",
-        message: "Error reading image file",
-      });
+      alert("Error reading image file");
     };
     reader.readAsDataURL(file);
   } else {
@@ -563,10 +543,7 @@ const handleSubmit = async () => {
       : route.params.id;
 
     if (!userId) {
-      showToast({
-        type: "error",
-        message: "User ID is required",
-      });
+      alert("User ID is required");
       return;
     }
 
@@ -576,38 +553,23 @@ const handleSubmit = async () => {
     const phone = formData.value.phone.trim();
 
     if (!username) {
-      showToast({
-        type: "error",
-        message: "Username is required",
-      });
+      alert("Username is required");
       return;
     }
     if (!name) {
-      showToast({
-        type: "error",
-        message: "Name is required",
-      });
+      alert("Name is required");
       return;
     }
     if (!email) {
-      showToast({
-        type: "error",
-        message: "Email is required",
-      });
+      alert("Email is required");
       return;
     }
     if (!phone) {
-      showToast({
-        type: "error",
-        message: "Phone number is required",
-      });
+      alert("Phone number is required");
       return;
     }
     if (formData.value.tags.length === 0) {
-      showToast({
-        type: "error",
-        message: "At least one tag is required",
-      });
+      alert("At least one tag is required");
       return;
     }
 
@@ -622,31 +584,19 @@ const handleSubmit = async () => {
     // If password fields are filled, validate them
     if (newPassword || confirmPassword) {
       if (!newPassword) {
-        showToast({
-          type: "error",
-          message: "New password is required",
-        });
+        alert("New password is required");
         return;
       }
       if (!confirmPassword) {
-        showToast({
-          type: "error",
-          message: "Password confirmation is required",
-        });
+        alert("Password confirmation is required");
         return;
       }
       if (newPassword !== confirmPassword) {
-        showToast({
-          type: "error",
-          message: "Passwords do not match",
-        });
+        alert("Passwords do not match");
         return;
       }
       if (newPassword.length < 8) {
-        showToast({
-          type: "error",
-          message: "Password must be at least 8 characters",
-        });
+        alert("Password must be at least 8 characters");
         return;
       }
     }
@@ -664,10 +614,7 @@ const handleSubmit = async () => {
       password_confirmation: confirmPassword || undefined,
     });
 
-    showToast({
-      type: "success",
-      message: "User updated successfully!",
-    });
+    alert("User updated successfully!");
 
     // Clear password fields after successful update
     passwordData.value.newPassword = "";
@@ -711,10 +658,7 @@ const handleSubmit = async () => {
       errorMsg = `Failed to update user (Status: ${err.response?.status || "Unknown"}). Please try again.`;
     }
     
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
   } finally {
     isLoading.value = false;
   }

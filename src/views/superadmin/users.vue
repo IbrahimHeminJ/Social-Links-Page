@@ -171,10 +171,8 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { superAdminUsersService } from "../../services/superAdmin";
 import defaultProfile from "../../assets/images/man.png";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 
 const router = useRouter();
 
@@ -292,10 +290,7 @@ const fetchUsers = async () => {
     });
   } catch (err: any) {
     console.error("Error fetching users:", err);
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || t("users.failedToFetchUsers"),
-    });
+    alert(err.response?.data?.message || t("users.failedToFetchUsers"));
   } finally {
     isLoading.value = false;
   }
@@ -307,14 +302,6 @@ const handleView = (userId: number) => {
 };
 
 const handleEdit = (userId: number) => {
-  const user = users.value.find((u) => u.id === userId);
-  if (user) {
-    showToast({
-      type: "info",
-      title: "Editing User",
-      message: `Opening edit page for ${user.name || user.username}...`,
-    });
-  }
   // Navigate to edit user page
   router.push({ name: "superAdmin.editUser", params: { id: userId } });
 };
@@ -345,20 +332,13 @@ const confirmDelete = async () => {
 
     // Show success message
     const deletedUserName = userToDeleteData.value?.name || "User";
-    showToast({
-      type: "success",
-      title: "User Deleted",
-      message: `${deletedUserName} has been deleted successfully.`,
-    });
+    alert(`${deletedUserName} has been deleted successfully.`);
 
     // Close modal
     closeDeleteModal();
   } catch (err: any) {
     console.error("Error deleting user:", err);
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || t("users.failedToDeleteUser"),
-    });
+    alert(err.response?.data?.message || t("users.failedToDeleteUser"));
     closeDeleteModal();
   }
 };

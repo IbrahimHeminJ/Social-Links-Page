@@ -164,10 +164,8 @@ import { useI18n } from "vue-i18n";
 import TextHeading from "../../components/textHeading.vue";
 import { useAuthStore } from "../../store/auth";
 import { adminThemeService } from "../../services/admin";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 
 const authStore = useAuthStore();
 
@@ -223,10 +221,7 @@ const fetchCurrentTheme = async () => {
     }
 
     if (!userId) {
-      showToast({
-        type: "error",
-        message: t("themes.userNotFound"),
-      });
+      alert(t("themes.userNotFound"));
       currentTheme.value = t("themes.notAvailable");
       return;
     }
@@ -254,10 +249,7 @@ const fetchCurrentTheme = async () => {
     }
   } catch (err: any) {
     console.error("Error fetching current theme:", err);
-    showToast({
-      type: "error",
-      message: t("themes.failedToLoadTheme"),
-    });
+    alert(t("themes.failedToLoadTheme"));
     currentTheme.value = t("themes.errorLoadingTheme");
   } finally {
     isLoading.value = false;
@@ -277,10 +269,7 @@ const selectTheme = async (themeName: string) => {
     // Get theme ID from theme name
     const themeId = themeNameToIdMap[themeName];
     if (!themeId) {
-      showToast({
-        type: "error",
-        message: t("themes.invalidTheme"),
-      });
+      alert(t("themes.invalidTheme"));
       return;
     }
 
@@ -297,10 +286,7 @@ const selectTheme = async (themeName: string) => {
     }
 
     if (!userId) {
-      showToast({
-        type: "error",
-        message: t("themes.userNotFound"),
-      });
+      alert(t("themes.userNotFound"));
       return;
     }
 
@@ -316,10 +302,7 @@ const selectTheme = async (themeName: string) => {
     currentTheme.value = t(`themes.${themeKey}`);
     selectedTheme.value = themeName;
     
-    showToast({
-      type: "success",
-      message: `${t("themes.themeUpdated")} ${t(`themes.${themeKey}`)}!`,
-    });
+    alert(`${t("themes.themeUpdated")} ${t(`themes.${themeKey}`)}!`);
 
     // Update user data in auth store if response includes user
     if (response?.data?.user) {
@@ -339,10 +322,7 @@ const selectTheme = async (themeName: string) => {
       errorMsg = err.response.data.message;
     }
     
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
   } finally {
     isLoading.value = false;
   }

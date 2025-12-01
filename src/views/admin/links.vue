@@ -154,10 +154,8 @@ import { useI18n } from "vue-i18n";
 import Submit from "../../components/buttons/submit.vue";
 import { useAuthStore } from "../../store/auth";
 import { adminLinksService } from "../../services/admin";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 
 interface LinkItem {
   id?: number;
@@ -220,10 +218,7 @@ const fetchLinks = async () => {
     }
 
     if (!userId) {
-      showToast({
-        type: "error",
-        message: t("themes.userNotFound"),
-      });
+      alert(t("themes.userNotFound"));
       linkItems.value = [];
       return;
     }
@@ -262,10 +257,7 @@ const fetchLinks = async () => {
       ? `${t("links.failedToLoadLinks")}: ${err.response.data.message}`
       : t("links.failedToLoadLinks");
     
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
 
     // Clear links on error
     linkItems.value = [];
@@ -297,10 +289,7 @@ function handleBack() {
 // Handle edit link - use existing link data to fill form
 const handleEditLink = async (link: LinkItem) => {
   if (!link.id) {
-    showToast({
-      type: "error",
-      message: "Cannot edit link: Missing link ID.",
-    });
+    alert("Cannot edit link: Missing link ID.");
     return;
   }
 
@@ -319,10 +308,7 @@ const handleEditLink = async (link: LinkItem) => {
     addNewLink.value = false;
   } catch (err: any) {
     console.error("Error setting up edit form:", err);
-    showToast({
-      type: "error",
-      message: "Failed to open edit form. Please try again.",
-    });
+    alert("Failed to open edit form. Please try again.");
   }
 };
 
@@ -343,10 +329,7 @@ const viewSocialLinksPage = async () => {
     }
 
     if (!userId) {
-      showToast({
-        type: "error",
-        message: t("themes.userNotFound"),
-      });
+      alert(t("themes.userNotFound"));
       console.error("No user ID found");
       return;
     }
@@ -357,10 +340,7 @@ const viewSocialLinksPage = async () => {
     });
   } catch (err: any) {
     console.error("Error navigating to social links page:", err);
-    showToast({
-      type: "error",
-      message: "Failed to open social links page. Please try again.",
-    });
+    alert("Failed to open social links page. Please try again.");
   }
 };
 
@@ -370,10 +350,7 @@ async function handleSubmit() {
 
     // Validate form
     if (!formData.title.trim() || !formData.link.trim() || !formData.platform) {
-      showToast({
-        type: "error",
-        message: t("links.pleaseFillRequired"),
-      });
+      alert(t("links.pleaseFillRequired"));
       return;
     }
 
@@ -389,17 +366,11 @@ async function handleSubmit() {
     if (editingLinkId.value) {
       // Update existing link
       await adminLinksService.updateLink(editingLinkId.value, payload);
-      showToast({
-        type: "success",
-        message: t("links.linkUpdated"),
-      });
+      alert(t("links.linkUpdated"));
     } else {
       // Create new link
       await adminLinksService.createLink(payload);
-      showToast({
-        type: "success",
-        message: t("links.linkSaved"),
-      });
+      alert(t("links.linkSaved"));
     }
 
     // Refresh links from API
@@ -427,10 +398,7 @@ async function handleSubmit() {
       errorMsg = err.response.data.message;
     }
     
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
   } finally {
     isLoading.value = false;
   }
@@ -460,10 +428,7 @@ async function handleConfirmDelete() {
 
     // Safety check: ensure we have a valid ID
     if (!linkToDelete || !linkToDelete.id) {
-      showToast({
-        type: "error",
-        message: "Cannot delete link: Missing link ID.",
-      });
+      alert("Cannot delete link: Missing link ID.");
       handleCloseAlert();
       return;
     }
@@ -479,20 +444,14 @@ async function handleConfirmDelete() {
     linkItems.value.splice(selectedIndex.value, 1);
     selectedIndex.value = null;
 
-    showToast({
-      type: "success",
-      message: t("links.linkDeleted") || "Link deleted successfully.",
-    });
+    alert(t("links.linkDeleted") || "Link deleted successfully.");
 
     // Optionally refresh from API to stay in sync
     await fetchLinks();
   } catch (err: any) {
     console.error("Error deleting link:", err);
     const errorMsg = err.response?.data?.message || "Failed to delete link. Please try again.";
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
     // Close alert on error too
     handleCloseAlert();
   } finally {

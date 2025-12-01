@@ -33,10 +33,8 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReportBox from "../../components/reports/reportBox.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 
 const router = useRouter();
 
@@ -55,10 +53,7 @@ const fetchReports = async () => {
   try {
     reports.value = await superAdminReportsService.getReports();
   } catch (err: any) {
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || t("reports.failedToFetchReports"),
-    });
+    alert(err.response?.data?.message || t("reports.failedToFetchReports"));
     console.error("Error fetching reports:", err);
   } finally {
     loading.value = false;

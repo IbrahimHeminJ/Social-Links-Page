@@ -221,10 +221,8 @@ import authService from "../../services/authService";
 import { userService } from "../../services/user";
 import api from "../../services/api";
 import defaultProfile from "../../assets/images/man.png";
-import { useToast } from "../../composables/useToast";
 
 const fileInput = ref<HTMLInputElement | null>(null);
-const { showToast } = useToast();
 const dropdownContainer = ref<HTMLElement | null>(null);
 const isLoading = ref(false);
 const isLoadingUser = ref(false);
@@ -263,10 +261,7 @@ const fetchTags = async () => {
     }));
   } catch (err: any) {
     console.error("Error fetching tags:", err);
-    showToast({
-      type: "error",
-      message: "Failed to load tags. Please refresh the page.",
-    });
+    alert("Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
   }
@@ -439,10 +434,7 @@ const fetchUserData = async () => {
     console.error("Error response:", err.response);
     console.error("Error response status:", err.response?.status);
     console.error("Error response data:", err.response?.data);
-    showToast({
-      type: "error",
-      message: err.response?.data?.message || "Failed to load profile data. Please try again.",
-    });
+    alert(err.response?.data?.message || "Failed to load profile data. Please try again.");
   } finally {
     isLoadingUser.value = false;
   }
@@ -459,10 +451,7 @@ const handleFileUpload = (event: Event) => {
   if (file) {
     // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
-      showToast({
-        type: "error",
-        message: "Image size must be less than 2MB",
-      });
+      alert("Image size must be less than 2MB");
       if (target) {
         target.value = "";
       }
@@ -472,10 +461,7 @@ const handleFileUpload = (event: Event) => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      showToast({
-        type: "error",
-        message: "Please select a valid image file",
-      });
+      alert("Please select a valid image file");
       if (target) {
         target.value = "";
       }
@@ -495,10 +481,7 @@ const handleFileUpload = (event: Event) => {
     };
     reader.onerror = () => {
       console.error("Error reading file for preview");
-      showToast({
-        type: "error",
-        message: "Error reading image file",
-      });
+      alert("Error reading image file");
     };
     reader.readAsDataURL(file);
   } else {
@@ -512,31 +495,19 @@ const handleSave = async () => {
 
     // Validate required fields
     if (!profileData.value.username.trim()) {
-      showToast({
-        type: "error",
-        message: "Username is required",
-      });
+      alert("Username is required");
       return;
     }
     if (!profileData.value.name.trim()) {
-      showToast({
-        type: "error",
-        message: "Name is required",
-      });
+      alert("Name is required");
       return;
     }
     if (!profileData.value.email.trim()) {
-      showToast({
-        type: "error",
-        message: "Email is required",
-      });
+      alert("Email is required");
       return;
     }
     if (!profileData.value.phone.trim()) {
-      showToast({
-        type: "error",
-        message: "Phone number is required",
-      });
+      alert("Phone number is required");
       return;
     }
 
@@ -660,20 +631,14 @@ const handleSave = async () => {
         profileData.value.phone;
       profileData.value.tags = tagIds;
 
-      showToast({
-        type: "success",
-        message: "Profile updated successfully!",
-      });
+      alert("Profile updated successfully!");
 
       // Clear selected file
       selectedImageFile.value = null;
     } else {
       console.warn("Could not extract user data from response");
       console.warn("Response structure:", JSON.stringify(data, null, 2));
-      showToast({
-        type: "error",
-        message: "Profile update completed, but some information may not have been saved. Please refresh the page.",
-      });
+      alert("Profile update completed, but some information may not have been saved. Please refresh the page.");
     }
   } catch (err: any) {
     console.error("Error updating profile:", err);
@@ -686,10 +651,7 @@ const handleSave = async () => {
       errorMsg = err.response.data.message;
     }
     
-    showToast({
-      type: "error",
-      message: errorMsg,
-    });
+    alert(errorMsg);
   } finally {
     isLoading.value = false;
   }

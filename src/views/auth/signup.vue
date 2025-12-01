@@ -198,7 +198,6 @@ import Text from "../../components/inputs/text.vue";
 import Hyperlink from "../../components/buttons/hyperlink.vue";
 import LanguageSwitcher from "../../components/LanguageSwitcher.vue";
 import { userService } from "../../services/user";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
 
@@ -218,7 +217,6 @@ const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 
 const router = useRouter();
 const authStore = useAuthStore();
-const { showToast } = useToast();
 
 // Fetch tags from backend (same style as profile.vue)
 const fetchTags = async () => {
@@ -317,33 +315,20 @@ const handleSignup = async () => {
     !trimmedName ||
     !phoneNumber.value?.trim()
   ) {
-    showToast({
-      type: "error",
-      title: "Validation Error",
-      message:
-        "Please fill in all required fields (username, email, password, name, phone number)",
-    });
+    alert("Please fill in all required fields (username, email, password, name, phone number)");
     return;
   }
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(trimmedEmail)) {
-    showToast({
-      type: "error",
-      title: "Invalid Email",
-      message: "Please enter a valid email address",
-    });
+    alert("Please enter a valid email address");
     return;
   }
 
   // Validate password length (>= 8 characters)
   if (trimmedPassword.length < 8) {
-    showToast({
-      type: "error",
-      title: "Weak Password",
-      message: "Password must be at least 8 characters long",
-    });
+    alert("Password must be at least 8 characters long");
     return;
   }
 
@@ -372,22 +357,12 @@ const handleSignup = async () => {
 
   if (result.success) {
     // Signup successful, show success message
-    showToast({
-      type: "success",
-      title: "Registration Successful",
-      message: "Your account has been created successfully! Welcome aboard!",
-    });
-    // Redirect to home after showing success message
-    setTimeout(() => {
-      router.push({ name: "home" });
-    }, 500);
+    alert("Your account has been created successfully! Welcome aboard!");
+    // Redirect to home
+    router.push({ name: "home" });
   } else {
     // Signup failed, show error
-    showToast({
-      type: "error",
-      title: "Signup Failed",
-      message: result.error || "Signup failed",
-    });
+    alert(result.error || "Signup failed");
   }
 };
 

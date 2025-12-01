@@ -8,10 +8,8 @@ import Submit from "../../components/buttons/submit.vue";
 import AuthService from "../../services/authService";
 import { adminProfileService } from "../../services/admin";
 import { userService } from "../../services/user";
-import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
-const { showToast } = useToast();
 
 const user = ref(AuthService.getStoredUser());
 
@@ -60,10 +58,7 @@ const fetchTags = async () => {
     }));
   } catch (err) {
     console.error("Error fetching tags:", err);
-    showToast({
-      type: "error",
-      message: t("profile.failedToLoadTags") || "Failed to load tags. Please refresh the page.",
-    });
+    alert(t("profile.failedToLoadTags") || "Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
   }
@@ -182,10 +177,7 @@ const handleImageChange = (event: Event) => {
 
   // Validate file type
   if (!file.type.startsWith("image/")) {
-    showToast({
-      type: "error",
-      message: t("profile.invalidImageFile"),
-    });
+    alert(t("profile.invalidImageFile"));
     selectedImageFile.value = null;
     profileImage.value = (user.value as any)?.profile_image || defaultProfile;
     return;
@@ -194,14 +186,11 @@ const handleImageChange = (event: Event) => {
   // Validate file size (2MB = 2 * 1024 * 1024 bytes)
   const maxSize = 2 * 1024 * 1024; // 2MB
   if (file.size > maxSize) {
-    showToast({
-      type: "error",
-      message: `${t("profile.imageTooLarge")} ${(
+    alert(`${t("profile.imageTooLarge")} ${(
         file.size /
         1024 /
         1024
-      ).toFixed(2)}MB`,
-    });
+      ).toFixed(2)}MB`);
     selectedImageFile.value = null;
     profileImage.value = (user.value as any)?.profile_image || defaultProfile;
     return;
@@ -240,19 +229,13 @@ const handleSave = async () => {
     // Validate file again before sending
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (selectedImageFile.value.size > maxSize) {
-      showToast({
-        type: "error",
-        message: t("profile.imageTooLarge"),
-      });
+      alert(t("profile.imageTooLarge"));
       isLoading.value = false;
       return;
     }
 
     if (!selectedImageFile.value.type.startsWith("image/")) {
-      showToast({
-        type: "error",
-        message: t("profile.invalidImageFile"),
-      });
+      alert(t("profile.invalidImageFile"));
       isLoading.value = false;
       return;
     }
@@ -317,19 +300,13 @@ const handleSave = async () => {
         profileData.phoneNumber;
       profileData.tags = tagIds;
 
-      showToast({
-        type: "success",
-        message: t("profile.profileSaved"),
-      });
+      alert(t("profile.profileSaved"));
     } else {
       console.warn(
         "Admin profile: Could not extract user data from update response",
         data
       );
-      showToast({
-        type: "error",
-        message: "Profile update completed, but some information may not have been saved. Please refresh the page.",
-      });
+      alert("Profile update completed, but some information may not have been saved. Please refresh the page.");
     }
   } catch (error: any) {
     // Parse error for user-friendly message
@@ -379,10 +356,7 @@ const handleSave = async () => {
         "Please try again. If the problem persists, contact support.";
     }
 
-    showToast({
-      type: "error",
-      message: userFriendlyError,
-    });
+    alert(userFriendlyError);
   } finally {
     isLoading.value = false;
   }

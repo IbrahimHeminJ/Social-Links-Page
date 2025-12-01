@@ -211,7 +211,6 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../store/auth'
 import ReportWindow from '../components/reports/reportWindow.vue'
 import LanguageSwitcher from '../components/LanguageSwitcher.vue'
-import { useToast } from '../composables/useToast'
 
 const { t } = useI18n()
 
@@ -239,7 +238,6 @@ const route = useRoute()
 const authStore = useAuthStore()
 const showReport = ref(false);
 const isSubmittingReport = ref(false);
-const { showToast } = useToast();
 
 // Get user ID from route params
 const userId = computed(() => route.params.id as string || '')
@@ -277,11 +275,7 @@ const handleSubmitReport = async (payload: {
   // Double check authentication before submitting
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
-    showToast({
-      type: 'error',
-      title: 'Authentication Required',
-      message: t('socialLinks.pleaseLoginToReport')
-    })
+    alert(t('socialLinks.pleaseLoginToReport'))
     router.push({
       name: 'login',
       query: { redirect: route.fullPath }
@@ -290,11 +284,7 @@ const handleSubmitReport = async (payload: {
   }
 
   if (!userId.value) {
-    showToast({
-      type: 'error',
-      title: 'Error',
-      message: t('socialLinks.userIdRequired')
-    })
+    alert(t('socialLinks.userIdRequired'))
     return
   }
 
@@ -307,11 +297,7 @@ const handleSubmitReport = async (payload: {
   })
 
   if (validationError) {
-    showToast({
-      type: 'error',
-      title: 'Validation Error',
-      message: validationError
-    })
+    alert(validationError)
     return
   }
 
@@ -331,21 +317,13 @@ const handleSubmitReport = async (payload: {
     });
 
     // Show success message
-    showToast({
-      type: 'success',
-      title: 'Report Submitted',
-      message: 'Report submitted successfully. Thank you for your feedback.'
-    });
+    alert('Report submitted successfully. Thank you for your feedback.');
 
     // Close the report window
     showReport.value = false;
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to submit report. Please try again.';
-    showToast({
-      type: 'error',
-      title: 'Error',
-      message: errorMessage
-    });
+    alert(errorMessage);
   } finally {
     isSubmittingReport.value = false
   }
