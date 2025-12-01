@@ -201,8 +201,6 @@
     </div>
 
     <ReportWindow :show="showReport" @close="showReport = false" @submit="handleSubmitReport" />
-    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
-      @close="closeToast" />
   </div>
 </template>
 
@@ -213,11 +211,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../store/auth'
 import ReportWindow from '../components/reports/reportWindow.vue'
 import LanguageSwitcher from '../components/LanguageSwitcher.vue'
-<<<<<<< HEAD
 import { useToast } from '../composables/useToast'
-=======
-import ToastMessage from '../components/alerts/toastMessage.vue'
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
 const { t } = useI18n()
 
@@ -246,22 +240,6 @@ const authStore = useAuthStore()
 const showReport = ref(false);
 const isSubmittingReport = ref(false);
 const { showToast } = useToast();
-
-// Toast state
-const toast = ref({
-  show: false,
-  type: 'info' as 'success' | 'error' | 'info',
-  title: '',
-  message: ''
-});
-
-const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
-  toast.value = { show: true, type, title, message };
-};
-
-const closeToast = () => {
-  toast.value.show = false;
-};
 
 // Get user ID from route params
 const userId = computed(() => route.params.id as string || '')
@@ -299,15 +277,11 @@ const handleSubmitReport = async (payload: {
   // Double check authentication before submitting
   authStore.syncAuthState()
   if (!authStore.isAuthenticated) {
-<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Authentication Required',
       message: t('socialLinks.pleaseLoginToReport')
     })
-=======
-    showToast('error', 'Authentication Required', t('socialLinks.pleaseLoginToReport'))
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     router.push({
       name: 'login',
       query: { redirect: route.fullPath }
@@ -316,15 +290,11 @@ const handleSubmitReport = async (payload: {
   }
 
   if (!userId.value) {
-<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Error',
       message: t('socialLinks.userIdRequired')
     })
-=======
-    showToast('error', 'Missing Information', t('socialLinks.userIdRequired'))
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return
   }
 
@@ -337,15 +307,11 @@ const handleSubmitReport = async (payload: {
   })
 
   if (validationError) {
-<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Validation Error',
       message: validationError
     })
-=======
-    showToast('error', 'Validation Error', validationError)
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return
   }
 
@@ -365,29 +331,21 @@ const handleSubmitReport = async (payload: {
     });
 
     // Show success message
-<<<<<<< HEAD
     showToast({
       type: 'success',
       title: 'Report Submitted',
       message: 'Report submitted successfully. Thank you for your feedback.'
     });
-=======
-    showToast('success', 'Success', 'Report submitted successfully. Thank you for your feedback.');
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
     // Close the report window
     showReport.value = false;
   } catch (err: any) {
     const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Failed to submit report. Please try again.';
-<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Error',
       message: errorMessage
     });
-=======
-    showToast('error', 'Error', errorMessage);
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
   } finally {
     isSubmittingReport.value = false
   }

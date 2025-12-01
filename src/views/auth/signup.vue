@@ -186,8 +186,6 @@
         <Hyperlink :text="t('auth.loginHere')" @click="goToLogin" />
       </div>
     </div>
-    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
-      @close="closeToast" />
   </div>
 </template>
 
@@ -200,11 +198,7 @@ import Text from "../../components/inputs/text.vue";
 import Hyperlink from "../../components/buttons/hyperlink.vue";
 import LanguageSwitcher from "../../components/LanguageSwitcher.vue";
 import { userService } from "../../services/user";
-<<<<<<< HEAD
 import { useToast } from "../../composables/useToast";
-=======
-import ToastMessage from "../../components/alerts/toastMessage.vue";
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
 const { t } = useI18n();
 
@@ -225,22 +219,6 @@ const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 const router = useRouter();
 const authStore = useAuthStore();
 const { showToast } = useToast();
-
-// Toast state
-const toast = ref({
-  show: false,
-  type: 'info' as 'success' | 'error' | 'info',
-  title: '',
-  message: ''
-});
-
-const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
-  toast.value = { show: true, type, title, message };
-};
-
-const closeToast = () => {
-  toast.value.show = false;
-};
 
 // Fetch tags from backend (same style as profile.vue)
 const fetchTags = async () => {
@@ -339,45 +317,33 @@ const handleSignup = async () => {
     !trimmedName ||
     !phoneNumber.value?.trim()
   ) {
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Validation Error",
       message:
         "Please fill in all required fields (username, email, password, name, phone number)",
     });
-=======
-    showToast('error', 'Validation Error', "Please fill in all required fields (username, email, password, name, phone number)");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(trimmedEmail)) {
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Invalid Email",
       message: "Please enter a valid email address",
     });
-=======
-    showToast('error', 'Validation Error', "Please enter a valid email address");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
   // Validate password length (>= 8 characters)
   if (trimmedPassword.length < 8) {
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Weak Password",
       message: "Password must be at least 8 characters long",
     });
-=======
-    showToast('error', 'Validation Error', "Password must be at least 8 characters long");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
@@ -417,15 +383,11 @@ const handleSignup = async () => {
     }, 500);
   } else {
     // Signup failed, show error
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Signup Failed",
       message: result.error || "Signup failed",
     });
-=======
-    showToast('error', 'Signup Failed', result.error || "Signup failed");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
   }
 };
 

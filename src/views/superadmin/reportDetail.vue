@@ -138,8 +138,6 @@
         </button>
       </div>
     </div>
-    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
-      @close="closeToast" />
   </div>
 </template>
 
@@ -150,11 +148,7 @@ import { useI18n } from "vue-i18n";
 import Text from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
-<<<<<<< HEAD
 import { useToast } from "../../composables/useToast";
-=======
-import ToastMessage from "../../components/alerts/toastMessage.vue";
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
 const { t } = useI18n();
 
@@ -193,22 +187,6 @@ const reportData = ref<ReportData>({
 
 const loading = ref(false);
 const error = ref<string | null>(null);
-
-// Toast state
-const toast = ref({
-  show: false,
-  type: 'info' as 'success' | 'error' | 'info',
-  title: '',
-  message: ''
-});
-
-const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
-  toast.value = { show: true, type, title, message };
-};
-
-const closeToast = () => {
-  toast.value.show = false;
-};
 
 const actionOptions = [
   { label: t("reports.actions.deleteUser"), value: "delete-user" },
@@ -330,28 +308,20 @@ const formatDate = (dateString: string) => {
 const handleResolve = async () => {
   // Validate required fields
   if (!reportData.value.action) {
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Validation Error",
       message: "Please select an action",
     });
-=======
-    showToast('error', 'Validation Error', "Please select an action");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
   if (!reportData.value.reason || !reportData.value.reason.trim()) {
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Validation Error",
       message: "Please enter a reason for the action",
     });
-=======
-    showToast('error', 'Validation Error', "Please enter a reason for the action");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
@@ -368,15 +338,11 @@ const handleResolve = async () => {
     });
 
     // Show success message
-<<<<<<< HEAD
     showToast({
       type: "success",
       title: "Report Resolved",
       message: "Report resolved successfully",
     });
-=======
-    showToast('success', 'Success', "Report resolved successfully");
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
     // Navigate back to reports list
     goBack();
@@ -386,15 +352,11 @@ const handleResolve = async () => {
       err.response?.data?.message ||
       err.response?.data?.error ||
       "Failed to resolve report. Please try again.";
-<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Error",
       message: errorMessage,
     });
-=======
-    showToast('error', 'Error', errorMessage);
->>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
   }
 };
 
