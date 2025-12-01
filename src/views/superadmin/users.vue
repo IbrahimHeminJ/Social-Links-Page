@@ -347,4 +347,6 @@ const confirmDelete = async () => {
 onMounted(() => {
   fetchUsers();
 });
+
+console.log(users);
 </script>

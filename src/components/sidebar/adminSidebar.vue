@@ -12,13 +12,13 @@ const { t } = useI18n()
 </script>
 <template> 
   <aside
-    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 md:w-[280px] w-[260px] h-screen shadow-sm relative"
+    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 pt-11 md:w-[280px] w-[260px] h-screen shadow-sm relative"
   >
     <!-- Close button for mobile -->
     <button
       v-if="toggleSidebar"
       @click="toggleSidebar"
-      class="absolute top-4 right-4 md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      class="absolute top-2 right-4 md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
       aria-label="Close sidebar"
     >
       <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
