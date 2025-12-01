@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from "vue-router";
 import Links from '../../views/admin/links.vue'
 import Profile from '../../views/admin/profile.vue'
 import Themes from '../../views/admin/themes.vue'
+import Subscription from '../../views/admin/subscription.vue'
 
 const AdminRoutes: RouteRecordRaw[] = [
     {
@@ -28,6 +29,16 @@ const AdminRoutes: RouteRecordRaw[] = [
         path: '/admin/themes',
         name: 'admin.themes',
         component: Themes,
+        meta: {
+            title: 'Admin Dashboard',
+            requiresAuth: true,
+            requiresAdmin: true,
+        },
+    },
+    {
+        path: '/admin/subscription',
+        name: 'admin.subscription',
+        component: Subscription,
         meta: {
             title: 'Admin Dashboard',
             requiresAuth: true,

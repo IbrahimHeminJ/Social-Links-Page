@@ -12,7 +12,7 @@ const { t } = useI18n()
 </script>
 <template> 
   <aside
-    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 md:w-[280px] w-[260px] h-screen shadow-sm relative"
+    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 md:w-[280px] w-[260px] self-stretch shadow-sm relative"
   >
     <!-- Close button for mobile -->
     <button

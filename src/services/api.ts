@@ -8,10 +8,13 @@ const baseURL = import.meta.env.PROD
   : '/api' // Use proxy in development
 
 const api = axios.create({
-  baseURL,
+  baseURL: 'http://localhost:8000/api',
   timeout: 10000,
+  withCredentials: true,
+  withXSRFToken: true,
   headers: {
     'Content-Type': 'application/json',
+    
   },
 })
 

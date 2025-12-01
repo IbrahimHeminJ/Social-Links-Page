@@ -19,7 +19,7 @@ const toggleSidebar = () => {
     </div>
 
     <!-- Content area with sidebar and main content -->
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1 min-h-0 overflow-hidden">
       <!-- Desktop sidebar - always visible on md+ screens, full height -->
       <AdminSidebar v-if="!isAuthenticated" class="hidden md:flex" />
 
@@ -34,13 +34,13 @@ const toggleSidebar = () => {
       >
         <AdminSidebar 
           v-if="!isAuthenticated && isSidebarOpen" 
-          class="md:hidden fixed z-40 top-0" 
+          class="md:hidden fixed z-40 top-0 h-screen" 
           :toggleSidebar="toggleSidebar"
         />
       </Transition>
 
       <!-- Main content area -->
-      <main class="flex-1 overflow-y-auto bg-white">
+      <main class="flex-1 overflow-y-auto bg-white min-h-full">
         <div class="p-6">
           <router-view />
         </div>

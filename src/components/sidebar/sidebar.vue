@@ -12,7 +12,7 @@ const { t } = useI18n()
 </script>
 <template> 
   <aside
-    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 md:w-[280px] w-[260px] h-screen shadow-sm relative"
+    class="bg-white border-r border-gray-200 flex flex-col items-start md:items-center px-6 py-6 md:w-[280px] w-[260px] self-stretch shadow-sm relative"
   >
     <!-- Close button for mobile -->
     <button
@@ -69,6 +69,20 @@ const { t } = useI18n()
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
               {{ t('admin.themes') }}
+            </router-link>
+          </li>
+          <li>
+            <router-link 
+              :to="{ name: 'admin.subscription' }"
+              class="flex items-center px-4 py-3 rounded-xl font-medium transition-colors"
+              :class="route.name === 'admin.subscription' 
+                ? 'bg-[#0094ff] text-white shadow-sm' 
+                : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+              {{ t('admin.subscription') }}
             </router-link>
           </li>
         </ul> 
