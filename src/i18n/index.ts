@@ -1,5 +1,6 @@
 import { createI18n } from 'vue-i18n'
 import en from '../plugins/en.json'
+import ar from '../plugins/ar.json'
 import ku from '../plugins/ku.json'
 
 // Get saved language from localStorage or default to English
@@ -11,6 +12,7 @@ const i18n = createI18n({
   fallbackLocale: 'en',
   messages: {
     en,
+    ar,
     ku
   }
 })

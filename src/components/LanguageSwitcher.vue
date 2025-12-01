@@ -18,7 +18,6 @@
       </svg>
     </button>
 
-    <!-- Dropdown Menu -->
     <div
       v-if="isOpen"
       class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
@@ -51,50 +50,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useI18n } from "vue-i18n";
 
-const { locale } = useI18n()
+const { locale } = useI18n();
 
-const isOpen = ref(false)
+const isOpen = ref(false);
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇬🇧' },
-  { code: 'ku', name: 'کوردی', flag: '🇮🇶' }
-]
+  { code: "en", name: "English", flag: "EN" },
+  { code: "ar", name: "العربية", flag: "AR" },
+  { code: "ku", name: "Kurdî", flag: "KU" },
+];
 
-const currentLocale = computed(() => locale.value)
+const currentLocale = computed(() => locale.value);
 
 const currentLanguage = computed(() => {
-  return languages.find(lang => lang.code === locale.value) || languages[0]
-})
+  return languages.find((lang) => lang.code === locale.value) || languages[0];
+});
 
-const currentLanguageFlag = computed(() => currentLanguage.value.flag)
-const currentLanguageName = computed(() => currentLanguage.value.name)
+const currentLanguageFlag = computed(() => currentLanguage.value.flag);
+const currentLanguageName = computed(() => currentLanguage.value.name);
 
 const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
+  isOpen.value = !isOpen.value;
+};
 
 const switchLanguage = (langCode: string) => {
-  locale.value = langCode
-  localStorage.setItem('locale', langCode)
-  isOpen.value = false
-}
+  locale.value = langCode;
+  localStorage.setItem("locale", langCode);
+  isOpen.value = false;
+};
 
 const closeDropdown = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (!target.closest('.relative')) {
-    isOpen.value = false
+  const target = event.target as HTMLElement;
+  if (!target.closest(".relative")) {
+    isOpen.value = false;
   }
-}
+};
 
 onMounted(() => {
-  document.addEventListener('click', closeDropdown)
-})
+  document.addEventListener("click", closeDropdown);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeDropdown)
-})
+  document.removeEventListener("click", closeDropdown);
+});
 </script>
-
