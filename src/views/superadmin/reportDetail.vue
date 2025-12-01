@@ -173,11 +173,13 @@ import { useI18n } from "vue-i18n";
 import Text from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
 
 const router = useRouter();
 const route = useRoute();
+const { showToast } = useToast();
 
 interface ReportData {
   id: number;
@@ -331,12 +333,20 @@ const formatDate = (dateString: string) => {
 const handleResolve = async () => {
   // Validate required fields
   if (!reportData.value.action) {
-    alert("Please select an action");
+    showToast({
+      type: "error",
+      title: "Validation Error",
+      message: "Please select an action",
+    });
     return;
   }
 
   if (!reportData.value.reason || !reportData.value.reason.trim()) {
-    alert("Please enter a reason for the action");
+    showToast({
+      type: "error",
+      title: "Validation Error",
+      message: "Please enter a reason for the action",
+    });
     return;
   }
 
@@ -353,7 +363,11 @@ const handleResolve = async () => {
     });
 
     // Show success message
-    alert("Report resolved successfully");
+    showToast({
+      type: "success",
+      title: "Report Resolved",
+      message: "Report resolved successfully",
+    });
 
     // Navigate back to reports list
     goBack();
@@ -363,7 +377,11 @@ const handleResolve = async () => {
       err.response?.data?.message ||
       err.response?.data?.error ||
       "Failed to resolve report. Please try again.";
-    alert(errorMessage);
+    showToast({
+      type: "error",
+      title: "Error",
+      message: errorMessage,
+    });
   }
 };
 

@@ -107,21 +107,6 @@
         >.
       </p>
     </div>
-    <!-- Error and Success Messages -->
-    <div v-if="errorMessage || successMessage" class="flex flex-col gap-y-2">
-      <div
-        v-if="errorMessage"
-        class="p-4 bg-red-50 border border-red-200 rounded-lg"
-      >
-        <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
-      </div>
-      <div
-        v-if="successMessage"
-        class="p-4 bg-green-50 border border-green-200 rounded-lg"
-      >
-        <p class="text-green-800 font-semibold">{{ successMessage }}</p>
-      </div>
-    </div>
     <form @submit.prevent="handleSubmit">
       <div class="flex flex-col gap-y-7">
         <Input
@@ -169,8 +154,10 @@ import { useI18n } from "vue-i18n";
 import Submit from "../../components/buttons/submit.vue";
 import { useAuthStore } from "../../store/auth";
 import { adminLinksService } from "../../services/admin";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 
 interface LinkItem {
   id?: number;
@@ -198,8 +185,6 @@ const editingLinkId = ref<number | null>(null);
 const showAlert = ref(false);
 const isLoading = ref(false);
 const isLoadingLinks = ref(false);
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
 
 const formData = reactive({
   title: "",
@@ -220,7 +205,6 @@ const selectedItem = computed<LinkItem | null>(() => {
 const fetchLinks = async () => {
   try {
     isLoadingLinks.value = true;
-    errorMessage.value = "";
 
     // Get user ID from auth store
     let userId = authStore.user?.id;
@@ -236,7 +220,10 @@ const fetchLinks = async () => {
     }
 
     if (!userId) {
-      errorMessage.value = t("themes.userNotFound");
+      showToast({
+        type: "error",
+        message: t("themes.userNotFound"),
+      });
       linkItems.value = [];
       return;
     }
@@ -271,13 +258,14 @@ const fetchLinks = async () => {
     console.error("Error fetching links:", err);
 
     // Parse error for user-friendly message
-    if (err.response?.data?.message) {
-      errorMessage.value = `${t("links.failedToLoadLinks")}: ${
-        err.response.data.message
-      }`;
-    } else {
-      errorMessage.value = t("links.failedToLoadLinks");
-    }
+    const errorMsg = err.response?.data?.message
+      ? `${t("links.failedToLoadLinks")}: ${err.response.data.message}`
+      : t("links.failedToLoadLinks");
+    
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
 
     // Clear links on error
     linkItems.value = [];
@@ -309,13 +297,14 @@ function handleBack() {
 // Handle edit link - use existing link data to fill form
 const handleEditLink = async (link: LinkItem) => {
   if (!link.id) {
-    errorMessage.value = "Cannot edit link: Missing link ID.";
+    showToast({
+      type: "error",
+      message: "Cannot edit link: Missing link ID.",
+    });
     return;
   }
 
   try {
-    errorMessage.value = "";
-    successMessage.value = "";
 
     // Pre-fill form with link data directly from the link object
     formData.title = link.title || "";
@@ -330,7 +319,10 @@ const handleEditLink = async (link: LinkItem) => {
     addNewLink.value = false;
   } catch (err: any) {
     console.error("Error setting up edit form:", err);
-    errorMessage.value = "Failed to open edit form. Please try again.";
+    showToast({
+      type: "error",
+      message: "Failed to open edit form. Please try again.",
+    });
   }
 };
 
@@ -351,7 +343,10 @@ const viewSocialLinksPage = async () => {
     }
 
     if (!userId) {
-      errorMessage.value = t("themes.userNotFound");
+      showToast({
+        type: "error",
+        message: t("themes.userNotFound"),
+      });
       console.error("No user ID found");
       return;
     }
@@ -362,19 +357,23 @@ const viewSocialLinksPage = async () => {
     });
   } catch (err: any) {
     console.error("Error navigating to social links page:", err);
-    errorMessage.value = "Failed to open social links page. Please try again.";
+    showToast({
+      type: "error",
+      message: "Failed to open social links page. Please try again.",
+    });
   }
 };
 
 async function handleSubmit() {
   try {
     isLoading.value = true;
-    errorMessage.value = "";
-    successMessage.value = "";
 
     // Validate form
     if (!formData.title.trim() || !formData.link.trim() || !formData.platform) {
-      errorMessage.value = t("links.pleaseFillRequired");
+      showToast({
+        type: "error",
+        message: t("links.pleaseFillRequired"),
+      });
       return;
     }
 
@@ -390,11 +389,17 @@ async function handleSubmit() {
     if (editingLinkId.value) {
       // Update existing link
       await adminLinksService.updateLink(editingLinkId.value, payload);
-      successMessage.value = t("links.linkUpdated");
+      showToast({
+        type: "success",
+        message: t("links.linkUpdated"),
+      });
     } else {
       // Create new link
       await adminLinksService.createLink(payload);
-      successMessage.value = t("links.linkSaved");
+      showToast({
+        type: "success",
+        message: t("links.linkSaved"),
+      });
     }
 
     // Refresh links from API
@@ -407,28 +412,25 @@ async function handleSubmit() {
     formData.platform = "";
     editingLinkId.value = null;
 
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
-
     // Go back to the links view
     addNewLink.value = true;
   } catch (err: any) {
     console.error("Error saving link:", err);
 
     // Parse error for user-friendly message
+    let errorMsg = t("links.failedToSaveLink");
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
       const errorMessages = Object.values(errors).flat();
-      errorMessage.value = `${t(
-        "links.failedToSaveLink"
-      )}: ${errorMessages.join(", ")}`;
+      errorMsg = `${t("links.failedToSaveLink")}: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
-    } else {
-      errorMessage.value = t("links.failedToSaveLink");
+      errorMsg = err.response.data.message;
     }
+    
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
   } finally {
     isLoading.value = false;
   }
@@ -458,41 +460,43 @@ async function handleConfirmDelete() {
 
     // Safety check: ensure we have a valid ID
     if (!linkToDelete || !linkToDelete.id) {
-      errorMessage.value = "Cannot delete link: Missing link ID.";
+      showToast({
+        type: "error",
+        message: "Cannot delete link: Missing link ID.",
+      });
       handleCloseAlert();
       return;
     }
 
     isLoading.value = true;
-    errorMessage.value = "";
-    successMessage.value = "";
 
     await adminLinksService.deleteLink(linkToDelete.id);
+
+    // Close alert immediately after successful deletion
+    handleCloseAlert();
 
     // Remove from local list
     linkItems.value.splice(selectedIndex.value, 1);
     selectedIndex.value = null;
 
-    successMessage.value =
-      t("links.linkDeleted") || "Link deleted successfully.";
+    showToast({
+      type: "success",
+      message: t("links.linkDeleted") || "Link deleted successfully.",
+    });
 
     // Optionally refresh from API to stay in sync
     await fetchLinks();
-
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
   } catch (err: any) {
     console.error("Error deleting link:", err);
-    if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
-    } else {
-      errorMessage.value = "Failed to delete link. Please try again.";
-    }
+    const errorMsg = err.response?.data?.message || "Failed to delete link. Please try again.";
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
+    // Close alert on error too
+    handleCloseAlert();
   } finally {
     isLoading.value = false;
-    handleCloseAlert();
   }
 }
 

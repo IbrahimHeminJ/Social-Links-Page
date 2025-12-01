@@ -25,22 +25,6 @@
       </div>
     </div>
 
-    <!-- Error and Success Messages -->
-    <div v-if="errorMessage || successMessage" class="flex flex-col gap-y-2">
-      <div
-        v-if="errorMessage"
-        class="p-4 bg-red-50 border border-red-200 rounded-lg"
-      >
-        <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
-      </div>
-      <div
-        v-if="successMessage"
-        class="p-4 bg-green-50 border border-green-200 rounded-lg"
-      >
-        <p class="text-green-800 font-semibold">{{ successMessage }}</p>
-      </div>
-    </div>
-
     <!-- Choose Theme Section -->
     <div class="flex flex-col gap-y-4">
       <h2 class="text-lg font-bold">{{ t("themes.chooseTheme") }}</h2>
@@ -180,8 +164,10 @@ import { useI18n } from "vue-i18n";
 import TextHeading from "../../components/textHeading.vue";
 import { useAuthStore } from "../../store/auth";
 import { adminThemeService } from "../../services/admin";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 
 const authStore = useAuthStore();
 
@@ -204,14 +190,11 @@ const currentThemeId = ref<number | null>(null);
 const currentTheme = ref("");
 const selectedTheme = ref<string | null>(null);
 const isLoading = ref(false);
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
 
 // Fetch current theme from API
 const fetchCurrentTheme = async () => {
   try {
     isLoading.value = true;
-    errorMessage.value = "";
 
     // Try to get user ID from auth store, or fetch current user
     let userId = authStore.user?.id;
@@ -240,7 +223,10 @@ const fetchCurrentTheme = async () => {
     }
 
     if (!userId) {
-      errorMessage.value = t("themes.userNotFound");
+      showToast({
+        type: "error",
+        message: t("themes.userNotFound"),
+      });
       currentTheme.value = t("themes.notAvailable");
       return;
     }
@@ -268,7 +254,10 @@ const fetchCurrentTheme = async () => {
     }
   } catch (err: any) {
     console.error("Error fetching current theme:", err);
-    errorMessage.value = t("themes.failedToLoadTheme");
+    showToast({
+      type: "error",
+      message: t("themes.failedToLoadTheme"),
+    });
     currentTheme.value = t("themes.errorLoadingTheme");
   } finally {
     isLoading.value = false;
@@ -284,13 +273,14 @@ const fetchCurrentTheme = async () => {
 const selectTheme = async (themeName: string) => {
   try {
     isLoading.value = true;
-    errorMessage.value = "";
-    successMessage.value = "";
 
     // Get theme ID from theme name
     const themeId = themeNameToIdMap[themeName];
     if (!themeId) {
-      errorMessage.value = t("themes.invalidTheme");
+      showToast({
+        type: "error",
+        message: t("themes.invalidTheme"),
+      });
       return;
     }
 
@@ -307,7 +297,10 @@ const selectTheme = async (themeName: string) => {
     }
 
     if (!userId) {
-      errorMessage.value = t("themes.userNotFound");
+      showToast({
+        type: "error",
+        message: t("themes.userNotFound"),
+      });
       return;
     }
 
@@ -322,14 +315,11 @@ const selectTheme = async (themeName: string) => {
     if (themeName === "Graphic Designer") themeKey = "graphicDesigner";
     currentTheme.value = t(`themes.${themeKey}`);
     selectedTheme.value = themeName;
-    successMessage.value = `${t("themes.themeUpdated")} ${t(
-      `themes.${themeKey}`
-    )}!`;
-
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
+    
+    showToast({
+      type: "success",
+      message: `${t("themes.themeUpdated")} ${t(`themes.${themeKey}`)}!`,
+    });
 
     // Update user data in auth store if response includes user
     if (response?.data?.user) {
@@ -340,17 +330,19 @@ const selectTheme = async (themeName: string) => {
     console.error("Error updating theme:", err);
 
     // Parse error for user-friendly message
+    let errorMsg = t("themes.failedToUpdateTheme");
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
       const errorMessages = Object.values(errors).flat();
-      errorMessage.value = `${t(
-        "themes.failedToUpdateTheme"
-      )}: ${errorMessages.join(", ")}`;
+      errorMsg = `${t("themes.failedToUpdateTheme")}: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
-    } else {
-      errorMessage.value = t("themes.failedToUpdateTheme");
+      errorMsg = err.response.data.message;
     }
+    
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
   } finally {
     isLoading.value = false;
   }

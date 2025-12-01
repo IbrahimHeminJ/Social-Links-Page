@@ -28,9 +28,6 @@
     <div v-if="loading" class="text-center py-8">
       <p class="text-gray-600">{{ t("reports.loadingReportHistory") }}</p>
     </div>
-    <div v-else-if="error" class="text-center py-8">
-      <p class="text-red-600">{{ error }}</p>
-    </div>
     <div v-else-if="reportHistory.length === 0" class="text-center py-8">
       <p class="text-gray-600">{{ t("reports.noReportHistoryFound") }}</p>
     </div>
@@ -51,8 +48,10 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReportBox from "../../components/reports/reportBox.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 const router = useRouter();
 
 interface ReportHistoryItem {
@@ -66,16 +65,16 @@ interface ReportHistoryItem {
 
 const reportHistory = ref<ReportHistoryItem[]>([]);
 const loading = ref(false);
-const error = ref<string | null>(null);
 
 const fetchReportHistory = async () => {
   loading.value = true;
-  error.value = null;
   try {
     reportHistory.value = await superAdminReportsService.getResolvedReports();
   } catch (err: any) {
-    error.value =
-      err.response?.data?.message || t("reports.failedToFetchReportHistory");
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || t("reports.failedToFetchReportHistory"),
+    });
     console.error("Error fetching report history:", err);
   } finally {
     loading.value = false;

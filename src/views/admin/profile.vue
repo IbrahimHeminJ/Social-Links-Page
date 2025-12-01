@@ -8,8 +8,10 @@ import Submit from "../../components/buttons/submit.vue";
 import AuthService from "../../services/authService";
 import { adminProfileService } from "../../services/admin";
 import { userService } from "../../services/user";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 
 const user = ref(AuthService.getStoredUser());
 
@@ -43,9 +45,6 @@ const profileImage = ref((user.value as any)?.profile_image || defaultProfile);
 const selectedImageFile = ref<File | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-// Error and success messages for user display
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
 const isLoading = ref(false);
 
 // Fetch tags from backend (reuse userService like superadmin profile)
@@ -61,10 +60,10 @@ const fetchTags = async () => {
     }));
   } catch (err) {
     console.error("Error fetching tags:", err);
-    errorMessage.value =
-      errorMessage.value ||
-      t("profile.failedToLoadTags") ||
-      "Failed to load tags. Please refresh the page.";
+    showToast({
+      type: "error",
+      message: t("profile.failedToLoadTags") || "Failed to load tags. Please refresh the page.",
+    });
   } finally {
     isLoadingTags.value = false;
   }
@@ -175,9 +174,6 @@ const handleImageChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  // Clear previous error
-  errorMessage.value = "";
-
   if (!file) {
     selectedImageFile.value = null;
     profileImage.value = (user.value as any)?.profile_image || defaultProfile;
@@ -186,7 +182,10 @@ const handleImageChange = (event: Event) => {
 
   // Validate file type
   if (!file.type.startsWith("image/")) {
-    errorMessage.value = t("profile.invalidImageFile");
+    showToast({
+      type: "error",
+      message: t("profile.invalidImageFile"),
+    });
     selectedImageFile.value = null;
     profileImage.value = (user.value as any)?.profile_image || defaultProfile;
     return;
@@ -195,11 +194,14 @@ const handleImageChange = (event: Event) => {
   // Validate file size (2MB = 2 * 1024 * 1024 bytes)
   const maxSize = 2 * 1024 * 1024; // 2MB
   if (file.size > maxSize) {
-    errorMessage.value = `${t("profile.imageTooLarge")} ${(
-      file.size /
-      1024 /
-      1024
-    ).toFixed(2)}MB`;
+    showToast({
+      type: "error",
+      message: `${t("profile.imageTooLarge")} ${(
+        file.size /
+        1024 /
+        1024
+      ).toFixed(2)}MB`,
+    });
     selectedImageFile.value = null;
     profileImage.value = (user.value as any)?.profile_image || defaultProfile;
     return;
@@ -215,9 +217,6 @@ const handleImageChange = (event: Event) => {
 };
 
 const handleSave = async () => {
-  // Clear previous messages
-  errorMessage.value = "";
-  successMessage.value = "";
   isLoading.value = true;
 
   // Convert selected tag IDs (strings) to numbers
@@ -241,13 +240,19 @@ const handleSave = async () => {
     // Validate file again before sending
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (selectedImageFile.value.size > maxSize) {
-      errorMessage.value = t("profile.imageTooLarge");
+      showToast({
+        type: "error",
+        message: t("profile.imageTooLarge"),
+      });
       isLoading.value = false;
       return;
     }
 
     if (!selectedImageFile.value.type.startsWith("image/")) {
-      errorMessage.value = t("profile.invalidImageFile");
+      showToast({
+        type: "error",
+        message: t("profile.invalidImageFile"),
+      });
       isLoading.value = false;
       return;
     }
@@ -312,20 +317,19 @@ const handleSave = async () => {
         profileData.phoneNumber;
       profileData.tags = tagIds;
 
-      successMessage.value = t("profile.profileSaved");
-      errorMessage.value = "";
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        successMessage.value = "";
-      }, 3000);
+      showToast({
+        type: "success",
+        message: t("profile.profileSaved"),
+      });
     } else {
       console.warn(
         "Admin profile: Could not extract user data from update response",
         data
       );
-      errorMessage.value =
-        "Profile update completed, but some information may not have been saved. Please refresh the page.";
+      showToast({
+        type: "error",
+        message: "Profile update completed, but some information may not have been saved. Please refresh the page.",
+      });
     }
   } catch (error: any) {
     // Parse error for user-friendly message
@@ -375,8 +379,10 @@ const handleSave = async () => {
         "Please try again. If the problem persists, contact support.";
     }
 
-    errorMessage.value = userFriendlyError;
-    successMessage.value = "";
+    showToast({
+      type: "error",
+      message: userFriendlyError,
+    });
   } finally {
     isLoading.value = false;
   }
@@ -568,28 +574,6 @@ onMounted(async () => {
             {{ t("profile.tagDescription") }}
           </p>
         </div>
-      </div>
-    </div>
-
-    <!-- Error and Success Messages -->
-    <div class="px-8">
-      <div
-        v-if="errorMessage"
-        class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
-      >
-        <h3 class="text-red-800 font-semibold mb-2">
-          {{ t("profile.updateStatus") }}
-        </h3>
-        <pre class="text-red-700 text-sm whitespace-pre-wrap">{{
-          errorMessage
-        }}</pre>
-      </div>
-
-      <div
-        v-if="successMessage"
-        class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg"
-      >
-        <p class="text-green-800 font-semibold">{{ successMessage }}</p>
       </div>
     </div>
 

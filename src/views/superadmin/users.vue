@@ -4,14 +4,6 @@
       {{ t("superAdmin.usersManagement") }}
     </h1>
 
-    <!-- Error Message -->
-    <div
-      v-if="error"
-      class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg"
-    >
-      <p class="text-red-600">{{ error }}</p>
-    </div>
-
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-8">
       <p class="text-gray-600">{{ t("users.loadingUsers") }}</p>
@@ -179,8 +171,10 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { superAdminUsersService } from "../../services/superAdmin";
 import defaultProfile from "../../assets/images/man.png";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 
 const router = useRouter();
 
@@ -197,7 +191,6 @@ interface User {
 
 const users = ref<User[]>([]);
 const isLoading = ref(false);
-const error = ref<string | null>(null);
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -226,7 +219,6 @@ const userToDeleteData = ref<User | null>(null);
 const fetchUsers = async () => {
   try {
     isLoading.value = true;
-    error.value = null;
 
     const fetchedUsers = await superAdminUsersService.getAllUsers();
 
@@ -300,7 +292,10 @@ const fetchUsers = async () => {
     });
   } catch (err: any) {
     console.error("Error fetching users:", err);
-    error.value = err.response?.data?.message || t("users.failedToFetchUsers");
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || t("users.failedToFetchUsers"),
+    });
   } finally {
     isLoading.value = false;
   }
@@ -312,6 +307,14 @@ const handleView = (userId: number) => {
 };
 
 const handleEdit = (userId: number) => {
+  const user = users.value.find((u) => u.id === userId);
+  if (user) {
+    showToast({
+      type: "info",
+      title: "Editing User",
+      message: `Opening edit page for ${user.name || user.username}...`,
+    });
+  }
   // Navigate to edit user page
   router.push({ name: "superAdmin.editUser", params: { id: userId } });
 };
@@ -340,11 +343,22 @@ const confirmDelete = async () => {
     // Remove user from list
     users.value = users.value.filter((u) => u.id !== userToDelete.value);
 
+    // Show success message
+    const deletedUserName = userToDeleteData.value?.name || "User";
+    showToast({
+      type: "success",
+      title: "User Deleted",
+      message: `${deletedUserName} has been deleted successfully.`,
+    });
+
     // Close modal
     closeDeleteModal();
   } catch (err: any) {
     console.error("Error deleting user:", err);
-    error.value = err.response?.data?.message || t("users.failedToDeleteUser");
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || t("users.failedToDeleteUser"),
+    });
     closeDeleteModal();
   }
 };

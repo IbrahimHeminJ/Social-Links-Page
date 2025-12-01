@@ -7,11 +7,13 @@ import Text from '../../components/inputs/text.vue';
 import Submit from '../../components/buttons/submit.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import { useToast } from '../../composables/useToast';
 
 const { t } = useI18n()
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { showToast } = useToast()
 
 const loginData = ref({
   username: '',
@@ -32,7 +34,11 @@ const handleLogin = async () => {
 
   // Validate inputs
   if (!trimmedUsername || !trimmedPassword) {
-    alert(t('validation.required'))
+    showToast({
+      type: 'error',
+      title: 'Validation Error',
+      message: t('validation.required')
+    })
     return
   }
 
@@ -46,13 +52,23 @@ const handleLogin = async () => {
   const result = await authStore.login(loginPayload)
 
   if (result.success) {
-    // Login successful, redirect to home
-    router.push({ name: 'home' })
+    // Login successful, show success message
+    showToast({
+      type: 'success',
+      title: 'Login Successful',
+      message: 'Welcome back! You have been logged in successfully.'
+    })
+    // Redirect to home after showing success message
+    setTimeout(() => {
+      router.push({ name: 'home' })
+    }, 500)
   } else {
     // Login failed, show error
-    // Error is already stored in authStore.error
-    // You can display it using an alert or toast component
-    alert(result.error || 'Login failed')
+    showToast({
+      type: 'error',
+      title: 'Login Failed',
+      message: result.error || 'Login failed'
+    })
   }
 }
 

@@ -13,9 +13,6 @@
     <div v-if="loading" class="text-center py-8">
       <p class="text-gray-600">{{ t("reports.loadingReports") }}</p>
     </div>
-    <div v-else-if="error" class="text-center py-8">
-      <p class="text-red-600">{{ error }}</p>
-    </div>
     <div v-else-if="reports.length === 0" class="text-center py-8">
       <p class="text-gray-600">{{ t("reports.noReportsFound") }}</p>
     </div>
@@ -36,8 +33,10 @@ import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import ReportBox from "../../components/reports/reportBox.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
+const { showToast } = useToast();
 
 const router = useRouter();
 
@@ -50,16 +49,16 @@ interface Report {
 
 const reports = ref<Report[]>([]);
 const loading = ref(false);
-const error = ref<string | null>(null);
 
 const fetchReports = async () => {
   loading.value = true;
-  error.value = null;
   try {
     reports.value = await superAdminReportsService.getReports();
   } catch (err: any) {
-    error.value =
-      err.response?.data?.message || t("reports.failedToFetchReports");
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || t("reports.failedToFetchReports"),
+    });
     console.error("Error fetching reports:", err);
   } finally {
     loading.value = false;

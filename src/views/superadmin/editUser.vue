@@ -4,22 +4,6 @@
       <h1 class="text-2xl font-bold text-gray-900">Edit User</h1>
     </div>
 
-    <!-- Error and Success Messages -->
-    <div v-if="errorMessage || successMessage" class="mb-4">
-      <div
-        v-if="errorMessage"
-        class="p-4 bg-red-50 border border-red-200 rounded-lg mb-4"
-      >
-        <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
-      </div>
-      <div
-        v-if="successMessage"
-        class="p-4 bg-green-50 border border-green-200 rounded-lg mb-4"
-      >
-        <p class="text-green-800 font-semibold">{{ successMessage }}</p>
-      </div>
-    </div>
-
     <div v-if="isLoadingUser" class="text-center py-8">
       <p class="text-gray-600">Loading user data...</p>
     </div>
@@ -252,8 +236,10 @@ import Text from "../../components/inputs/text.vue";
 import { superAdminUsersService } from "../../services/superAdmin";
 import { userService } from "../../services/user";
 import defaultProfile from "../../assets/images/man.png";
+import { useToast } from "../../composables/useToast";
 
 const router = useRouter();
+const { showToast } = useToast();
 const route = useRoute();
 const fileInput = ref<HTMLInputElement | null>(null);
 const dropdownContainer = ref<HTMLElement | null>(null);
@@ -289,8 +275,6 @@ const passwordData = ref<PasswordData>({
 const isLoading = ref(false);
 const isLoadingUser = ref(false);
 const isLoadingTags = ref(false);
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 const isTagsDropdownOpen = ref(false);
 const selectedImageFile = ref<File | null>(null);
@@ -307,7 +291,10 @@ const fetchTags = async () => {
     }));
   } catch (err: any) {
     console.error("Error fetching tags:", err);
-    errorMessage.value = "Failed to load tags. Please refresh the page.";
+    showToast({
+      type: "error",
+      message: "Failed to load tags. Please refresh the page.",
+    });
   } finally {
     isLoadingTags.value = false;
   }
@@ -373,13 +360,15 @@ const fetchUserData = async () => {
     : route.params.id;
 
   if (!userId) {
-    errorMessage.value = "User ID is required";
+    showToast({
+      type: "error",
+      message: "User ID is required",
+    });
     return;
   }
 
   try {
     isLoadingUser.value = true;
-    errorMessage.value = "";
 
     const userData = await superAdminUsersService.getUserById(userId);
 
@@ -451,9 +440,10 @@ const fetchUserData = async () => {
     };
   } catch (err: any) {
     console.error("Error fetching user data:", err);
-    errorMessage.value =
-      err.response?.data?.message ||
-      "Failed to load user data. Please try again.";
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || "Failed to load user data. Please try again.",
+    });
   } finally {
     isLoadingUser.value = false;
   }
@@ -513,12 +503,12 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  // Clear previous error messages
-  errorMessage.value = "";
-
   if (file) {
     if (file.size > 2 * 1024 * 1024) {
-      errorMessage.value = "Image size must be less than 2MB";
+      showToast({
+        type: "error",
+        message: "Image size must be less than 2MB",
+      });
       // Reset file input
       if (target) {
         target.value = "";
@@ -528,7 +518,10 @@ const handleFileUpload = (event: Event) => {
     }
 
     if (!file.type.startsWith("image/")) {
-      errorMessage.value = "Please select a valid image file";
+      showToast({
+        type: "error",
+        message: "Please select a valid image file",
+      });
       // Reset file input
       if (target) {
         target.value = "";
@@ -549,7 +542,10 @@ const handleFileUpload = (event: Event) => {
     };
     reader.onerror = () => {
       console.error("Error reading file for preview");
-      errorMessage.value = "Error reading image file";
+      showToast({
+        type: "error",
+        message: "Error reading image file",
+      });
     };
     reader.readAsDataURL(file);
   } else {
@@ -561,15 +557,16 @@ const handleFileUpload = (event: Event) => {
 const handleSubmit = async () => {
   try {
     isLoading.value = true;
-    errorMessage.value = "";
-    successMessage.value = "";
 
     const userId = Array.isArray(route.params.id)
       ? route.params.id[0]
       : route.params.id;
 
     if (!userId) {
-      errorMessage.value = "User ID is required";
+      showToast({
+        type: "error",
+        message: "User ID is required",
+      });
       return;
     }
 
@@ -579,23 +576,38 @@ const handleSubmit = async () => {
     const phone = formData.value.phone.trim();
 
     if (!username) {
-      errorMessage.value = "Username is required";
+      showToast({
+        type: "error",
+        message: "Username is required",
+      });
       return;
     }
     if (!name) {
-      errorMessage.value = "Name is required";
+      showToast({
+        type: "error",
+        message: "Name is required",
+      });
       return;
     }
     if (!email) {
-      errorMessage.value = "Email is required";
+      showToast({
+        type: "error",
+        message: "Email is required",
+      });
       return;
     }
     if (!phone) {
-      errorMessage.value = "Phone number is required";
+      showToast({
+        type: "error",
+        message: "Phone number is required",
+      });
       return;
     }
     if (formData.value.tags.length === 0) {
-      errorMessage.value = "At least one tag is required";
+      showToast({
+        type: "error",
+        message: "At least one tag is required",
+      });
       return;
     }
 
@@ -610,19 +622,31 @@ const handleSubmit = async () => {
     // If password fields are filled, validate them
     if (newPassword || confirmPassword) {
       if (!newPassword) {
-        errorMessage.value = "New password is required";
+        showToast({
+          type: "error",
+          message: "New password is required",
+        });
         return;
       }
       if (!confirmPassword) {
-        errorMessage.value = "Password confirmation is required";
+        showToast({
+          type: "error",
+          message: "Password confirmation is required",
+        });
         return;
       }
       if (newPassword !== confirmPassword) {
-        errorMessage.value = "Passwords do not match";
+        showToast({
+          type: "error",
+          message: "Passwords do not match",
+        });
         return;
       }
       if (newPassword.length < 8) {
-        errorMessage.value = "Password must be at least 8 characters";
+        showToast({
+          type: "error",
+          message: "Password must be at least 8 characters",
+        });
         return;
       }
     }
@@ -640,14 +664,16 @@ const handleSubmit = async () => {
       password_confirmation: confirmPassword || undefined,
     });
 
-    successMessage.value = "User updated successfully!";
+    showToast({
+      type: "success",
+      message: "User updated successfully!",
+    });
 
     // Clear password fields after successful update
     passwordData.value.newPassword = "";
     passwordData.value.confirmPassword = "";
 
     setTimeout(() => {
-      successMessage.value = "";
       goBack();
     }, 2000);
   } catch (err: any) {
@@ -665,28 +691,30 @@ const handleSubmit = async () => {
     console.error("Request method:", err.config?.method);
     console.error("Request data:", err.config?.data);
 
+    let errorMsg = "Failed to update user. Please try again.";
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
       console.error("Validation errors:", errors);
       const errorMessages = Object.values(errors).flat();
-      errorMessage.value = `Validation failed: ${errorMessages.join(", ")}`;
+      errorMsg = `Validation failed: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
+      errorMsg = err.response.data.message;
     } else if (err.message) {
-      errorMessage.value = `Error: ${err.message}`;
+      errorMsg = `Error: ${err.message}`;
     } else if (err.response?.status === 404) {
-      errorMessage.value =
-        "User not found. Please refresh the page and try again.";
+      errorMsg = "User not found. Please refresh the page and try again.";
     } else if (err.response?.status === 500) {
-      errorMessage.value = "Server error. Please check the backend logs.";
+      errorMsg = "Server error. Please check the backend logs.";
     } else if (!err.response) {
-      errorMessage.value =
-        "Network error: Could not reach the server. Please check your connection.";
+      errorMsg = "Network error: Could not reach the server. Please check your connection.";
     } else {
-      errorMessage.value = `Failed to update user (Status: ${
-        err.response?.status || "Unknown"
-      }). Please try again.`;
+      errorMsg = `Failed to update user (Status: ${err.response?.status || "Unknown"}). Please try again.`;
     }
+    
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
   } finally {
     isLoading.value = false;
   }

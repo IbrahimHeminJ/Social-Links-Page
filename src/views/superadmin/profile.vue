@@ -41,22 +41,6 @@
 
       <!-- Right Section - Form -->
       <div class="flex-1">
-        <!-- Error and Success Messages -->
-        <div v-if="errorMessage || successMessage" class="mb-4">
-          <div
-            v-if="errorMessage"
-            class="p-4 bg-red-50 border border-red-200 rounded-lg mb-4"
-          >
-            <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
-          </div>
-          <div
-            v-if="successMessage"
-            class="p-4 bg-green-50 border border-green-200 rounded-lg mb-4"
-          >
-            <p class="text-green-800 font-semibold">{{ successMessage }}</p>
-          </div>
-        </div>
-
         <div v-if="isLoadingUser" class="text-center py-8">
           <p class="text-gray-600">Loading profile data...</p>
         </div>
@@ -237,14 +221,14 @@ import authService from "../../services/authService";
 import { userService } from "../../services/user";
 import api from "../../services/api";
 import defaultProfile from "../../assets/images/man.png";
+import { useToast } from "../../composables/useToast";
 
 const fileInput = ref<HTMLInputElement | null>(null);
+const { showToast } = useToast();
 const dropdownContainer = ref<HTMLElement | null>(null);
 const isLoading = ref(false);
 const isLoadingUser = ref(false);
 const isLoadingTags = ref(false);
-const errorMessage = ref<string>("");
-const successMessage = ref<string>("");
 const selectedImageFile = ref<File | null>(null);
 const tagOptions = ref<Array<{ label: string; value: string }>>([]);
 const isTagsDropdownOpen = ref(false);
@@ -279,7 +263,10 @@ const fetchTags = async () => {
     }));
   } catch (err: any) {
     console.error("Error fetching tags:", err);
-    errorMessage.value = "Failed to load tags. Please refresh the page.";
+    showToast({
+      type: "error",
+      message: "Failed to load tags. Please refresh the page.",
+    });
   } finally {
     isLoadingTags.value = false;
   }
@@ -381,7 +368,6 @@ const handleClickOutside = (event: MouseEvent) => {
 const fetchUserData = async () => {
   try {
     isLoadingUser.value = true;
-    errorMessage.value = "";
 
     const rawUserData = await authService.getCurrentUser();
 
@@ -453,9 +439,10 @@ const fetchUserData = async () => {
     console.error("Error response:", err.response);
     console.error("Error response status:", err.response?.status);
     console.error("Error response data:", err.response?.data);
-    errorMessage.value =
-      err.response?.data?.message ||
-      "Failed to load profile data. Please try again.";
+    showToast({
+      type: "error",
+      message: err.response?.data?.message || "Failed to load profile data. Please try again.",
+    });
   } finally {
     isLoadingUser.value = false;
   }
@@ -469,13 +456,13 @@ const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
 
-  // Clear previous error messages
-  errorMessage.value = "";
-
   if (file) {
     // Validate file size (2MB max)
     if (file.size > 2 * 1024 * 1024) {
-      errorMessage.value = "Image size must be less than 2MB";
+      showToast({
+        type: "error",
+        message: "Image size must be less than 2MB",
+      });
       if (target) {
         target.value = "";
       }
@@ -485,7 +472,10 @@ const handleFileUpload = (event: Event) => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      errorMessage.value = "Please select a valid image file";
+      showToast({
+        type: "error",
+        message: "Please select a valid image file",
+      });
       if (target) {
         target.value = "";
       }
@@ -505,7 +495,10 @@ const handleFileUpload = (event: Event) => {
     };
     reader.onerror = () => {
       console.error("Error reading file for preview");
-      errorMessage.value = "Error reading image file";
+      showToast({
+        type: "error",
+        message: "Error reading image file",
+      });
     };
     reader.readAsDataURL(file);
   } else {
@@ -516,24 +509,34 @@ const handleFileUpload = (event: Event) => {
 const handleSave = async () => {
   try {
     isLoading.value = true;
-    errorMessage.value = "";
-    successMessage.value = "";
 
     // Validate required fields
     if (!profileData.value.username.trim()) {
-      errorMessage.value = "Username is required";
+      showToast({
+        type: "error",
+        message: "Username is required",
+      });
       return;
     }
     if (!profileData.value.name.trim()) {
-      errorMessage.value = "Name is required";
+      showToast({
+        type: "error",
+        message: "Name is required",
+      });
       return;
     }
     if (!profileData.value.email.trim()) {
-      errorMessage.value = "Email is required";
+      showToast({
+        type: "error",
+        message: "Email is required",
+      });
       return;
     }
     if (!profileData.value.phone.trim()) {
-      errorMessage.value = "Phone number is required";
+      showToast({
+        type: "error",
+        message: "Phone number is required",
+      });
       return;
     }
 
@@ -657,32 +660,36 @@ const handleSave = async () => {
         profileData.value.phone;
       profileData.value.tags = tagIds;
 
-      successMessage.value = "Profile updated successfully!";
-
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        successMessage.value = "";
-      }, 3000);
+      showToast({
+        type: "success",
+        message: "Profile updated successfully!",
+      });
 
       // Clear selected file
       selectedImageFile.value = null;
     } else {
       console.warn("Could not extract user data from response");
       console.warn("Response structure:", JSON.stringify(data, null, 2));
-      errorMessage.value =
-        "Profile update completed, but some information may not have been saved. Please refresh the page.";
+      showToast({
+        type: "error",
+        message: "Profile update completed, but some information may not have been saved. Please refresh the page.",
+      });
     }
   } catch (err: any) {
     console.error("Error updating profile:", err);
+    let errorMsg = "Failed to update profile. Please try again.";
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
       const errorMessages = Object.values(errors).flat();
-      errorMessage.value = `Validation failed: ${errorMessages.join(", ")}`;
+      errorMsg = `Validation failed: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {
-      errorMessage.value = err.response.data.message;
-    } else {
-      errorMessage.value = "Failed to update profile. Please try again.";
+      errorMsg = err.response.data.message;
     }
+    
+    showToast({
+      type: "error",
+      message: errorMsg,
+    });
   } finally {
     isLoading.value = false;
   }
