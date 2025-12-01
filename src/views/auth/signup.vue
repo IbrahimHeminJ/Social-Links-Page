@@ -211,13 +211,13 @@ const fetchTags = async () => {
   try {
     isLoadingTags.value = true;
     const tags = await userService.getTags();
-
     tagOptions.value = tags.map((tag: any) => ({
       label: tag.tag || tag.tag_name || tag.name || `Tag ${tag.id}`,
       value: String(tag.id),
     }));
-  } catch (err) {
-    console.error("Error fetching tags:", err);
+  } catch (err: any) {
+    // console.error("Error fetching tags:", err); // Dead code: Replaced by toastMessage component
+    // Fail silently for tags - not critical for signup page load
   } finally {
     isLoadingTags.value = false;
   }

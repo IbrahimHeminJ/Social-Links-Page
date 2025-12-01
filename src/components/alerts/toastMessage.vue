@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { watch } from 'vue';
 
-const toast = defineProps<{
+const toast = withDefaults(defineProps<{
   show: boolean;
   type: 'success' | 'error' | 'info';
   title: string;
   message: string;
-}>();
+  timeout?: number;
+}>(), {
+  // default timeout is 5 seconds
+  timeout: 5000
+});
 
 const emit = defineEmits<{
   close: [];
@@ -26,7 +30,7 @@ watch(
       // Set new timeout to auto-close after 5 seconds
       timeoutId = setTimeout(() => {
         emit('close');
-      }, 5000);
+      }, toast.timeout);
     } else {
       // Clear timeout if toast is manually closed
       if (timeoutId) {

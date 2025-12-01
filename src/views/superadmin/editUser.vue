@@ -208,7 +208,7 @@ const fetchTags = async () => {
       value: String(tag.id),
     }));
   } catch (err: any) {
-    console.error("Error fetching tags:", err);
+    // console.error("Error fetching tags:", err); // Dead code: Replaced by toastMessage component
     showToast('error', 'Error', "Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
@@ -351,7 +351,7 @@ const fetchUserData = async () => {
       tags: tagIds,
     };
   } catch (err: any) {
-    console.error("Error fetching user data:", err);
+    // console.error("Error fetching user data:", err); // Dead code: Replaced by toastMessage component
     showToast('error', 'Error', err.response?.data?.message || "Failed to load user data. Please try again.");
   } finally {
     isLoadingUser.value = false;
@@ -444,7 +444,7 @@ const handleFileUpload = (event: Event) => {
       }
     };
     reader.onerror = () => {
-      console.error("Error reading file for preview");
+      // console.error("Error reading file for preview"); // Dead code: Replaced by toastMessage component
       showToast('error', 'Error', "Error reading image file");
     };
     reader.readAsDataURL(file);
@@ -544,24 +544,12 @@ const handleSubmit = async () => {
       goBack();
     }, 2000);
   } catch (err: any) {
-    console.error("=== Error updating user ===");
-    console.error("Error object:", err);
-    console.error("Error message:", err.message);
-    console.error("Error code:", err.code);
-    console.error("Error response:", err.response);
-    console.error("Error response status:", err.response?.status);
-    console.error("Error response statusText:", err.response?.statusText);
-    console.error("Error response data:", err.response?.data);
-    console.error("Error response headers:", err.response?.headers);
-    console.error("Request config:", err.config);
-    console.error("Request URL:", err.config?.url);
-    console.error("Request method:", err.config?.method);
-    console.error("Request data:", err.config?.data);
+    // console.error("=== Error updating user ==="); // Dead code: Replaced by toastMessage component
 
     let errorMsg = "Failed to update user. Please try again.";
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
-      console.error("Validation errors:", errors);
+      // console.error("Validation errors:", errors); // Dead code: Replaced by toastMessage component
       const errorMessages = Object.values(errors).flat();
       errorMsg = `Validation failed: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {

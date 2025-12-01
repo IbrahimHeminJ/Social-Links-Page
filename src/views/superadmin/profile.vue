@@ -187,7 +187,7 @@ const fetchTags = async () => {
       value: String(tag.id),
     }));
   } catch (err: any) {
-    console.error("Error fetching tags:", err);
+    // console.error("Error fetching tags:", err); // Dead code: Replaced by toastMessage component
     showToast('error', 'Error', "Failed to load tags. Please refresh the page.");
   } finally {
     isLoadingTags.value = false;
@@ -355,12 +355,12 @@ const fetchUserData = async () => {
       image: imageUrl,
     };
   } catch (err: any) {
-    console.error("=== Error fetching user data ===");
-    console.error("Error object:", err);
-    console.error("Error message:", err.message);
-    console.error("Error response:", err.response);
-    console.error("Error response status:", err.response?.status);
-    console.error("Error response data:", err.response?.data);
+    // console.error("=== Error fetching user data ==="); // Dead code: Replaced by toastMessage component
+    // console.error("Error object:", err);
+    // console.error("Error message:", err.message);
+    // console.error("Error response:", err.response);
+    // console.error("Error response status:", err.response?.status);
+    // console.error("Error response data:", err.response?.data);
     showToast('error', 'Error', err.response?.data?.message || "Failed to load profile data. Please try again.");
   } finally {
     isLoadingUser.value = false;
@@ -407,7 +407,7 @@ const handleFileUpload = (event: Event) => {
       }
     };
     reader.onerror = () => {
-      console.error("Error reading file for preview");
+      // console.error("Error reading file for preview"); // Dead code: Replaced by toastMessage component
       showToast('error', 'Error', "Error reading image file");
     };
     reader.readAsDataURL(file);
@@ -568,7 +568,7 @@ const handleSave = async () => {
       showToast('info', 'Partial Update', "Profile update completed, but some information may not have been saved. Please refresh the page.");
     }
   } catch (err: any) {
-    console.error("Error updating profile:", err);
+    // console.error("Error updating profile:", err); // Dead code: Replaced by toastMessage component
     let errorMsg = "Failed to update profile. Please try again.";
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;

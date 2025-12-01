@@ -71,7 +71,7 @@ const fetchReportHistory = async () => {
     reportHistory.value = await superAdminReportsService.getResolvedReports();
   } catch (err: any) {
     showToast('error', 'Error', err.response?.data?.message || t("reports.failedToFetchReportHistory"));
-    console.error("Error fetching report history:", err);
+    // console.error("Error fetching report history:", err); // Dead code: Replaced by toastMessage component
   } finally {
     loading.value = false;
   }

@@ -66,7 +66,7 @@ const fetchReports = async () => {
     reports.value = await superAdminReportsService.getReports();
   } catch (err: any) {
     showToast('error', 'Error', err.response?.data?.message || t("reports.failedToFetchReports"));
-    console.error("Error fetching reports:", err);
+    // console.error("Error fetching reports:", err); // Dead code: Replaced by toastMessage component
   } finally {
     loading.value = false;
   }

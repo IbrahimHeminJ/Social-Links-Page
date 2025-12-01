@@ -272,7 +272,7 @@ const fetchUsers = async () => {
       };
     });
   } catch (err: any) {
-    console.error("Error fetching users:", err);
+    // console.error("Error fetching users:", err); // Dead code: Replaced by toastMessage component
     showToast('error', 'Error', err.response?.data?.message || t("users.failedToFetchUsers"));
   } finally {
     isLoading.value = false;
@@ -320,7 +320,7 @@ const confirmDelete = async () => {
     // Close modal
     closeDeleteModal();
   } catch (err: any) {
-    console.error("Error deleting user:", err);
+    // console.error("Error deleting user:", err); // Dead code: Replaced by toastMessage component
     showToast('error', 'Error', err.response?.data?.message || t("users.failedToDeleteUser"));
     closeDeleteModal();
   }

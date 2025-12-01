@@ -255,11 +255,11 @@ const fetchReportDetail = async () => {
       updatedAt: reportDetail.updatedAt,
     };
   } catch (err: any) {
+    // console.error("Error fetching report detail:", err); // Dead code: Replaced by toastMessage component
     error.value =
       err.response?.data?.message ||
       err.message ||
       t("reports.failedToFetchReportDetails");
-    console.error("Error fetching report detail:", err);
   } finally {
     loading.value = false;
   }
@@ -352,7 +352,7 @@ const handleResolve = async () => {
     // Navigate back to reports list
     goBack();
   } catch (err: any) {
-    console.error("Error resolving report:", err);
+    // console.error("Error resolving report:", err); // Dead code: Replaced by toastMessage component
     const errorMessage =
       err.response?.data?.message ||
       err.response?.data?.error ||
