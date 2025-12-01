@@ -36,35 +36,68 @@ export interface UpdateUserData {
   password_confirmation?: string;
 }
 
+export interface PaginationMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+  from: number;
+  to: number;
+}
+
+export interface PaginatedUsersResponse {
+  users: SuperAdminUser[];
+  pagination: PaginationMeta;
+}
+
 class SuperAdminUsersService {
   /**
-   * Get all users
-   * @returns Array of users
+   * Get all users with pagination
+   * @param page - Page number (default: 1)
+   * @param perPage - Items per page (optional, backend default)
+   * @returns Paginated users response
    */
-  async getAllUsers(): Promise<SuperAdminUser[]> {
+  async getAllUsers(page: number = 1, perPage?: number): Promise<PaginatedUsersResponse> {
+    // Build query parameters
+    const params: Record<string, string> = {
+      page: page.toString(),
+    };
+    if (perPage) {
+      params.per_page = perPage.toString();
+    }
+
     const response = await api.get<{ message?: string; data: any }>(
-      "/admin/users"
+      "/admin/users",
+      { params }
     );
 
-    // Try multiple possible response structures
+    // Handle paginated response structure: { data: { data: [...], pagination: {...} } }
     let usersArray: any[] = [];
+    let paginationMeta: PaginationMeta | null = null;
 
-    // Case 1: Direct array in data
-    if (Array.isArray(response.data?.data)) {
+    // Check for paginated response structure
+    if (response.data?.data?.data && Array.isArray(response.data.data.data)) {
+      usersArray = response.data.data.data;
+      
+      // Extract pagination metadata
+      if (response.data.data.pagination) {
+        paginationMeta = {
+          total: response.data.data.pagination.total || 0,
+          per_page: response.data.data.pagination.per_page || 10,
+          current_page: response.data.data.pagination.current_page || 1,
+          last_page: response.data.data.pagination.last_page || 1,
+          from: response.data.data.pagination.from || 0,
+          to: response.data.data.pagination.to || 0,
+        };
+      }
+    }
+    // Fallback: Try multiple possible response structures (backward compatibility)
+    else if (Array.isArray(response.data?.data)) {
       usersArray = response.data.data;
     }
-    // Case 2: Direct array in response.data
     else if (Array.isArray(response.data)) {
       usersArray = response.data;
     }
-    // Case 3: Paginated response (Laravel pagination)
-    else if (
-      response.data?.data?.data &&
-      Array.isArray(response.data.data.data)
-    ) {
-      usersArray = response.data.data.data;
-    }
-    // Case 4: Nested in data.users
     else if (
       response.data?.data &&
       typeof response.data.data === "object" &&
@@ -73,7 +106,6 @@ class SuperAdminUsersService {
     ) {
       usersArray = (response.data.data as any).users;
     }
-    // Case 5: Nested in data.users (direct)
     else if (
       response.data &&
       typeof response.data === "object" &&
@@ -82,7 +114,6 @@ class SuperAdminUsersService {
     ) {
       usersArray = (response.data as any).users;
     }
-    // Case 6: Empty or unknown structure
     else {
       console.warn("Unknown response structure:", response.data);
       usersArray = [];
@@ -90,7 +121,7 @@ class SuperAdminUsersService {
 
     // Map users to our interface
     // Structure: [{ id, data: { email, name, phone_no, profile_image, role, tags, username }, theme }]
-    return usersArray.map((user: any) => {
+    const users = usersArray.map((user: any) => {
       // Extract user data from nested 'data' property, fallback to top level
       const userData = user.data || user;
 
@@ -112,6 +143,19 @@ class SuperAdminUsersService {
         tags: userData.tags || [],
       };
     });
+
+    // Return paginated response
+    return {
+      users,
+      pagination: paginationMeta || {
+        total: users.length,
+        per_page: users.length,
+        current_page: 1,
+        last_page: 1,
+        from: 1,
+        to: users.length,
+      },
+    };
   }
 
   /**

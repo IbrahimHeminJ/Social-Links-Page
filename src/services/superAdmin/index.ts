@@ -5,7 +5,9 @@ export { default as superAdminReportsService } from './reportsService'
 // Export types
 export type {
   SuperAdminUser,
-  UpdateUserData
+  UpdateUserData,
+  PaginationMeta,
+  PaginatedUsersResponse
 } from './usersService'
 
 export type {

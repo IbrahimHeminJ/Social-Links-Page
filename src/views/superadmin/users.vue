@@ -125,6 +125,58 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Pagination Controls -->
+      <div v-if="pagination && pagination.last_page > 1" class="px-4 py-3 bg-gray-50 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-gray-700">
+            <span>Showing {{ pagination.from }} to {{ pagination.to }} of {{ pagination.total }} users</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- Previous Button -->
+            <button
+              @click="goToPage(pagination.current_page - 1)"
+              :disabled="pagination.current_page === 1"
+              :class="[
+                'px-3 py-1 text-sm font-medium rounded transition-colors',
+                pagination.current_page === 1
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              ]">
+              Previous
+            </button>
+            
+            <!-- Page Numbers -->
+            <div class="flex items-center gap-1">
+              <button
+                v-for="page in visiblePages"
+                :key="page"
+                @click="goToPage(page)"
+                :class="[
+                  'px-3 py-1 text-sm font-medium rounded transition-colors',
+                  page === pagination.current_page
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                ]">
+                {{ page }}
+              </button>
+            </div>
+            
+            <!-- Next Button -->
+            <button
+              @click="goToPage(pagination.current_page + 1)"
+              :disabled="pagination.current_page === pagination.last_page"
+              :class="[
+                'px-3 py-1 text-sm font-medium rounded transition-colors',
+                pagination.current_page === pagination.last_page
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              ]">
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
       @close="closeToast" />
@@ -132,10 +184,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { superAdminUsersService } from "../../services/superAdmin";
+import { superAdminUsersService, type PaginationMeta } from "../../services/superAdmin";
 import defaultProfile from "../../assets/images/man.png";
 import ToastMessage from "../../components/alerts/toastMessage.vue";
 
@@ -156,6 +208,8 @@ interface User {
 
 const users = ref<User[]>([]);
 const isLoading = ref(false);
+const currentPage = ref(1);
+const pagination = ref<PaginationMeta | null>(null);
 
 // Toast state
 const toast = ref({
@@ -196,15 +250,52 @@ const showDeleteModal = ref(false);
 const userToDelete = ref<number | null>(null);
 const userToDeleteData = ref<User | null>(null);
 
+// Computed property for visible page numbers
+const visiblePages = computed(() => {
+  if (!pagination.value) return [];
+  
+  const totalPages = pagination.value.last_page;
+  const current = pagination.value.current_page;
+  const pages: number[] = [];
+  
+  // Show up to 5 page numbers
+  if (totalPages <= 5) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+  } else {
+    // Show pages around current page
+    if (current <= 3) {
+      for (let i = 1; i <= 5; i++) {
+        pages.push(i);
+      }
+    } else if (current >= totalPages - 2) {
+      for (let i = totalPages - 4; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      for (let i = current - 2; i <= current + 2; i++) {
+        pages.push(i);
+      }
+    }
+  }
+  
+  return pages;
+});
+
 // Fetch users from API
-const fetchUsers = async () => {
+const fetchUsers = async (page: number = 1) => {
   try {
     isLoading.value = true;
+    currentPage.value = page;
 
-    const fetchedUsers = await superAdminUsersService.getAllUsers();
+    const response = await superAdminUsersService.getAllUsers(page);
+    
+    // Update pagination metadata
+    pagination.value = response.pagination;
 
     // Map to our User interface
-    users.value = fetchedUsers.map((user) => {
+    users.value = response.users.map((user) => {
       // Validate and set image URL with fallback
       let imageUrl = user.image || user.profile_image || "";
 
@@ -312,6 +403,18 @@ const confirmDelete = async () => {
 
     // Remove user from list
     users.value = users.value.filter((u) => u.id !== userToDelete.value);
+    
+    // Update pagination total if needed
+    if (pagination.value) {
+      pagination.value.total = Math.max(0, pagination.value.total - 1);
+      
+      // If current page is empty and not first page, go to previous page
+      if (users.value.length === 0 && currentPage.value > 1) {
+        goToPage(currentPage.value - 1);
+        closeDeleteModal();
+        return;
+      }
+    }
 
     // Show success message
     const deletedUserName = userToDeleteData.value?.name || "User";
@@ -326,10 +429,18 @@ const confirmDelete = async () => {
   }
 };
 
+// Pagination navigation
+const goToPage = (page: number) => {
+  if (page < 1 || (pagination.value && page > pagination.value.last_page)) {
+    return;
+  }
+  fetchUsers(page);
+  // Scroll to top of table
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 // Fetch users when component mounts
 onMounted(() => {
-  fetchUsers();
+  fetchUsers(1);
 });
-
-console.log(users);
 </script>
