@@ -23,7 +23,7 @@
     <!-- Dropdown Menu -->
     <div
       v-if="isOpen"
-      class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+      class="absolute right-0 mt-2 w-auto bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
       @click.stop
     >
       <button

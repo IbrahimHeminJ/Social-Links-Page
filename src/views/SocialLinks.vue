@@ -271,7 +271,7 @@
 
     <ReportWindow :show="showReport" @close="showReport = false" @submit="handleSubmitReport" />
     <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
-      @close="closeToast" />
+      @close="closeToast"  class="text-black"/>
   </div>
 </template>
 
