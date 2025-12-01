@@ -1,22 +1,9 @@
 <template>
   <div class="p-4 md:p-6">
     <div class="mb-6">
-      <button
-        @click="goBack"
-        class="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2"
-      >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
+      <button @click="goBack" class="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
         {{ t("reports.backToReports") }}
       </button>
@@ -50,9 +37,7 @@
         <label class="block text-sm font-medium text-gray-900 mb-2">{{
           t("reports.descriptionLabel")
         }}</label>
-        <div
-          class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900 min-h-[100px] whitespace-pre-wrap"
-        >
+        <div class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900 min-h-[100px] whitespace-pre-wrap">
           {{ reportData.description || t("reports.noDescriptionProvided") }}
         </div>
       </div>
@@ -101,8 +86,8 @@
             reportData.reportStatus === 1
               ? t("reports.resolved")
               : reportData.reportStatus === 0
-              ? t("reports.pending")
-              : t("reports.unknown")
+                ? t("reports.pending")
+                : t("reports.unknown")
           }}
         </div>
       </div>
@@ -128,20 +113,12 @@
       </div>
 
       <!-- Action -->
-      <Select
-        v-model="reportData.action"
-        :label="t('reports.action')"
-        :placeholder="t('reports.selectAction')"
-        :options="actionOptions"
-      />
+      <Select v-model="reportData.action" :label="t('reports.action')" :placeholder="t('reports.selectAction')"
+        :options="actionOptions" />
 
       <!-- Reason for action -->
-      <Text
-        :label="t('reports.reasonForAction')"
-        v-model="reportData.reason"
-        type="text"
-        :placeholder="t('reports.enterReasonForAction')"
-      />
+      <Text :label="t('reports.reasonForAction')" v-model="reportData.reason" type="text"
+        :placeholder="t('reports.enterReasonForAction')" />
 
       <!-- Previous Reason of Action (if exists and report is already resolved) -->
       <div v-if="reportData.reasonOfAction && reportData.reportStatus === 1">
@@ -155,14 +132,14 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-center gap-4 pt-4">
-        <button
-          @click="handleResolve"
-          class="px-8 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors"
-        >
+        <button @click="handleResolve"
+          class="px-8 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors">
           {{ t("reports.resolve") }}
         </button>
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>
 
@@ -173,7 +150,11 @@ import { useI18n } from "vue-i18n";
 import Text from "../../components/inputs/text.vue";
 import Select from "../../components/inputs/select.vue";
 import { superAdminReportsService } from "../../services/superAdmin";
+<<<<<<< HEAD
 import { useToast } from "../../composables/useToast";
+=======
+import ToastMessage from "../../components/alerts/toastMessage.vue";
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
 const { t } = useI18n();
 
@@ -212,6 +193,22 @@ const reportData = ref<ReportData>({
 
 const loading = ref(false);
 const error = ref<string | null>(null);
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 const actionOptions = [
   { label: t("reports.actions.deleteUser"), value: "delete-user" },
@@ -333,20 +330,28 @@ const formatDate = (dateString: string) => {
 const handleResolve = async () => {
   // Validate required fields
   if (!reportData.value.action) {
+<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Validation Error",
       message: "Please select an action",
     });
+=======
+    showToast('error', 'Validation Error', "Please select an action");
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
   if (!reportData.value.reason || !reportData.value.reason.trim()) {
+<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Validation Error",
       message: "Please enter a reason for the action",
     });
+=======
+    showToast('error', 'Validation Error', "Please enter a reason for the action");
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return;
   }
 
@@ -363,11 +368,15 @@ const handleResolve = async () => {
     });
 
     // Show success message
+<<<<<<< HEAD
     showToast({
       type: "success",
       title: "Report Resolved",
       message: "Report resolved successfully",
     });
+=======
+    showToast('success', 'Success', "Report resolved successfully");
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
     // Navigate back to reports list
     goBack();
@@ -377,11 +386,15 @@ const handleResolve = async () => {
       err.response?.data?.message ||
       err.response?.data?.error ||
       "Failed to resolve report. Please try again.";
+<<<<<<< HEAD
     showToast({
       type: "error",
       title: "Error",
       message: errorMessage,
     });
+=======
+    showToast('error', 'Error', errorMessage);
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
   }
 };
 

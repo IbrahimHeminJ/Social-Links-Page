@@ -7,7 +7,11 @@ import Text from '../../components/inputs/text.vue';
 import Submit from '../../components/buttons/submit.vue';
 import Hyperlink from '../../components/buttons/hyperlink.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+<<<<<<< HEAD
 import { useToast } from '../../composables/useToast';
+=======
+import ToastMessage from '../../components/alerts/toastMessage.vue';
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
 
 const { t } = useI18n()
 
@@ -19,6 +23,22 @@ const loginData = ref({
   username: '',
   password: ''
 })
+
+// Toast state
+const toast = ref({
+  show: false,
+  type: 'info' as 'success' | 'error' | 'info',
+  title: '',
+  message: ''
+});
+
+const showToast = (type: 'success' | 'error' | 'info', title: string, message: string) => {
+  toast.value = { show: true, type, title, message };
+};
+
+const closeToast = () => {
+  toast.value.show = false;
+};
 
 const goToSignup = () => {
   router.push({ name: 'signup' })
@@ -34,11 +54,15 @@ const handleLogin = async () => {
 
   // Validate inputs
   if (!trimmedUsername || !trimmedPassword) {
+<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Validation Error',
       message: t('validation.required')
     })
+=======
+    showToast('error', 'Validation Error', t('validation.required'))
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
     return
   }
 
@@ -64,11 +88,17 @@ const handleLogin = async () => {
     }, 500)
   } else {
     // Login failed, show error
+<<<<<<< HEAD
     showToast({
       type: 'error',
       title: 'Login Failed',
       message: result.error || 'Login failed'
     })
+=======
+    // Error is already stored in authStore.error
+    // You can display it using an alert or toast component
+    showToast('error', 'Login Failed', result.error || 'Login failed')
+>>>>>>> f3875fc3b36962570a6b72018e29012be97429a6
   }
 }
 
@@ -92,11 +122,13 @@ const handleLogin = async () => {
     <!-- Login Form -->
     <div class="w-full max-w-md">
       <!-- Username/Email Field -->
-      <Text v-model="loginData.username" :label="t('auth.usernameOrEmail')" :placeholder="t('auth.enterUsernameOrEmail')" type="text" class="mb-6" />
+      <Text v-model="loginData.username" :label="t('auth.usernameOrEmail')"
+        :placeholder="t('auth.enterUsernameOrEmail')" type="text" class="mb-6" />
 
       <!-- Password Field -->
-      <Text v-model="loginData.password" :label="t('auth.password')" :placeholder="t('auth.enterPassword')" type="password" class="mb-6" />
-  
+      <Text v-model="loginData.password" :label="t('auth.password')" :placeholder="t('auth.enterPassword')"
+        type="password" class="mb-6" />
+
       <!-- Login Button -->
       <Submit :text="t('auth.loginButton')" @click="handleLogin" class="h-[50px] mb-6" />
 
@@ -106,5 +138,7 @@ const handleLogin = async () => {
         <Hyperlink :text="t('auth.signUpHere')" @click="goToSignup" />
       </div>
     </div>
+    <ToastMessage :show="toast.show" :type="toast.type" :title="toast.title" :message="toast.message"
+      @close="closeToast" />
   </div>
 </template>

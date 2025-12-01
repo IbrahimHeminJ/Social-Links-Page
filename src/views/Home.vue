@@ -3,7 +3,6 @@ import Footer from '../components/footer.vue';
 import Header from '../components/header.vue';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../store/auth';
 import { useI18n } from 'vue-i18n';
 import Icon from '../assets/icons/icon.svg';
 
@@ -13,27 +12,7 @@ const { t } = useI18n()
 
 const searchQuery = ref('');
 const router = useRouter();
-const authStore = useAuthStore();
 
-const goToLogin = () => {
-  router.push({ name: 'login' });
-};
-
-const handleLogout = async () => {
-  await authStore.logout();
-};
-
-const handleUserClick = () => {
-  const role = authStore.userRole;
-  
-  if (role === 'user') {
-    // User role → redirect to admin links
-    router.push({ name: 'admin.links' });
-  } else if (role === 'admin' || role === 'superadmin') {
-    // Admin or superadmin → redirect to superadmin users
-    router.push({ name: 'superAdmin.users' });
-  }
-};
 
 const goToExplore = () => {
   router.push({ name: 'explore' });
@@ -88,11 +67,8 @@ const numberOfUsers = ref(getNumberOfUsers());
         </div>
 
         <!-- Search -->
-        <SearchBar
-        v-model="searchQuery"
-        :placeholder="t('home.exploreCommunity')"
-        class="w-full md:max-w-md mt-3"
-        @click="goToExplore" />
+        <SearchBar v-model="searchQuery" :placeholder="t('home.exploreCommunity')" class="w-full md:max-w-md mt-3"
+          @click="goToExplore" />
 
         <!-- Explore text -->
         <div class="mt-2">
@@ -117,7 +93,7 @@ const numberOfUsers = ref(getNumberOfUsers());
         </p>
       </div>
     </section>
-    
+
     <!-- Features -->
     <section class="mt-12 md:mt-16">
       <h2 class="font-bold text-lg text-center mb-6">{{ t('home.featuresWeProvide') }}</h2>
