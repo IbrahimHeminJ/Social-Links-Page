@@ -301,12 +301,11 @@
       "fakeAccount": "Fake Account",
       "harassment": "Harassment",
       "other": "Other",
-    "unknown": "Unknown"
+      "unknown": "Unknown"
+    }
   },
   "profileSwitcher": {
-    "userProfile": "User Profile",
-    "adminProfile": "Admin Profile"
+    "userProfile": "Profile (User)",
+    "adminProfile": "Profile (Admin)"
   }
 }
-}
-

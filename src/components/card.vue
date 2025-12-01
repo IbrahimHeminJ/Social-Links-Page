@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-[#F5F5F5] border border-[#009AFF] rounded-[10px] px-4 py-3 flex justify-between items-center"
+    class="bg-[#F5F5F5] border border-[#009AFF] rounded-[10px] p-5 flex justify-between items-center"
   >
     <div class="flex gap-x-5 items-center">
       <img

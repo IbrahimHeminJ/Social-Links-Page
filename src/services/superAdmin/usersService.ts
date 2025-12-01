@@ -1,0 +1,443 @@
+import api from "../api";
+
+export interface SuperAdminUser {
+  id: number;
+  username: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  phone_no?: string;
+  profile_image?: string;
+  image?: string;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  tags?: Array<{ id: number; tag_id?: number; tag?: string }>;
+}
+
+export interface CreateUserData {
+  username: string;
+  name: string;
+  email: string;
+  phone_no: string;
+  profile_image?: File;
+  tags?: number[];
+}
+
+export interface UpdateUserData {
+  username: string;
+  name: string;
+  email: string;
+  phone_no: string;
+  profile_image?: File;
+  tags?: number[];
+  password?: string;
+  password_confirmation?: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  per_page: number;
+  current_page: number;
+  last_page: number;
+  from: number;
+  to: number;
+}
+
+export interface PaginatedUsersResponse {
+  users: SuperAdminUser[];
+  pagination: PaginationMeta;
+}
+
+class SuperAdminUsersService {
+  /**
+   * Get all users with pagination
+   * @param page - Page number (default: 1)
+   * @param perPage - Items per page (optional, backend default)
+   * @returns Paginated users response
+   */
+  async getAllUsers(page: number = 1, perPage?: number): Promise<PaginatedUsersResponse> {
+    // Build query parameters
+    const params: Record<string, string> = {
+      page: page.toString(),
+    };
+    if (perPage) {
+      params.per_page = perPage.toString();
+    }
+
+    const response = await api.get<{ message?: string; data: any }>(
+      "/admin/users",
+      { params }
+    );
+
+    // Handle paginated response structure: { data: { data: [...], pagination: {...} } }
+    let usersArray: any[] = [];
+    let paginationMeta: PaginationMeta | null = null;
+
+    // Check for paginated response structure
+    if (response.data?.data?.data && Array.isArray(response.data.data.data)) {
+      usersArray = response.data.data.data;
+      
+      // Extract pagination metadata
+      if (response.data.data.pagination) {
+        paginationMeta = {
+          total: response.data.data.pagination.total || 0,
+          per_page: response.data.data.pagination.per_page || 10,
+          current_page: response.data.data.pagination.current_page || 1,
+          last_page: response.data.data.pagination.last_page || 1,
+          from: response.data.data.pagination.from || 0,
+          to: response.data.data.pagination.to || 0,
+        };
+      }
+    }
+    // Fallback: Try multiple possible response structures (backward compatibility)
+    else if (Array.isArray(response.data?.data)) {
+      usersArray = response.data.data;
+    }
+    else if (Array.isArray(response.data)) {
+      usersArray = response.data;
+    }
+    else if (
+      response.data?.data &&
+      typeof response.data.data === "object" &&
+      "users" in response.data.data &&
+      Array.isArray((response.data.data as any).users)
+    ) {
+      usersArray = (response.data.data as any).users;
+    }
+    else if (
+      response.data &&
+      typeof response.data === "object" &&
+      "users" in response.data &&
+      Array.isArray((response.data as any).users)
+    ) {
+      usersArray = (response.data as any).users;
+    }
+    else {
+      console.warn("Unknown response structure:", response.data);
+      usersArray = [];
+    }
+
+    // Map users to our interface
+    // Structure: [{ id, data: { email, name, phone_no, profile_image, role, tags, username }, theme }]
+    const users = usersArray.map((user: any) => {
+      // Extract user data from nested 'data' property, fallback to top level
+      const userData = user.data || user;
+
+      const rawProfileImage = userData.profile_image || userData.image;
+
+      return {
+        id: user.id || userData.id,
+        username: userData.username || "",
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phone_no || userData.phone || null,
+        phone_no: userData.phone_no || userData.phone,
+        profile_image: rawProfileImage,
+        image: rawProfileImage || "/src/assets/images/man.png",
+        createdAt: userData.created_at || userData.createdAt || "",
+        created_at: userData.created_at || userData.createdAt,
+        updatedAt: userData.updated_at || userData.updatedAt || "",
+        updated_at: userData.updated_at || userData.updatedAt,
+        tags: userData.tags || [],
+      };
+    });
+
+    // Return paginated response
+    return {
+      users,
+      pagination: paginationMeta || {
+        total: users.length,
+        per_page: users.length,
+        current_page: 1,
+        last_page: 1,
+        from: 1,
+        to: users.length,
+      },
+    };
+  }
+
+  /**
+   * Get user by ID
+   * @param userId - User ID
+   * @returns User data
+   */
+  async getUserById(userId: string | number): Promise<SuperAdminUser> {
+    const response = await api.get<{ message?: string; data: any }>(
+      `/admin/users/${userId}`
+    );
+
+    // Handle nested structure: { id, data: { email, name, ... }, theme }
+    const userResponse = response.data?.data || response.data || {};
+
+    // Extract user data from nested 'data' property, fallback to top level
+    const userData = userResponse.data || userResponse;
+
+    // Extract tags - check multiple possible locations
+    // Tags might be in: userData.tags, userResponse.tags, or in a relationship
+    let tags = [];
+
+    // Check in userData first (most common location)
+    if (userData.tags && Array.isArray(userData.tags)) {
+      tags = userData.tags;
+    }
+    // Check in userResponse (top level)
+    else if (userResponse.tags && Array.isArray(userResponse.tags)) {
+      tags = userResponse.tags;
+    }
+    // Check for tag (singular)
+    else if (userData.tag && Array.isArray(userData.tag)) {
+      tags = userData.tag;
+    }
+    // Check for user_tags
+    else if (userData.user_tags && Array.isArray(userData.user_tags)) {
+      tags = userData.user_tags;
+    }
+    // Check in relationships (Laravel relationships)
+    else if (
+      userResponse.relationships?.tags &&
+      Array.isArray(userResponse.relationships.tags)
+    ) {
+      tags = userResponse.relationships.tags;
+    } else if (
+      userData.relationships?.tags &&
+      Array.isArray(userData.relationships.tags)
+    ) {
+      tags = userData.relationships.tags;
+    }
+    // Check if tags is nested in data.data
+    else if (userResponse.data?.tags && Array.isArray(userResponse.data.tags)) {
+      tags = userResponse.data.tags;
+    }
+
+    return {
+      id: userResponse.id || userData.id,
+      username: userData.username || "",
+      name: userData.name || "",
+      email: userData.email || "",
+      phone: userData.phone_no || userData.phone || null,
+      phone_no: userData.phone_no || userData.phone || undefined,
+      profile_image: userData.profile_image || userData.image,
+      image:
+        userData.profile_image ||
+        userData.image ||
+        "/src/assets/images/man.png",
+      createdAt: userData.created_at || userData.createdAt || "",
+      created_at: userData.created_at || userData.createdAt,
+      updatedAt: userData.updated_at || userData.updatedAt || "",
+      updated_at: userData.updated_at || userData.updatedAt,
+      tags: tags,
+    };
+  }
+
+  /**
+   * Create a new user
+   * @param userData - User data to create
+   * @returns Created user data
+   */
+  async createUser(userData: CreateUserData): Promise<any> {
+    // Create FormData for multipart/form-data
+    const formData = new FormData();
+
+    // Validate required fields before sending
+    if (!userData.username || !userData.username.trim()) {
+      throw new Error("Username is required");
+    }
+    if (!userData.name || !userData.name.trim()) {
+      throw new Error("Name is required");
+    }
+    if (!userData.email || !userData.email.trim()) {
+      throw new Error("Email is required");
+    }
+    if (!userData.phone_no || !userData.phone_no.trim()) {
+      throw new Error("Phone number is required");
+    }
+
+    formData.append("username", userData.username.trim());
+    formData.append("name", userData.name.trim());
+    formData.append("email", userData.email.trim());
+    formData.append("phone_no", userData.phone_no.trim());
+
+    // Add tags - backend requires tags field
+    if (userData.tags && userData.tags.length > 0) {
+      userData.tags.forEach((tagId, index) => {
+        formData.append(`tags[${index + 1}]`, String(tagId));
+      });
+    } else {
+      // Send empty tags array if no tags (backend requires tags field)
+      formData.append("tags[]", "");
+    }
+
+    // Add profile image if provided
+    if (userData.profile_image) {
+      formData.append("profile_image", userData.profile_image);
+    }
+
+    const response = await api.post("/admin/users", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  }
+
+  /**
+   * Update user by ID
+   * @param userId - User ID
+   * @param userData - User data to update
+   * @returns Updated user data
+   */
+  async updateUser(
+    userId: string | number,
+    userData: UpdateUserData
+  ): Promise<any> {
+    // Validate and prepare required fields
+    const username = (userData.username || "").trim();
+    const name = (userData.name || "").trim();
+    const email = (userData.email || "").trim();
+    const phone_no = (userData.phone_no || "").trim();
+
+    // Validate required fields are not empty
+    if (!username) {
+      throw new Error("Username is required and cannot be empty");
+    }
+    if (!name) {
+      throw new Error("Name is required and cannot be empty");
+    }
+    if (!email) {
+      throw new Error("Email is required and cannot be empty");
+    }
+    if (!phone_no) {
+      throw new Error("Phone number is required and cannot be empty");
+    }
+
+    // Prepare tags array - ensure they are numbers
+    let tags: number[] = [];
+    if (
+      userData.tags &&
+      Array.isArray(userData.tags) &&
+      userData.tags.length > 0
+    ) {
+      tags = userData.tags
+        .map((tagId) => {
+          const numTagId =
+            typeof tagId === "number" ? tagId : parseInt(String(tagId), 10);
+          return !isNaN(numTagId) && numTagId > 0 ? numTagId : null;
+        })
+        .filter((id): id is number => id !== null);
+    }
+
+    // If no file upload, send as JSON (like Postman)
+    if (!userData.profile_image) {
+      const jsonData: any = {
+        name,
+        username,
+        email,
+        phone_no,
+        tags,
+      };
+
+      // Add password fields only if provided
+      if (userData.password) {
+        jsonData.password = userData.password;
+      }
+      if (userData.password_confirmation) {
+        jsonData.password_confirmation = userData.password_confirmation;
+      }
+
+      try {
+        const response = await api.put(`/admin/users/${userId}`, jsonData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        return response.data;
+      } catch (error: any) {
+        console.error("=== PUT request failed (JSON) ===");
+        console.error("Error response status:", error.response?.status);
+        console.error("Error response data:", error.response?.data);
+        throw error;
+      }
+    }
+
+    // If file upload exists, use FormData
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("phone_no", phone_no);
+
+    // Add tags - use tags[] format for Laravel FormData array handling
+    // This matches how Laravel expects array data in FormData
+    tags.forEach((tagId) => {
+      formData.append("tags[]", String(tagId));
+    });
+
+    // Add password fields only if provided
+    if (userData.password) {
+      formData.append("password", userData.password);
+    }
+    if (userData.password_confirmation) {
+      formData.append("password_confirmation", userData.password_confirmation);
+    }
+
+    // Add profile image
+    formData.append("profile_image", userData.profile_image);
+
+    // When sending FormData, Laravel often requires POST with _method=PUT for file uploads
+    // Some Laravel configurations don't handle PUT with multipart/form-data well
+    formData.append("_method", "PUT");
+
+    try {
+      const response = await api.post(`/admin/users/${userId}`, formData);
+      return response.data;
+    } catch (error: any) {
+      console.error("=== POST with _method=PUT failed (FormData) ===");
+      console.error("Error response status:", error.response?.status);
+      console.error("Error response data:", error.response?.data);
+
+      // Try direct PUT as fallback (some Laravel setups might support it)
+      if (error.response?.status === 405 || error.response?.status === 404) {
+        // Remove _method from FormData and try PUT
+        const putFormData = new FormData();
+        putFormData.append("username", username);
+        putFormData.append("name", name);
+        putFormData.append("email", email);
+        putFormData.append("phone_no", phone_no);
+        tags.forEach((tagId) => {
+          putFormData.append("tags[]", String(tagId));
+        });
+        if (userData.password) {
+          putFormData.append("password", userData.password);
+        }
+        if (userData.password_confirmation) {
+          putFormData.append(
+            "password_confirmation",
+            userData.password_confirmation
+          );
+        }
+        putFormData.append("profile_image", userData.profile_image);
+
+        const response = await api.put(`/admin/users/${userId}`, putFormData);
+        return response.data;
+      }
+
+      // Re-throw the original error if it's not a method issue
+      throw error;
+    }
+  }
+
+  /**
+   * Delete user by ID
+   * @param userId - User ID
+   * @returns Response data
+   */
+  async deleteUser(userId: string | number): Promise<any> {
+    const response = await api.delete(`/admin/users/${userId}`);
+    return response.data;
+  }
+}
+
+export default new SuperAdminUsersService();

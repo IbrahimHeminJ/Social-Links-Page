@@ -25,29 +25,31 @@ onMounted(() => {
 
 // Check if current route is admin or super admin route
 const isAdminOrSuperAdminRoute = computed(() => {
-  const routeName = route.name as string
-  return routeName?.startsWith('admin.') || routeName?.startsWith('superAdmin.')
-})
+  const routeName = route.name as string;
+  return (
+    routeName?.startsWith("admin.") || routeName?.startsWith("superAdmin.")
+  );
+});
 
 // Profile switcher visibility logic:
 // If role is 'user' → DON'T show it
 // If role is 'admin' (superadmin in DB) → Always show it in both dashboards
 const showProfileSwitcher = computed(() => {
-  const role = authStore.userRole
-  
+  const role = authStore.userRole;
+
   // If role is 'user' → DON'T show it
-  if (role === 'user') {
-    return false
+  if (role === "user") {
+    return false;
   }
-  
+
   // If role is 'admin' (superadmin in DB) → Always show it in both dashboards
-  if (role === 'admin') {
-    return isAdminOrSuperAdminRoute.value
+  if (role === "admin") {
+    return isAdminOrSuperAdminRoute.value;
   }
-  
+
   // All other cases → don't show
-  return false
-})
+  return false;
+});
 
 const handleMenuClick = () => {
   // Only toggle on mobile screens
@@ -57,11 +59,11 @@ const handleMenuClick = () => {
 };
 
 const goToHome = () => {
-  router.push({ name: 'home' });
+  router.push({ name: "home" });
 };
 
 const goToLogin = () => {
-  router.push({ name: 'login' });
+  router.push({ name: "login" });
 };
 
 const handleLogout = async () => {
@@ -71,13 +73,13 @@ const handleLogout = async () => {
 
 const handleUserClick = () => {
   const role = authStore.userRole;
-  
-  if (role === 'user') {
+
+  if (role === "user") {
     // User role → redirect to admin links
-    router.push({ name: 'admin.links' });
-  } else if (role === 'admin' || role === 'superadmin') {
+    router.push({ name: "admin.links" });
+  } else if (role === "admin" || role === "superadmin") {
     // Admin or superadmin → redirect to superadmin users
-    router.push({ name: 'superAdmin.users' });
+    router.push({ name: "superAdmin.users" });
   }
   profileDropdownOpen.value = false;
 };
@@ -86,47 +88,83 @@ const toggleProfileDropdown = () => {
   profileDropdownOpen.value = !profileDropdownOpen.value;
 };
 
+// Use user's profile image in header if available; otherwise keep default SVG icon
+const profileImageUrl = computed(() => {
+  const user = authStore.user as any;
+  if (!user) return null;
+
+  // Prefer profile_image, fallback to generic image field if present
+  const raw = user.profile_image || user.image;
+  if (!raw || typeof raw !== "string" || !raw.trim()) return null;
+
+  // If backend already returns full URL, just use it
+  if (raw.startsWith("http://") || raw.startsWith("https://")) {
+    return raw;
+  }
+
+  // If it's a /storage path, let Vite proxy handle it in dev; in prod, prepend API base if configured
+  let url = raw;
+  if (!url.startsWith("/")) {
+    url = `/${url}`;
+  }
+
+  if (import.meta.env.PROD) {
+    const apiBase =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api";
+    const backendBase = apiBase.replace(/\/api\/?$/, "");
+    return `${backendBase}${url}`;
+  }
+
+  // In dev, /storage is proxied via Vite config
+  return url;
+});
+
 const toggleLanguageDropdown = (e: Event) => {
   e.stopPropagation();
   languageDropdownOpen.value = !languageDropdownOpen.value;
 };
 
 const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'ku', name: 'کوردی' },
-  { code: 'ar', name: 'العربية' }
+  { code: "en", name: "English" },
+  { code: "ku", name: "کوردی" },
+  { code: "ar", name: "العربية" },
 ];
 
 const currentLanguage = computed(() => {
-  const lang = languages.find(l => l.code === locale.value) || languages[0];
-  return lang?.code.toUpperCase().substring(0, 2) || 'EN';
+  const lang = languages.find((l) => l.code === locale.value) || languages[0];
+  return lang?.code.toUpperCase().substring(0, 2) || "EN";
 });
 
 const switchLanguage = (langCode: string) => {
   locale.value = langCode;
-  localStorage.setItem('locale', langCode);
+  localStorage.setItem("locale", langCode);
   languageDropdownOpen.value = false;
 };
 
 const closeDropdowns = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
-  if (!target.closest('.profile-dropdown') && !target.closest('.language-dropdown')) {
+  if (
+    !target.closest(".profile-dropdown") &&
+    !target.closest(".language-dropdown")
+  ) {
     profileDropdownOpen.value = false;
     languageDropdownOpen.value = false;
   }
 };
 
 onMounted(() => {
-  document.addEventListener('click', closeDropdowns);
+  document.addEventListener("click", closeDropdowns);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeDropdowns);
+  document.removeEventListener("click", closeDropdowns);
 });
 </script>
 
 <template>
-  <header class="rounded-2xl px-6 py-3 min-md:h-[70px] h-[50px] shadow-sm mt-4 mb-4 bg-white">
+  <header
+    class="rounded-2xl px-6 py-3 min-md:h-[70px] h-[50px] shadow-sm mt-4 mb-4 bg-white"
+  >
     <nav class="flex justify-between items-center h-full">
       <!-- Left: Logo and Mobile Menu -->
       <div class="flex items-center gap-x-5">
@@ -160,10 +198,15 @@ onUnmounted(() => {
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </button>
-          
+
           <!-- Language Dropdown Menu -->
           <div
             v-if="languageDropdownOpen"
@@ -193,39 +236,56 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
-        
+
         <!-- Profile Switcher (for users with role 'user' or 'admin' in admin/superAdmin routes) -->
         <ProfileSwitcher v-if="showProfileSwitcher" />
-        
+
         <!-- Theme Toggle -->
         <img
           src="../assets/icons/moon.svg"
           alt="theme toggle"
           class="size-[21px] max-md:hidden"
         />
-        
+
         <!-- Profile Dropdown -->
         <div class="relative profile-dropdown">
           <template v-if="!authStore.isAuthenticated">
-            <button 
+            <button
               @click="goToLogin"
               class="px-5 py-1.5 rounded-full bg-[#0094ff] text-white text-sm font-semibold shadow-sm hover:bg-[#0094ff]/90 transition-colors cursor-pointer"
             >
-              {{ t('common.login') }}
+              {{ t("common.login") }}
             </button>
           </template>
           <template v-else>
-            <button 
+            <button
               @click="toggleProfileDropdown"
-              class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center"
+              class="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer flex items-center justify-center"
               title="Profile menu"
             >
-              <!-- User Icon SVG -->
-              <svg class="w-6 h-6 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-              </svg>
+              <!-- Use user profile image if available; otherwise fallback to SVG icon -->
+              <template v-if="profileImageUrl">
+                <img
+                  :src="profileImageUrl"
+                  alt="User avatar"
+                  class="w-8 h-8 rounded-full object-cover"
+                />
+              </template>
+              <template v-else>
+                <svg
+                  class="w-6 h-6 text-gray-700"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </template>
             </button>
-            
+
             <!-- Profile Dropdown Menu -->
             <div
               v-if="profileDropdownOpen"
@@ -237,21 +297,41 @@ onUnmounted(() => {
                 @click="handleUserClick"
                 class="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors text-left"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
                 </svg>
-                <span>{{ t('admin.dashboard') }}</span>
+                <span>{{ t("admin.dashboard") }}</span>
               </button>
-              
+
               <!-- Logout -->
               <button
                 @click="handleLogout"
                 class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
               >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
                 </svg>
-                <span>{{ t('common.logout') }}</span>
+                <span>{{ t("common.logout") }}</span>
               </button>
             </div>
           </template>

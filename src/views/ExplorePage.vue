@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import Header from '../components/header.vue';
-import SearchBar from '../components/inputs/searchBar.vue';
-import ExploreCategories from '../views/ExploreCategories.vue';
-import UserCard from '../components/userCard.vue';
-import api from '../services/api';
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import Header from "../components/header.vue";
+import SearchBar from "../components/inputs/searchBar.vue";
+import ExploreCategories from "../views/ExploreCategories.vue";
+import UserCard from "../components/userCard.vue";
+import { userService } from "../services/user";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
-const searchQuery = ref((route.query.q as string) ?? '');
+const searchQuery = ref((route.query.q as string) ?? "");
 const searchMode = ref(false);
 const searchResults = ref<TagCategory[]>([]);
 const isSearching = ref(false);
@@ -42,16 +42,6 @@ interface User {
   role: string;
 }
 
-// Format tag name function (same as ExploreCategories)
-const formatTagName = (tagName: string): string => {
-  return tagName
-    .split('_')
-    .map(word => word.replace(/\d+/g, ''))
-    .filter(word => word.length > 0)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
-
 const handleSearch = async (value: string) => {
   if (!value.trim()) {
     hasSearched.value = false;
@@ -63,83 +53,61 @@ const handleSearch = async (value: string) => {
     isSearching.value = true;
     searchError.value = null;
     hasSearched.value = true;
-    
-    console.log('Searching for:', value);
-    
+
     // Call search API - public endpoint
-    const response = await api.get('/users', {
-      params: { search: value.trim() }
-    });
-    
-    console.log('Search response:', response.data);
-    
-    // Handle response - same structure as /users endpoint (tags grouped)
-    const tagsData = response.data.data || {};
-    
+    const tagsData = await userService.searchUsers(value.trim());
+
     // Convert to categories array (same structure as explore page)
     const categoriesList: TagCategory[] = [];
-    
+
     // Loop through each tag in the response
     Object.keys(tagsData).forEach((tagKey) => {
       const tagArray = tagsData[tagKey];
-      
+
       // Get users from the first item in the array
-      if (tagArray && tagArray.length > 0 && tagArray[0].users && tagArray[0].users.length > 0) {
+      if (
+        tagArray &&
+        tagArray.length > 0 &&
+        tagArray[0].users &&
+        tagArray[0].users.length > 0
+      ) {
         // Get ALL users (no limit for search results)
         const users = tagArray[0].users;
-        
+
         // Format tag name for display
-        const formattedTagName = formatTagName(tagKey);
-        
+        const formattedTagName = userService.formatTagName(tagKey);
+
         categoriesList.push({
           title: formattedTagName,
           users: users.map((user: User) => ({
             id: user.id,
             name: user.name,
             role: formattedTagName,
-            avatar: user.profile_image || '/src/assets/images/user.jpg',
+            avatar: user.profile_image || "/src/assets/images/user.jpg",
           })),
         });
       }
     });
-    
+
     searchResults.value = categoriesList;
-    console.log('Search results grouped by tags:', searchResults.value);
-    
   } catch (err: any) {
-    console.error('Search error:', err);
-    searchError.value = err.response?.data?.message || t('explore.failedToSearch');
+    console.error("Search error:", err);
+    searchError.value =
+      err.response?.data?.message || t("explore.failedToSearch");
     searchResults.value = [];
   } finally {
     isSearching.value = false;
   }
 };
 
-
 // Fetch available tags from API
 const fetchAvailableTags = async () => {
   try {
     isLoadingTags.value = true;
-    
-    const response = await api.get('/users');
-    const tagsData = response.data.data || {};
-    
-    // Extract all tag names and format them
-    const tags: string[] = [];
-    
-    Object.keys(tagsData).forEach((tagKey) => {
-      const tagArray = tagsData[tagKey];
-      
-      // Only include tags that have users
-      if (tagArray && tagArray.length > 0 && tagArray[0].users && tagArray[0].users.length > 0) {
-        const formattedTagName = formatTagName(tagKey);
-        tags.push(formattedTagName);
-      }
-    });
-    
-    availableTags.value = tags;
+
+    availableTags.value = await userService.getAvailableTags();
   } catch (err: any) {
-    console.error('Error fetching tags:', err);
+    console.error("Error fetching tags:", err);
   } finally {
     isLoadingTags.value = false;
   }
@@ -163,39 +131,39 @@ const handleSearchBlur = () => {
 };
 
 const goToAllUsers = (category: string) => {
-  router.push({ name: 'allUsers', query: { category } });
+  router.push({ name: "allUsers", query: { category } });
 };
 
 const selectTag = (tag: string) => {
   isTagClicking.value = true;
   searchMode.value = false;
-  router.push({ name: 'allUsers', query: { category: tag } });
+  router.push({ name: "allUsers", query: { category: tag } });
 };
 
 const clearSearch = () => {
-  searchQuery.value = '';
+  searchQuery.value = "";
   hasSearched.value = false;
   searchResults.value = [];
   searchError.value = null;
 };
-
-
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10">
+  <main
+    class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-10"
+  >
     <!-- Header Component -->
     <Header class="mb-6" />
 
     <!-- Search -->
-    <section class="mt-6" >
+    <section class="mt-6">
       <div class="flex items-center gap-2">
         <div class="flex-1">
-          <SearchBar 
-            v-model="searchQuery" 
+          <SearchBar
+            v-model="searchQuery"
             :placeholder="t('explore.searchPlaceholder')"
             @focus="handleSearchFocus"
             @blur="handleSearchBlur"
-            @search="handleSearch" 
+            @search="handleSearch"
           />
         </div>
         <button
@@ -203,18 +171,20 @@ const clearSearch = () => {
           @click="clearSearch"
           class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm font-medium"
         >
-          {{ t('explore.clear') }}
+          {{ t("explore.clear") }}
         </button>
       </div>
     </section>
 
     <!-- Search Results -->
     <section v-if="hasSearched" class="mt-6">
-      <h2 class="text-xl font-semibold mb-4">{{ t('explore.searchResults') }} "{{ searchQuery }}"</h2>
-      
+      <h2 class="text-xl font-semibold mb-4">
+        {{ t("explore.searchResults") }} "{{ searchQuery }}"
+      </h2>
+
       <!-- Loading state -->
       <div v-if="isSearching" class="text-center py-12">
-        <p class="text-gray-600">{{ t('explore.searching') }}</p>
+        <p class="text-gray-600">{{ t("explore.searching") }}</p>
       </div>
 
       <!-- Error state -->
@@ -224,7 +194,7 @@ const clearSearch = () => {
 
       <!-- No results -->
       <div v-else-if="searchResults.length === 0" class="text-center py-12">
-        <p class="text-gray-600">{{ t('explore.noUsersFound') }}</p>
+        <p class="text-gray-600">{{ t("explore.noUsersFound") }}</p>
       </div>
 
       <!-- Results grouped by tags -->
@@ -234,11 +204,10 @@ const clearSearch = () => {
             <h3 class="text-xl font-semibold">{{ category.title }}</h3>
             <button
               v-if="category.users.length > 5"
-              class="mt-auto mx-2 px-2 py-2 rounded-xl bg-[#3d4f5d] text-white font-semibold text-[10px] shadow-sm
-                     hover:brightness-110 transition"
+              class="mt-auto mx-2 px-2 py-2 rounded-xl bg-[#3d4f5d] text-white font-semibold text-[10px] shadow-sm hover:brightness-110 transition"
               @click="goToAllUsers(category.title)"
             >
-              {{ t('explore.viewAll') }}
+              {{ t("explore.viewAll") }}
             </button>
           </div>
 
@@ -261,27 +230,24 @@ const clearSearch = () => {
     <!-- Tags Selection (show when search input is focused and not searched) -->
     <section v-if="searchMode && !hasSearched" class="mt-6">
       <p class="text-xl font-medium text-center">
-        {{ t('explore.orChooseFromHere') }}
+        {{ t("explore.orChooseFromHere") }}
       </p>
 
       <!-- Loading state -->
       <div v-if="isLoadingTags" class="mt-6 text-center py-8">
-        <p class="text-gray-600">{{ t('explore.loadingTags') }}</p>
+        <p class="text-gray-600">{{ t("explore.loadingTags") }}</p>
       </div>
 
       <!-- Tags grid -->
       <div
         v-else
-        class="mt-6 grid grid-cols-1 gap-4 max-w-2xl mx-auto
-               lg:grid-cols-2 lg:max-w-4xl lg:gap-x-8 lg:gap-y-6"
+        class="mt-6 grid grid-cols-1 gap-4 max-w-2xl mx-auto lg:grid-cols-2 lg:max-w-4xl lg:gap-x-8 lg:gap-y-6"
       >
         <button
           v-for="tag in availableTags"
           :key="tag"
           @mousedown.prevent="selectTag(tag)"
-          class="w-full text-left text-lg font-medium
-                 bg-[#f7f7f7] border border-[#0094ff]
-                 rounded-2xl py-4 px-6 hover:bg-[#eaf6ff] transition"
+          class="w-full text-left text-lg font-medium bg-[#f7f7f7] border border-[#0094ff] rounded-2xl py-4 px-6 hover:bg-[#eaf6ff] transition"
         >
           {{ tag }}
         </button>
@@ -289,9 +255,9 @@ const clearSearch = () => {
     </section>
 
     <!-- Explore Categories (show when not searching and not focused) -->
-    <ExploreCategories v-if="!hasSearched && !searchMode" @search="handleSearch" />
-
-
+    <ExploreCategories
+      v-if="!hasSearched && !searchMode"
+      @search="handleSearch"
+    />
   </main>
-
 </template>

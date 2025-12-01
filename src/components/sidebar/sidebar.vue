@@ -18,7 +18,7 @@ const { t } = useI18n()
     <button
       v-if="toggleSidebar"
       @click="toggleSidebar"
-      class="absolute top-4 right-4 md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+      class="absolute top-2 right-4 md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
       aria-label="Close sidebar"
     >
       <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,8 +1,8 @@
-    
 <script setup lang="ts">
-
-  import { defineProps,ref } from "vue";
+  import { ref } from "vue";
+  
   const focus = ref(false);
+  
   const props = defineProps({
     label: {
       type: String,
@@ -17,18 +17,16 @@
       type: String,
       required: true,
     },
-    modelValue: {
-      type: String,
-      required: true,
-    },
     description: {
       type: String,
       required: false,
     },
   });
-    
-  const emit = defineEmits(["update:modelValue"]);
-  const modelValue = defineModel<string>({ required: true });
+  
+  // Use defineModel for v-model support (this handles both prop and emit)
+  const modelValue = defineModel<string>({ 
+    default: "" // Allow empty string as default instead of required
+  });
 </script>
 <template>
   <div class="flex flex-col">
