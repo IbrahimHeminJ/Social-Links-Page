@@ -9,7 +9,7 @@
       <img src="../../assets/icons/icon.svg" alt="logo" class="w-40 h-40 md:w-56 md:h-56 mb-4 md:mb-0 md:mr-8" />
       <div class="hidden md:block w-px h-20 bg-gray-300 mr-8"></div>
       <h2 class="text-2xl md:text-4xl text-gray-700 text-center md:text-left">
-        {{ t("auth.signup") }}
+        Sign up
       </h2>
     </div>
 
