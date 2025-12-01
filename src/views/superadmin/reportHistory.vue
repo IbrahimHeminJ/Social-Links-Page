@@ -5,7 +5,7 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        {{ t("reports.back") }}
+        Back
       </button>
       <h1 class="text-2xl font-bold text-gray-900">
         {{ t("reports.reportHistory") }}
@@ -68,7 +68,8 @@ const closeToast = () => {
 const fetchReportHistory = async () => {
   loading.value = true;
   try {
-    reportHistory.value = await superAdminReportsService.getResolvedReports();
+    const fetchedHistory = await superAdminReportsService.getResolvedReports();
+    reportHistory.value = fetchedHistory.slice().reverse();
   } catch (err: any) {
     showToast('error', 'Error', err.response?.data?.message || t("reports.failedToFetchReportHistory"));
     // console.error("Error fetching report history:", err); // Dead code: Replaced by toastMessage component
