@@ -68,7 +68,8 @@ const closeToast = () => {
 const fetchReportHistory = async () => {
   loading.value = true;
   try {
-    reportHistory.value = await superAdminReportsService.getResolvedReports();
+    const fetchedHistory = await superAdminReportsService.getResolvedReports();
+    reportHistory.value = fetchedHistory.slice().reverse();
   } catch (err: any) {
     showToast('error', 'Error', err.response?.data?.message || t("reports.failedToFetchReportHistory"));
     // console.error("Error fetching report history:", err); // Dead code: Replaced by toastMessage component
