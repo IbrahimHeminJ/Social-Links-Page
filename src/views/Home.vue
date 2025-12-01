@@ -67,11 +67,8 @@ const numberOfUsers = ref(getNumberOfUsers());
         </div>
 
         <!-- Search -->
-        <SearchBar
-        v-model="searchQuery"
-        :placeholder="t('home.exploreCommunity')"
-        class="w-full md:max-w-md mt-3"
-        @click="goToExplore" />
+        <SearchBar v-model="searchQuery" :placeholder="t('home.exploreCommunity')" class="w-full md:max-w-md mt-3"
+          @click="goToExplore" />
 
         <!-- Explore text -->
         <div class="mt-2">
@@ -96,7 +93,7 @@ const numberOfUsers = ref(getNumberOfUsers());
         </p>
       </div>
     </section>
-    
+
     <!-- Features -->
     <section class="mt-12 md:mt-16">
       <h2 class="font-bold text-lg text-center mb-6">{{ t('home.featuresWeProvide') }}</h2>
