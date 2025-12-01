@@ -63,7 +63,7 @@ watch(() => props.show, (isOpen) => {
   <!-- Overlay -->
   <div
     v-if="show"
-    class="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
+    class="fixed text-black inset-0 z-40 flex items-center justify-center bg-black/40"
   >
     <!-- Modal box -->
     <div
@@ -71,7 +71,7 @@ watch(() => props.show, (isOpen) => {
     >
       <!-- Close button -->
       <button
-        class="absolute top-4 right-4 text-2xl leading-none hover:scale-110 transition"
+        class="absolute top-4 right-5 text-4xl  leading-none hover:scale-110 transition"
         @click="handleClose"
         aria-label="Close report window"
       >
