@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../store/auth";
+import { useThemeStore } from "../store/theme";
 import { useI18n } from "vue-i18n";
 import ProfileSwitcher from "./ProfileSwitcher.vue";
 
@@ -11,12 +12,14 @@ interface Props {
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const themeStore = useThemeStore();
 const { t, locale } = useI18n();
 
 const props = defineProps<Props>();
 
 const profileDropdownOpen = ref(false);
 const languageDropdownOpen = ref(false);
+const isDarkMode = computed(() => themeStore.theme === "dark");
 
 // Sync auth state on mount to ensure user data is loaded
 onMounted(() => {
@@ -86,6 +89,10 @@ const handleUserClick = () => {
 
 const toggleProfileDropdown = () => {
   profileDropdownOpen.value = !profileDropdownOpen.value;
+};
+
+const handleThemeToggle = () => {
+  themeStore.toggleTheme();
 };
 
 // Use user's profile image in header if available; otherwise keep default SVG icon
@@ -241,11 +248,43 @@ onUnmounted(() => {
         <ProfileSwitcher v-if="showProfileSwitcher" />
 
         <!-- Theme Toggle -->
-        <img
-          src="../assets/icons/moon.svg"
-          alt="theme toggle"
-          class="size-[21px] max-md:hidden"
-        />
+        <button
+          @click="handleThemeToggle"
+          class="p-2 rounded-full hover:bg-gray-100 transition-colors max-md:hidden"
+          :aria-label="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'"
+          type="button"
+        >
+          <svg
+            v-if="isDarkMode"
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-gray-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-7.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05 5.636 5.636M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-gray-700"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"
+            />
+          </svg>
+        </button>
 
         <!-- Profile Dropdown -->
         <div class="relative profile-dropdown">

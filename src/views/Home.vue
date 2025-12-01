@@ -44,7 +44,7 @@ const numberOfUsers = ref(getNumberOfUsers());
 
 </script>
 <template>
-  <main class="min-h-screen bg-white text-[#111111] max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-12">
+  <main class="min-h-screen bg-white max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-12">
     <!-- Header component -->
     <Header class="mb-6" />
 
