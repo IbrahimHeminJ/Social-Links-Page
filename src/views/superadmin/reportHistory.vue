@@ -73,7 +73,6 @@ const fetchReportHistory = async () => {
   error.value = null;
   try {
     reportHistory.value = await superAdminReportsService.getResolvedReports();
-    console.log("Mapped Report History:", reportHistory.value);
   } catch (err: any) {
     error.value =
       err.response?.data?.message || t("reports.failedToFetchReportHistory");
@@ -88,8 +87,6 @@ onMounted(() => {
 });
 
 const viewReport = (report: { id: number }) => {
-  console.log("Clicking report:", report);
-  console.log("Report ID:", report.id, "Type:", typeof report.id);
   router.push({ name: "superAdmin.reportDetail", params: { id: report.id } });
 };
 

@@ -319,10 +319,6 @@ const extractTagIds = (userTags: any[]): string[] => {
     return [];
   }
 
-  console.log("=== Extracting tag IDs ===");
-  console.log("User tags received:", userTags);
-  console.log("Tag options available:", tagOptions.value);
-
   return userTags
     .map((tag) => {
       // First, try to get ID directly
@@ -347,15 +343,8 @@ const extractTagIds = (userTags: any[]): string[] => {
 
         if (matchingOption) {
           id = matchingOption.value;
-          console.log(
-            `✅ Matched tag "${tag.tag}" to ID: ${id} (label: "${matchingOption.label}")`
-          );
         } else {
           console.warn(`⚠️ Could not find tag ID for tag string: "${tag.tag}"`);
-          console.log(
-            "Available tag labels:",
-            tagOptions.value.map((opt) => opt.label)
-          );
         }
       }
 
@@ -368,9 +357,6 @@ const extractTagIds = (userTags: any[]): string[] => {
           const extractedId = match[1];
           if (tagOptions.value.some((opt) => opt.value === extractedId)) {
             id = extractedId;
-            console.log(
-              `Extracted tag ID "${extractedId}" from tag string "${tag.tag}"`
-            );
           }
         }
       }
@@ -397,14 +383,7 @@ const fetchUserData = async () => {
 
     const userData = await superAdminUsersService.getUserById(userId);
 
-    console.log("=== User data fetched ===");
-    console.log("User tags from API:", userData.tags);
-    console.log("Tag options loaded:", tagOptions.value.length, "tags");
-
     let imageUrl = userData.image || userData.profile_image || "";
-
-    // Debug: Log the raw image URL from API
-    console.log("Edit User - Raw image URL:", imageUrl);
 
     // If we have an image URL, process it
     if (imageUrl && imageUrl.trim() !== "") {
@@ -414,7 +393,6 @@ const fetchUserData = async () => {
       // If it's already a full URL (http/https), use it as is
       // Laravel asset() helper returns full URLs when APP_URL is set
       if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-        console.log("Edit User - Using full URL from asset():", imageUrl);
         // Use the URL as-is - asset() already provides the correct domain
       }
       // If it's a relative path starting with /storage, it will work with Vite proxy in dev
@@ -430,9 +408,8 @@ const fetchUserData = async () => {
           if (!imageUrl.startsWith("http")) {
             imageUrl = `${backendBase}${imageUrl}`;
           }
-          console.log("Edit User - Constructed production URL:", imageUrl);
         } else {
-          console.log("Edit User - Using relative URL (dev proxy):", imageUrl);
+          // Dev proxy handles /storage
         }
       }
       // If it starts with storage/ (no leading slash), add the slash
@@ -444,7 +421,6 @@ const fetchUserData = async () => {
           const backendBase = apiBaseUrl.replace("/api", "");
           imageUrl = `${backendBase}${imageUrl}`;
         }
-        console.log("Edit User - Fixed storage path:", imageUrl);
       }
       // Invalid format - use default
       else {
@@ -455,18 +431,15 @@ const fetchUserData = async () => {
         imageUrl = defaultProfile;
       }
     } else {
-      console.log("Edit User - No image URL, using default");
       imageUrl = defaultProfile;
     }
 
     // Check for placeholder URLs
     if (imageUrl.includes("via.placeholder.com")) {
-      console.log("Edit User - Placeholder URL detected, using default");
       imageUrl = defaultProfile;
     }
 
     const tagIds = extractTagIds(userData.tags || []);
-    console.log("Extracted tag IDs:", tagIds);
 
     formData.value = {
       username: userData.username || "",
@@ -544,12 +517,6 @@ const handleFileUpload = (event: Event) => {
   errorMessage.value = "";
 
   if (file) {
-    console.log("File selected:", {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-    });
-
     if (file.size > 2 * 1024 * 1024) {
       errorMessage.value = "Image size must be less than 2MB";
       // Reset file input
@@ -572,14 +539,12 @@ const handleFileUpload = (event: Event) => {
 
     // Set the selected file
     selectedImageFile.value = file;
-    console.log("Image file set for upload:", selectedImageFile.value?.name);
 
     // Update preview
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
         formData.value.image = e.target.result as string;
-        console.log("Image preview updated");
       }
     };
     reader.onerror = () => {
@@ -663,19 +628,6 @@ const handleSubmit = async () => {
     }
 
     const imageFile = selectedImageFile.value;
-
-    console.log("Submitting data:", {
-      username,
-      name,
-      email,
-      phone_no: phone,
-      tags: tagsAsNumbers,
-      hasImage: !!imageFile,
-      imageFileName: imageFile?.name,
-      imageFileSize: imageFile?.size,
-      imageFileType: imageFile?.type,
-      hasPassword: !!newPassword,
-    });
 
     await superAdminUsersService.updateUser(userId, {
       username,

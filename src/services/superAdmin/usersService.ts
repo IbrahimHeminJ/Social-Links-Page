@@ -46,11 +46,6 @@ class SuperAdminUsersService {
       "/admin/users"
     );
 
-    // Debug: Log the full response to understand the structure
-    console.log("Full API response:", response);
-    console.log("Response data:", response.data);
-    console.log("Response data.data:", response.data?.data);
-
     // Try multiple possible response structures
     let usersArray: any[] = [];
 
@@ -93,26 +88,13 @@ class SuperAdminUsersService {
       usersArray = [];
     }
 
-    console.log("Extracted users array:", usersArray);
-    console.log("Number of users:", usersArray.length);
-    if (usersArray.length > 0) {
-      console.log("First user sample:", usersArray[0]);
-    }
-
     // Map users to our interface
     // Structure: [{ id, data: { email, name, phone_no, profile_image, role, tags, username }, theme }]
     return usersArray.map((user: any) => {
       // Extract user data from nested 'data' property, fallback to top level
       const userData = user.data || user;
 
-      // Debug: Log profile_image from API
       const rawProfileImage = userData.profile_image || userData.image;
-      if (rawProfileImage) {
-        console.log(
-          `Service - User ${user.id || userData.id} profile_image:`,
-          rawProfileImage
-        );
-      }
 
       return {
         id: user.id || userData.id,
@@ -142,31 +124,11 @@ class SuperAdminUsersService {
       `/admin/users/${userId}`
     );
 
-    // Debug: Log the full response to understand the structure
-    console.log("Full getUserById API response:", response);
-    console.log("Response data:", response.data);
-    console.log("Response data.data:", response.data?.data);
-
     // Handle nested structure: { id, data: { email, name, ... }, theme }
     const userResponse = response.data?.data || response.data || {};
 
-    console.log("User response object:", userResponse);
-
     // Extract user data from nested 'data' property, fallback to top level
     const userData = userResponse.data || userResponse;
-
-    console.log("Extracted userData:", userData);
-    console.log("UserData fields:", {
-      id: userResponse.id || userData.id,
-      username: userData.username,
-      name: userData.name,
-      email: userData.email,
-      phone_no: userData.phone_no,
-      phone: userData.phone,
-      profile_image: userData.profile_image,
-      image: userData.image,
-      tags: userData.tags,
-    });
 
     // Extract tags - check multiple possible locations
     // Tags might be in: userData.tags, userResponse.tags, or in a relationship
@@ -203,22 +165,6 @@ class SuperAdminUsersService {
     // Check if tags is nested in data.data
     else if (userResponse.data?.tags && Array.isArray(userResponse.data.tags)) {
       tags = userResponse.data.tags;
-    }
-
-    console.log("Extracted tags:", tags);
-    console.log("Tags location check:", {
-      "userData.tags": userData.tags,
-      "userResponse.tags": userResponse.tags,
-      "userData.tag": userData.tag,
-      "userData.user_tags": userData.user_tags,
-      "userResponse.relationships?.tags": userResponse.relationships?.tags,
-      "userData.relationships?.tags": userData.relationships?.tags,
-    });
-
-    // Log the structure of tags if they exist
-    if (tags.length > 0) {
-      console.log("First tag structure:", tags[0]);
-      console.log("All tags structure:", tags);
     }
 
     return {
@@ -339,30 +285,6 @@ class SuperAdminUsersService {
         .filter((id): id is number => id !== null);
     }
 
-    // Debug: Log what we're sending
-    console.log("=== Sending update request ===");
-    console.log("Raw userData object:", userData);
-    console.log("Username:", username);
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Phone_no:", phone_no);
-    console.log("Tags:", tags);
-    console.log(
-      "Profile image:",
-      userData.profile_image ? "File provided" : "No file"
-    );
-    if (userData.profile_image) {
-      console.log("Image file details:", {
-        name: userData.profile_image.name,
-        size: userData.profile_image.size,
-        type: userData.profile_image.type,
-        lastModified: userData.profile_image.lastModified,
-      });
-    }
-    console.log("Password:", userData.password ? "Provided" : "Not provided");
-    console.log("Full URL:", `/admin/users/${userId}`);
-    console.log("User ID:", userId);
-
     // If no file upload, send as JSON (like Postman)
     if (!userData.profile_image) {
       const jsonData: any = {
@@ -381,18 +303,12 @@ class SuperAdminUsersService {
         jsonData.password_confirmation = userData.password_confirmation;
       }
 
-      console.log("=== Sending as JSON (no file upload) ===");
-      console.log("JSON data:", JSON.stringify(jsonData, null, 2));
-
       try {
         const response = await api.put(`/admin/users/${userId}`, jsonData, {
           headers: {
             "Content-Type": "application/json",
           },
         });
-        console.log("=== PUT request successful (JSON) ===");
-        console.log("Response:", response);
-        console.log("Response data:", response.data);
         return response.data;
       } catch (error: any) {
         console.error("=== PUT request failed (JSON) ===");
@@ -426,38 +342,12 @@ class SuperAdminUsersService {
     // Add profile image
     formData.append("profile_image", userData.profile_image);
 
-    console.log("=== Sending as FormData (with file upload) ===");
-    console.log("FormData fields:");
-    console.log("  username:", username);
-    console.log("  name:", name);
-    console.log("  email:", email);
-    console.log("  phone_no:", phone_no);
-    console.log("  tags[]:", tags);
-    if (userData.password) {
-      console.log("  password: (provided)");
-    }
-    if (userData.password_confirmation) {
-      console.log("  password_confirmation: (provided)");
-    }
-    console.log("  profile_image: (file)", {
-      name: userData.profile_image.name,
-      size: userData.profile_image.size,
-      type: userData.profile_image.type,
-    });
-
     // When sending FormData, Laravel often requires POST with _method=PUT for file uploads
     // Some Laravel configurations don't handle PUT with multipart/form-data well
     formData.append("_method", "PUT");
 
-    console.log(
-      "=== Sending FormData with POST _method=PUT (Laravel file upload best practice) ==="
-    );
-
     try {
       const response = await api.post(`/admin/users/${userId}`, formData);
-      console.log("=== POST with _method=PUT successful (FormData) ===");
-      console.log("Response:", response);
-      console.log("Response data:", response.data);
       return response.data;
     } catch (error: any) {
       console.error("=== POST with _method=PUT failed (FormData) ===");
@@ -466,7 +356,6 @@ class SuperAdminUsersService {
 
       // Try direct PUT as fallback (some Laravel setups might support it)
       if (error.response?.status === 405 || error.response?.status === 404) {
-        console.log("=== Trying direct PUT request as fallback ===");
         // Remove _method from FormData and try PUT
         const putFormData = new FormData();
         putFormData.append("username", username);
@@ -488,7 +377,6 @@ class SuperAdminUsersService {
         putFormData.append("profile_image", userData.profile_image);
 
         const response = await api.put(`/admin/users/${userId}`, putFormData);
-        console.log("=== PUT request successful (FormData fallback) ===");
         return response.data;
       }
 

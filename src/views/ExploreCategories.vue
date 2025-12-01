@@ -41,17 +41,12 @@ const fetchUsers = async () => {
     // The /api/tags endpoint might only return tags without users
     const tagsData = await userService.getAllUsers();
 
-    console.log("Tags data received:", tagsData);
-    console.log("Number of tag keys:", Object.keys(tagsData).length);
-
     // Convert to categories array
     const categoriesList: TagCategory[] = [];
 
     // Loop through each tag in the response
     Object.keys(tagsData).forEach((tagKey) => {
       const tagArray = tagsData[tagKey];
-
-      console.log(`Processing tag key: ${tagKey}`, tagArray);
 
       // Get users from the first item in the array (each tag key has array of tag objects)
       if (
@@ -75,16 +70,8 @@ const fetchUsers = async () => {
             avatar: user.profile_image || "/src/assets/images/user.jpg",
           })),
         });
-      } else {
-        console.log(`No users found for tag key: ${tagKey}`, tagArray);
       }
     });
-
-    console.log(
-      "Categories list created:",
-      categoriesList.length,
-      categoriesList
-    );
     categories.value = categoriesList;
   } catch (err: any) {
     console.error("Error fetching tags with users:", err);

@@ -57,10 +57,6 @@ const fetchReports = async () => {
   error.value = null;
   try {
     reports.value = await superAdminReportsService.getReports();
-    console.log("Mapped Reports:", reports.value);
-    if (reports.value.length > 0) {
-      console.log("First mapped report:", reports.value[0]);
-    }
   } catch (err: any) {
     error.value =
       err.response?.data?.message || t("reports.failedToFetchReports");
@@ -75,8 +71,6 @@ onMounted(() => {
 });
 
 const viewReport = (report: Report) => {
-  console.log("Clicking report:", report);
-  console.log("Report ID:", report.id, "Type:", typeof report.id);
   router.push({ name: "superAdmin.reportDetail", params: { id: report.id } });
 };
 

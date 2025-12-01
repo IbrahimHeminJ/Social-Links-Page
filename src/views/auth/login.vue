@@ -42,12 +42,6 @@ const handleLogin = async () => {
     password: trimmedPassword
   }
 
-  // Debug: Log what's being sent
-  console.log('Login data being sent:', {
-    userCredential: trimmedUsername,
-    password: '***'
-  })
-
   // Call login action
   const result = await authStore.login(loginPayload)
 

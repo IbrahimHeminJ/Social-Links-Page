@@ -28,15 +28,6 @@ api.interceptors.request.use(
       delete config.headers["Content-Type"];
     }
 
-    // Log request for debugging
-    console.log("API Request:", {
-      method: config.method?.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      fullURL: `${config.baseURL}${config.url}`,
-      data: config.data instanceof FormData ? "[FormData]" : config.data,
-      headers: config.headers,
-    });
     return config;
   },
   (error) => {

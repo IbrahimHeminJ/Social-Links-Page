@@ -39,23 +39,15 @@ const fetchAllUsers = async () => {
     isLoading.value = true;
     error.value = null;
 
-    console.log("Fetching all users for category:", category.value);
-
     const tagsData = await userService.getAllUsers();
-    console.log("Tags data:", tagsData);
-    console.log("Available tag keys:", Object.keys(tagsData));
 
     // Find the tag key that matches the category (formatted name)
     const tagKey = userService.findTagKey(category.value, tagsData);
 
-    console.log("Found tag key:", tagKey);
-
     if (!tagKey) {
-      console.error("Tag not found. Category:", category.value);
       const availableTags = Object.keys(tagsData).map((key) =>
         userService.formatTagName(key)
       );
-      console.log("Available formatted tags:", availableTags);
       error.value = `Tag "${
         category.value
       }" not found. Available tags: ${availableTags.join(", ")}`;
@@ -64,13 +56,10 @@ const fetchAllUsers = async () => {
     }
 
     const foundTagData = tagsData[tagKey];
-    console.log("Found tag data:", foundTagData);
 
     // Get all users for this tag (don't limit, show all)
     if (foundTagData && foundTagData.length > 0 && foundTagData[0].users) {
       const allUsers = foundTagData[0].users;
-      console.log("All users for tag:", allUsers);
-      console.log("Number of users:", allUsers.length);
 
       users.value = allUsers.map((user: User) => ({
         id: user.id,
@@ -83,9 +72,7 @@ const fetchAllUsers = async () => {
       }));
 
       tagName.value = userService.formatTagName(tagKey);
-      console.log("Users loaded successfully:", users.value.length);
     } else {
-      console.error("No users in tag data");
       error.value = "No users found for this tag";
     }
   } catch (err: any) {
@@ -97,14 +84,10 @@ const fetchAllUsers = async () => {
 };
 
 onMounted(() => {
-  console.log("AllUsers mounted. Category:", category.value);
-  console.log("Route query:", route.query);
-
   if (category.value) {
     fetchAllUsers();
   } else {
     error.value = "No category specified";
-    console.error("No category in query params");
   }
 });
 </script>

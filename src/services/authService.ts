@@ -114,23 +114,10 @@ class AuthService {
    */
   async getCurrentUser(): Promise<any> {
     // Backend endpoint is /user (not /auth/me)
-    console.log("=== AuthService: Fetching current user ===");
     const response = await api.get("/user");
-    console.log("=== AuthService: API Response ===");
-    console.log("Full response:", response);
-    console.log("Response data:", response.data);
-    console.log("Response data.data:", response.data?.data);
 
     // Backend returns: { message: "...", data: { ...user data with role... } }
     const userData = response.data?.data || response.data;
-    console.log("=== AuthService: Extracted user data ===");
-    console.log("User data:", userData);
-    console.log("User data type:", typeof userData);
-    console.log(
-      "User data keys:",
-      userData ? Object.keys(userData) : "No data"
-    );
-
     return userData;
   }
 

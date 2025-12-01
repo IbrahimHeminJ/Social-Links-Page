@@ -54,12 +54,8 @@ const handleSearch = async (value: string) => {
     searchError.value = null;
     hasSearched.value = true;
 
-    console.log("Searching for:", value);
-
     // Call search API - public endpoint
     const tagsData = await userService.searchUsers(value.trim());
-
-    console.log("Search response:", tagsData);
 
     // Convert to categories array (same structure as explore page)
     const categoriesList: TagCategory[] = [];
@@ -94,7 +90,6 @@ const handleSearch = async (value: string) => {
     });
 
     searchResults.value = categoriesList;
-    console.log("Search results grouped by tags:", searchResults.value);
   } catch (err: any) {
     console.error("Search error:", err);
     searchError.value =

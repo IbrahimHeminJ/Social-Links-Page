@@ -12,37 +12,56 @@
   >
     <div class="w-full flex flex-col gap-y-4">
       <div class="flex items-center justify-between mb-2">
-        <TextHeading>{{ t('links.title') }}</TextHeading>
+        <TextHeading>{{ t("links.title") }}</TextHeading>
         <button
           @click.prevent="viewSocialLinksPage"
           type="button"
           class="px-4 py-2 bg-[#009AFF] text-white rounded-lg hover:bg-[#0088e6] transition-colors text-sm font-medium flex items-center gap-x-2"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+            />
           </svg>
-          {{ t('links.viewMySocialLinksPage') }}
+          {{ t("links.viewMySocialLinksPage") }}
         </button>
       </div>
       <div class="w-full flex flex-col gap-y-4" @click="handleAddNewLink">
         <div
           class="hover:cursor-pointer h-[91px] w-full bg-[#F5F5F5] flex justify-center items-center gap-x-4 border-2 border-[#009AFF] rounded-[10px] border-dashed"
         >
-          <img src="../../assets/icons/plus.svg" alt="plus" class="size-[21px]" />
-          <TextHeading>{{ t('links.addNewLink') }}</TextHeading>
+          <img
+            src="../../assets/icons/plus.svg"
+            alt="plus"
+            class="size-[21px]"
+          />
+          <TextHeading>{{ t("links.addNewLink") }}</TextHeading>
         </div>
       </div>
       <div class="flex flex-col gap-y-4">
         <div class="flex flex-col gap-y-4">
           <div v-if="isLoadingLinks" class="text-center text-gray-400 py-8">
-            {{ t('links.loadingLinks') }}
+            {{ t("links.loadingLinks") }}
           </div>
           <div
             v-else-if="linkItems.length === 0"
             class="text-center text-gray-400 py-8"
           >
-            {{ t('links.noLinksYet') }}
+            {{ t("links.noLinksYet") }}
           </div>
           <template v-else>
             <div
@@ -68,27 +87,38 @@
   >
     <div class="flex flex-col gap-y-4">
       <div class="flex items-center justify-between">
-        <TextHeading>{{ editingLinkId ? t('links.editLink') : t('links.addNewLink') }}</TextHeading>
+        <TextHeading>{{
+          editingLinkId ? t("links.editLink") : t("links.addNewLink")
+        }}</TextHeading>
         <button
           class="text-[#009AFF] cursor-pointer text-sm font-medium"
           @click="handleBack"
         >
-          {{ t('links.back') }}
+          {{ t("links.back") }}
         </button>
       </div>
       <p class="text-justify">
-        {{ t('links.formDescription') }}
-        <span class="text-[#009AFF]">{{ t('links.communityGuideline') }}</span>, {{ t('links.andByUsing') }}
-        <span class="text-[#009AFF]">{{ t('links.terms') }}</span> {{ t('common.and') }}
-        <span class="text-[#009AFF]">{{ t('links.policies') }}</span>.
+        {{ t("links.formDescription") }}
+        <span class="text-[#009AFF]">{{ t("links.communityGuideline") }}</span
+        >, {{ t("links.andByUsing") }}
+        <span class="text-[#009AFF]">{{ t("links.terms") }}</span>
+        {{ t("common.and") }}
+        <span class="text-[#009AFF]">{{ t("links.policies") }}</span
+        >.
       </p>
     </div>
     <!-- Error and Success Messages -->
     <div v-if="errorMessage || successMessage" class="flex flex-col gap-y-2">
-      <div v-if="errorMessage" class="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div
+        v-if="errorMessage"
+        class="p-4 bg-red-50 border border-red-200 rounded-lg"
+      >
         <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
       </div>
-      <div v-if="successMessage" class="p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div
+        v-if="successMessage"
+        class="p-4 bg-green-50 border border-green-200 rounded-lg"
+      >
         <p class="text-green-800 font-semibold">{{ successMessage }}</p>
       </div>
     </div>
@@ -119,7 +149,9 @@
           v-model="formData.platform"
         />
         <Submit />
-        <p v-if="isLoading" class="text-center text-gray-600 text-sm">{{ t('links.savingLink') }}</p>
+        <p v-if="isLoading" class="text-center text-gray-600 text-sm">
+          {{ t("links.savingLink") }}
+        </p>
       </div>
     </form>
   </div>
@@ -133,12 +165,12 @@ import Select from "../../components/inputs/select.vue";
 import Alert from "../../components/alerts/alert.vue";
 import { reactive, ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
 import Submit from "../../components/buttons/submit.vue";
-import api from "../../services/api";
 import { useAuthStore } from "../../store/auth";
+import { adminLinksService } from "../../services/admin";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 interface LinkItem {
   id?: number;
@@ -184,7 +216,6 @@ const selectedItem = computed<LinkItem | null>(() => {
   return linkItems.value[selectedIndex.value] ?? null;
 });
 
-
 // Fetch user's links from API (same structure as SocialLinks.vue)
 const fetchLinks = async () => {
   try {
@@ -193,12 +224,11 @@ const fetchLinks = async () => {
 
     // Get user ID from auth store
     let userId = authStore.user?.id;
-    
+
     // If user ID not available, try to get it from current user endpoint
     if (!userId) {
       try {
-        const currentUserResponse = await api.get("/user");
-        const currentUser = currentUserResponse.data?.data || currentUserResponse.data;
+        const currentUser = await adminLinksService.getCurrentUser();
         userId = currentUser?.id || (currentUser as any)?.data?.id;
       } catch (err) {
         console.error("Error fetching current user:", err);
@@ -206,24 +236,21 @@ const fetchLinks = async () => {
     }
 
     if (!userId) {
-      errorMessage.value = t('themes.userNotFound');
+      errorMessage.value = t("themes.userNotFound");
       linkItems.value = [];
       return;
     }
 
     // Use same endpoint as SocialLinks: /user/{id}/button-links
-    const response = await api.get(`/user/${userId}/button-links`);
-    
-    console.log("Button Links API Response:", response.data);
-    
-    // Parse API response structure (same as SocialLinks.vue)
-    const linksData = response.data.data || [];
-    
+    const linksData = await adminLinksService.getUserButtonLinks(userId);
+
     if (linksData.length > 0) {
       // Map buttons from relationship.button_link (same structure as SocialLinks)
       // Sort by order field
-      const sortedLinks = [...linksData].sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
-      
+      const sortedLinks = [...linksData].sort(
+        (a: any, b: any) => (a.order || 0) - (b.order || 0)
+      );
+
       // Map to local LinkItem structure
       linkItems.value = sortedLinks
         .filter((item: any) => item.relationship?.button_link?.is_visible === 1) // Only show visible buttons
@@ -237,8 +264,6 @@ const fetchLinks = async () => {
             platform: buttonLink.icon || "", // Map 'icon' from API to 'platform' for local use
           };
         });
-      
-      console.log("Mapped links:", linkItems.value);
     } else {
       linkItems.value = [];
     }
@@ -247,9 +272,11 @@ const fetchLinks = async () => {
 
     // Parse error for user-friendly message
     if (err.response?.data?.message) {
-      errorMessage.value = `${t('links.failedToLoadLinks')}: ${err.response.data.message}`;
+      errorMessage.value = `${t("links.failedToLoadLinks")}: ${
+        err.response.data.message
+      }`;
     } else {
-      errorMessage.value = t('links.failedToLoadLinks');
+      errorMessage.value = t("links.failedToLoadLinks");
     }
 
     // Clear links on error
@@ -290,9 +317,6 @@ const handleEditLink = async (link: LinkItem) => {
     errorMessage.value = "";
     successMessage.value = "";
 
-    // Use the link data we already have
-    console.log("Editing link:", link);
-
     // Pre-fill form with link data directly from the link object
     formData.title = link.title || "";
     formData.description = link.description || "";
@@ -304,9 +328,6 @@ const handleEditLink = async (link: LinkItem) => {
 
     // Open form
     addNewLink.value = false;
-
-    console.log("Form pre-filled for editing:", formData);
-    console.log("Editing link ID:", editingLinkId.value);
   } catch (err: any) {
     console.error("Error setting up edit form:", err);
     errorMessage.value = "Failed to open edit form. Please try again.";
@@ -316,39 +337,29 @@ const handleEditLink = async (link: LinkItem) => {
 // Navigate to social links page with current user's ID
 const viewSocialLinksPage = async () => {
   try {
-    console.log("View Social Links Page clicked");
-    console.log("Auth store user:", authStore.user);
-    
     // Get user ID from auth store
     let userId = authStore.user?.id;
-    
+
     // If user ID not available, try to get it from current user endpoint
     if (!userId) {
       try {
-        const currentUserResponse = await api.get("/user");
-        const currentUser = currentUserResponse.data?.data || currentUserResponse.data;
+        const currentUser = await adminLinksService.getCurrentUser();
         userId = currentUser?.id || (currentUser as any)?.data?.id;
-        console.log("Fetched user ID from API:", userId);
       } catch (err) {
         console.error("Error fetching current user:", err);
       }
     }
-    
+
     if (!userId) {
-      errorMessage.value = t('themes.userNotFound');
+      errorMessage.value = t("themes.userNotFound");
       console.error("No user ID found");
       return;
     }
-    
-    console.log("Navigating to social-links with user ID:", userId);
-    
     // Navigate to social-links route with user ID
     await router.push({
       name: "social-links",
       params: { id: userId.toString() },
     });
-    
-    console.log("Navigation completed");
   } catch (err: any) {
     console.error("Error navigating to social links page:", err);
     errorMessage.value = "Failed to open social links page. Please try again.";
@@ -363,7 +374,7 @@ async function handleSubmit() {
 
     // Validate form
     if (!formData.title.trim() || !formData.link.trim() || !formData.platform) {
-      errorMessage.value = t('links.pleaseFillRequired');
+      errorMessage.value = t("links.pleaseFillRequired");
       return;
     }
 
@@ -375,22 +386,15 @@ async function handleSubmit() {
       link: formData.link.trim(),
     };
 
-    let response;
-
     // Check if we're editing or creating
     if (editingLinkId.value) {
       // Update existing link
-      console.log("Updating link with ID:", editingLinkId.value);
-      console.log("Update payload:", payload);
-      response = await api.put(`/user/links/${editingLinkId.value}`, payload);
-      console.log("Link updated successfully:", response.data);
-      successMessage.value = t('links.linkUpdated');
+      await adminLinksService.updateLink(editingLinkId.value, payload);
+      successMessage.value = t("links.linkUpdated");
     } else {
       // Create new link
-      console.log("Creating new link:", payload);
-      response = await api.post("/user/links", payload);
-      console.log("Link saved successfully:", response.data);
-      successMessage.value = t('links.linkSaved');
+      await adminLinksService.createLink(payload);
+      successMessage.value = t("links.linkSaved");
     }
 
     // Refresh links from API
@@ -417,11 +421,13 @@ async function handleSubmit() {
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors;
       const errorMessages = Object.values(errors).flat();
-      errorMessage.value = `${t('links.failedToSaveLink')}: ${errorMessages.join(", ")}`;
+      errorMessage.value = `${t(
+        "links.failedToSaveLink"
+      )}: ${errorMessages.join(", ")}`;
     } else if (err.response?.data?.message) {
       errorMessage.value = err.response.data.message;
     } else {
-      errorMessage.value = t('links.failedToSaveLink');
+      errorMessage.value = t("links.failedToSaveLink");
     }
   } finally {
     isLoading.value = false;
@@ -441,12 +447,53 @@ function handleDeleteLink(index: number) {
   handleShowAlert();
 }
 
-function handleConfirmDelete() {
-  if (selectedIndex.value !== null) {
+async function handleConfirmDelete() {
+  try {
+    if (selectedIndex.value === null) {
+      handleCloseAlert();
+      return;
+    }
+
+    const linkToDelete = linkItems.value[selectedIndex.value];
+
+    // Safety check: ensure we have a valid ID
+    if (!linkToDelete || !linkToDelete.id) {
+      errorMessage.value = "Cannot delete link: Missing link ID.";
+      handleCloseAlert();
+      return;
+    }
+
+    isLoading.value = true;
+    errorMessage.value = "";
+    successMessage.value = "";
+
+    await adminLinksService.deleteLink(linkToDelete.id);
+
+    // Remove from local list
     linkItems.value.splice(selectedIndex.value, 1);
     selectedIndex.value = null;
+
+    successMessage.value =
+      t("links.linkDeleted") || "Link deleted successfully.";
+
+    // Optionally refresh from API to stay in sync
+    await fetchLinks();
+
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
+  } catch (err: any) {
+    console.error("Error deleting link:", err);
+    if (err.response?.data?.message) {
+      errorMessage.value = err.response.data.message;
+    } else {
+      errorMessage.value = "Failed to delete link. Please try again.";
+    }
+  } finally {
+    isLoading.value = false;
+    handleCloseAlert();
   }
-  handleCloseAlert();
 }
 
 // Fetch links when component mounts

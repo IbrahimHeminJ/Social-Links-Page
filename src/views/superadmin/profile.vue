@@ -291,10 +291,6 @@ const extractTagIds = (userTags: any[]): string[] => {
     return [];
   }
 
-  console.log("=== Extracting tag IDs ===");
-  console.log("User tags received:", userTags);
-  console.log("Tag options available:", tagOptions.value);
-
   return userTags
     .map((tag) => {
       // First, try to get ID directly
@@ -319,15 +315,8 @@ const extractTagIds = (userTags: any[]): string[] => {
 
         if (matchingOption) {
           id = matchingOption.value;
-          console.log(
-            `✅ Matched tag "${tag.tag}" to ID: ${id} (label: "${matchingOption.label}")`
-          );
         } else {
           console.warn(`⚠️ Could not find tag ID for tag string: "${tag.tag}"`);
-          console.log(
-            "Available tag labels:",
-            tagOptions.value.map((opt) => opt.label)
-          );
         }
       }
 
@@ -340,9 +329,6 @@ const extractTagIds = (userTags: any[]): string[] => {
           const extractedId = match[1];
           if (tagOptions.value.some((opt) => opt.value === extractedId)) {
             id = extractedId;
-            console.log(
-              `Extracted tag ID "${extractedId}" from tag string "${tag.tag}"`
-            );
           }
         }
       }
@@ -397,36 +383,12 @@ const fetchUserData = async () => {
     isLoadingUser.value = true;
     errorMessage.value = "";
 
-    console.log("=== Fetching current user data ===");
     const rawUserData = await authService.getCurrentUser();
-
-    console.log("=== Raw user data from API ===");
-    console.log("Full user data object:", rawUserData);
-    console.log(
-      "User data keys:",
-      rawUserData ? Object.keys(rawUserData) : "No data"
-    );
 
     // Handle nested structure: { id, data: { username, name, email, ... } }
     // Similar to how UserResource returns data
     const userData = rawUserData?.data || rawUserData;
     const userId = rawUserData?.id || userData?.id;
-
-    console.log("=== Extracted user data ===");
-    console.log("User ID:", userId);
-    console.log("User data (after extraction):", userData);
-    console.log(
-      "User data keys:",
-      userData ? Object.keys(userData) : "No data"
-    );
-    console.log("Username:", userData?.username);
-    console.log("Name:", userData?.name);
-    console.log("Email:", userData?.email);
-    console.log("Phone:", userData?.phone_no || userData?.phone);
-    console.log("Profile Image:", userData?.profile_image || userData?.image);
-    console.log("Tags:", userData?.tags);
-    console.log("Tag (single):", userData?.tag);
-    console.log("Role:", userData?.role);
 
     // Handle image URL - similar to users.vue
     let imageUrl = userData.profile_image || userData.image || "";
@@ -436,7 +398,7 @@ const fetchUserData = async () => {
 
       // If it's already a full URL (http/https), use it as is
       if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-        console.log("Profile - Using full URL from asset():", imageUrl);
+        // Already full URL
       }
       // If it's a relative path starting with /storage
       else if (imageUrl.startsWith("/storage") || imageUrl.startsWith("/")) {
@@ -447,9 +409,8 @@ const fetchUserData = async () => {
           if (!imageUrl.startsWith("http")) {
             imageUrl = `${backendBase}${imageUrl}`;
           }
-          console.log("Profile - Constructed production URL:", imageUrl);
         } else {
-          console.log("Profile - Using relative URL (dev proxy):", imageUrl);
+          // Dev proxy will handle /storage
         }
       }
       // If it starts with storage/ (no leading slash), add the slash
@@ -461,7 +422,6 @@ const fetchUserData = async () => {
           const backendBase = apiBaseUrl.replace("/api", "");
           imageUrl = `${backendBase}${imageUrl}`;
         }
-        console.log("Profile - Fixed storage path:", imageUrl);
       }
       // Invalid format - use default
       else {
@@ -472,13 +432,11 @@ const fetchUserData = async () => {
         imageUrl = defaultProfile;
       }
     } else {
-      console.log("Profile - No image URL, using default");
       imageUrl = defaultProfile;
     }
 
     // Extract tags - handle different tag structures
     const tagIds = extractTagIds(userData.tags || []);
-    console.log("Extracted tag IDs:", tagIds);
 
     profileData.value = {
       username: userData.username || "",
@@ -488,16 +446,6 @@ const fetchUserData = async () => {
       tags: tagIds,
       image: imageUrl,
     };
-
-    console.log("=== Mapped profile data ===");
-    console.log("Profile data object:", profileData.value);
-    console.log("Username:", profileData.value.username);
-    console.log("Name:", profileData.value.name);
-    console.log("Email:", profileData.value.email);
-    console.log("Phone:", profileData.value.phone);
-    console.log("Tags:", profileData.value.tags);
-    console.log("Image URL:", profileData.value.image);
-    console.log("=== User data fetch completed ===");
   } catch (err: any) {
     console.error("=== Error fetching user data ===");
     console.error("Error object:", err);
@@ -616,29 +564,11 @@ const handleSave = async () => {
       formData.append("profile_image", selectedImageFile.value);
     }
 
-    console.log("=== Updating profile ===");
-    console.log("Endpoint: POST /user/update");
-    console.log("FormData fields:", {
-      username: profileData.value.username,
-      name: profileData.value.name,
-      email: profileData.value.email,
-      phone_no: profileData.value.phone,
-      tags: tagsAsNumbers,
-      hasImage: !!selectedImageFile.value,
-    });
-
     const { data } = await api.post("/user/update", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-
-    console.log("=== Profile update response ===");
-    console.log("Full response data:", data);
-    console.log("Response data.data:", data?.data);
-    console.log("Response data.data.user:", data?.data?.user);
-    console.log("Response data.data.data:", data?.data?.data);
-    console.log("Response data.user:", data?.user);
 
     // Handle multiple possible response structures
     // Structure 1: { data: { user: {...} } }
@@ -670,10 +600,6 @@ const handleSave = async () => {
       updatedUser = data;
       updatedUserData = updatedUser.data || updatedUser;
     }
-
-    console.log("=== Extracted user data ===");
-    console.log("Updated user:", updatedUser);
-    console.log("Updated user data:", updatedUserData);
 
     if (updatedUserData) {
       // Update local storage with the user data

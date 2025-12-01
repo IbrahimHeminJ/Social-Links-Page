@@ -233,8 +233,6 @@ const fetchReportDetail = async () => {
       throw new Error("Report ID is required");
     }
 
-    console.log("Fetching report detail for ID:", reportId);
-
     const reportDetail = await superAdminReportsService.getReportById(reportId);
 
     // Map to our ReportData interface
@@ -262,8 +260,6 @@ const fetchReportDetail = async () => {
       createdAt: reportDetail.createdAt,
       updatedAt: reportDetail.updatedAt,
     };
-
-    console.log("Mapped Report Data:", reportData.value);
   } catch (err: any) {
     error.value =
       err.response?.data?.message ||
@@ -350,20 +346,11 @@ const handleResolve = async () => {
     // Map action to delete_user: 1 for "delete-user", 0 for others
     const deleteUser = reportData.value.action === "delete-user" ? 1 : 0;
 
-    console.log("Resolving report:", {
-      reportId,
-      action: reportData.value.action,
-      deleteUser,
-      reason: reportData.value.reason,
-    });
-
     // Call service to resolve the report
-    const response = await superAdminReportsService.resolveReport(reportId, {
+    await superAdminReportsService.resolveReport(reportId, {
       delete_user: deleteUser,
       reason_of_action: reportData.value.reason.trim(),
     });
-
-    console.log("Report resolved successfully:", response);
 
     // Show success message
     alert("Report resolved successfully");

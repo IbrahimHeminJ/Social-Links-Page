@@ -235,12 +235,6 @@ const fetchUsers = async () => {
       // Validate and set image URL with fallback
       let imageUrl = user.image || user.profile_image || "";
 
-      // Debug: Log the raw image URL from API
-      console.log(
-        `User ${user.id} (${user.username}) - Raw image URL:`,
-        imageUrl
-      );
-
       // If we have an image URL, process it
       if (imageUrl && imageUrl.trim() !== "") {
         // Trim whitespace
@@ -249,10 +243,6 @@ const fetchUsers = async () => {
         // If it's already a full URL (http/https), use it as is
         // Laravel asset() helper returns full URLs when APP_URL is set
         if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-          console.log(
-            `User ${user.id} - Using full URL from asset():`,
-            imageUrl
-          );
           // Use the URL as-is - asset() already provides the correct domain
         }
         // If it's a relative path starting with /storage, it will work with Vite proxy in dev
@@ -268,15 +258,6 @@ const fetchUsers = async () => {
             if (!imageUrl.startsWith("http")) {
               imageUrl = `${backendBase}${imageUrl}`;
             }
-            console.log(
-              `User ${user.id} - Constructed production URL:`,
-              imageUrl
-            );
-          } else {
-            console.log(
-              `User ${user.id} - Using relative URL (dev proxy):`,
-              imageUrl
-            );
           }
         }
         // If it starts with storage/ (no leading slash), add the slash
@@ -288,7 +269,6 @@ const fetchUsers = async () => {
             const backendBase = apiBaseUrl.replace("/api", "");
             imageUrl = `${backendBase}${imageUrl}`;
           }
-          console.log(`User ${user.id} - Fixed storage path:`, imageUrl);
         }
         // Invalid format - use default
         else {
@@ -299,15 +279,11 @@ const fetchUsers = async () => {
           imageUrl = defaultProfile;
         }
       } else {
-        console.log(`User ${user.id} - No image URL, using default`);
         imageUrl = defaultProfile;
       }
 
       // Check for placeholder URLs
       if (imageUrl.includes("via.placeholder.com")) {
-        console.log(
-          `User ${user.id} - Placeholder URL detected, using default`
-        );
         imageUrl = defaultProfile;
       }
 
