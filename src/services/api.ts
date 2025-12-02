@@ -13,12 +13,8 @@ const api = axios.create({
   withCredentials: true,
   withXSRFToken: true,
   headers: {
-<<<<<<< HEAD
     'Content-Type': 'application/json',
     
-=======
-    "Content-Type": "application/json",
->>>>>>> 76cb6b0eb7957cdd58906d662e84133712b788f0
   },
 });
 
