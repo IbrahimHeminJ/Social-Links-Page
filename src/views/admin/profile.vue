@@ -9,9 +9,11 @@ import AuthService from "../../services/authService";
 import { adminProfileService } from "../../services/admin";
 import { userService } from "../../services/user";
 import { useToast } from "../../composables/useToast";
+import { useAuthStore } from "../../store/auth";
 
 const { t } = useI18n();
 const { showToast } = useToast();
+const authStore = useAuthStore();
 
 const user = ref(AuthService.getStoredUser());
 
@@ -278,6 +280,9 @@ const handleSave = async () => {
     }
 
     if (updatedUserData) {
+      // Preserve role from current user if not in response (role shouldn't change from profile update)
+      const currentRole = (user.value as any)?.role || authStore.user?.role;
+      
       // Persist user in localStorage
       const userForStorage = {
         id: updatedUser?.id || updatedUserData.id,
@@ -286,13 +291,17 @@ const handleSave = async () => {
         email: updatedUserData.email,
         phone_no: updatedUserData.phone_no || updatedUserData.phone,
         profile_image: updatedUserData.profile_image || updatedUserData.image,
-        role: updatedUserData.role,
+        role: updatedUserData.role || currentRole || 'user',
         tags: updatedUserData.tags || [],
       };
       localStorage.setItem("user", JSON.stringify(userForStorage));
 
       // Update local user ref
       user.value = userForStorage as any;
+      
+      // IMPORTANT: Update auth store's user ref to keep it in sync
+      // This prevents navigation issues where router guard checks isAdmin
+      authStore.user = userForStorage as any;
 
       // Update profile image
       if (userForStorage.profile_image) {
@@ -309,6 +318,42 @@ const handleSave = async () => {
         updatedUserData.phone ||
         profileData.phoneNumber;
       profileData.tags = tagIds;
+
+      // CRITICAL: Fetch complete user data from backend after save to ensure
+      // we have all fields including role. This prevents redirect issues on reload.
+      try {
+        const completeUserData = await AuthService.getCurrentUser();
+        const completeUser = completeUserData?.data || completeUserData;
+        
+        if (completeUser && completeUser.id) {
+          // Save complete user data to localStorage (ensures role is included)
+          localStorage.setItem("user", JSON.stringify(completeUser));
+          
+          // Update auth store with complete user data
+          authStore.user = completeUser;
+          
+          // Update local user ref
+          user.value = completeUser;
+          
+          // Update profile data from complete user
+          if (completeUser.username) profileData.username = completeUser.username;
+          if (completeUser.name) profileData.name = completeUser.name;
+          if (completeUser.email) profileData.email = completeUser.email;
+          if (completeUser.phone_no || completeUser.phone) {
+            profileData.phoneNumber = completeUser.phone_no || completeUser.phone;
+          }
+          if (completeUser.profile_image) {
+            profileImage.value = completeUser.profile_image;
+          }
+          if (completeUser.tags) {
+            const completeTagIds = extractTagIds(completeUser.tags);
+            profileData.tags = completeTagIds;
+          }
+        }
+      } catch (fetchError) {
+        console.error("Error fetching complete user data after profile save:", fetchError);
+        // Continue anyway - we already saved the profile updates
+      }
 
       showToast({ type: "success", message: t("profile.profileSaved") });
     } else {

@@ -132,6 +132,9 @@ import { userService } from "../../services/user";
 import api from "../../services/api";
 import defaultProfile from "../../assets/images/man.png";
 import ToastMessage from "../../components/alerts/toastMessage.vue";
+import { useAuthStore } from "../../store/auth";
+
+const authStore = useAuthStore();
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const dropdownContainer = ref<HTMLElement | null>(null);
@@ -503,6 +506,10 @@ const handleSave = async () => {
     }
 
     if (updatedUserData) {
+      // Preserve role from current user if not in response (role shouldn't change from profile update)
+      const storedUser = authService.getStoredUser();
+      const currentRole = updatedUserData.role || (storedUser as any)?.role || authStore.user?.role || 'user';
+      
       // Update local storage with the user data
       const userForStorage = {
         id: updatedUser?.id || updatedUserData.id,
@@ -511,10 +518,14 @@ const handleSave = async () => {
         email: updatedUserData.email,
         phone_no: updatedUserData.phone_no || updatedUserData.phone,
         profile_image: updatedUserData.profile_image || updatedUserData.image,
-        role: updatedUserData.role,
+        role: currentRole,
         tags: updatedUserData.tags || [],
       };
       localStorage.setItem("user", JSON.stringify(userForStorage));
+      
+      // IMPORTANT: Update auth store's user ref to keep it in sync
+      // This prevents navigation issues where router guard checks isAdmin/isSuperAdmin
+      authStore.user = userForStorage as any;
 
       // Update profile image if it was updated
       const updatedImageUrl =
@@ -557,6 +568,57 @@ const handleSave = async () => {
         updatedUserData.phone ||
         profileData.value.phone;
       profileData.value.tags = tagIds;
+
+      // CRITICAL: Fetch complete user data from backend after save to ensure
+      // we have all fields including role. This prevents redirect issues on reload.
+      try {
+        const completeUserData = await authService.getCurrentUser();
+        const completeUser = completeUserData?.data || completeUserData;
+        
+        if (completeUser && completeUser.id) {
+          // Save complete user data to localStorage (ensures role is included)
+          localStorage.setItem("user", JSON.stringify(completeUser));
+          
+          // Update auth store with complete user data
+          authStore.user = completeUser;
+          
+          // Update profile data from complete user if needed
+          if (completeUser.username) profileData.value.username = completeUser.username;
+          if (completeUser.name) profileData.value.name = completeUser.name;
+          if (completeUser.email) profileData.value.email = completeUser.email;
+          if (completeUser.phone_no || completeUser.phone) {
+            profileData.value.phone = completeUser.phone_no || completeUser.phone;
+          }
+          if (completeUser.tags) {
+            const completeTagIds = extractTagIds(completeUser.tags);
+            profileData.value.tags = completeTagIds;
+          }
+          
+          // Update profile image from complete user data
+          if (completeUser.profile_image || completeUser.image) {
+            const completeImageUrl = completeUser.profile_image || completeUser.image;
+            if (completeImageUrl) {
+              let processedImageUrl = completeImageUrl;
+              if (processedImageUrl.startsWith("http://") || processedImageUrl.startsWith("https://")) {
+                profileData.value.image = processedImageUrl;
+              } else if (processedImageUrl.startsWith("/storage") || processedImageUrl.startsWith("/")) {
+                if (import.meta.env.PROD) {
+                  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+                  const backendBase = apiBaseUrl.replace("/api", "");
+                  profileData.value.image = `${backendBase}${processedImageUrl}`;
+                } else {
+                  profileData.value.image = processedImageUrl;
+                }
+              } else {
+                profileData.value.image = processedImageUrl;
+              }
+            }
+          }
+        }
+      } catch (fetchError) {
+        console.error("Error fetching complete user data after profile save:", fetchError);
+        // Continue anyway - we already saved the profile updates
+      }
 
       showToast('success', 'Success', "Profile updated successfully!");
 
