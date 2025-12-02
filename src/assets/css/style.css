@@ -1,5 +1,119 @@
 @import "tailwindcss";
 
+/* Global theme tokens */
+:root {
+  --color-bg: #f4f6fb;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-subtle: #475569;
+  --color-muted: #6b7280;
+  --color-border: #e5e7eb;
+  --color-hover: #f3f4f6;
+  --color-accent: #0094ff;
+}
+
+[data-theme="dark"],
+.theme-dark {
+  --color-bg: #0b1220;
+  --color-surface: #111827;
+  --color-text: #e2e8f0;
+  --color-subtle: #cbd5e1;
+  --color-muted: #94a3b8;
+  --color-border: #1f2937;
+  --color-hover: #0f172a;
+  --color-accent: #38bdf8;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* Override common utility classes in dark mode */
+[data-theme="dark"] .bg-white,
+.theme-dark .bg-white {
+  background-color: var(--color-surface) !important;
+}
+
+[data-theme="dark"] .bg-gray-50,
+.theme-dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+[data-theme="dark"] .bg-gray-100,
+.theme-dark .bg-gray-100 {
+  background-color: #111827 !important;
+}
+
+[data-theme="dark"] .bg-gray-200,
+.theme-dark .bg-gray-200 {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .border-gray-200,
+.theme-dark .border-gray-200 {
+  border-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .border-gray-300,
+.theme-dark .border-gray-300 {
+  border-color: #374151 !important;
+}
+
+[data-theme="dark"] .text-gray-900,
+.theme-dark .text-gray-900 {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .text-gray-700,
+.theme-dark .text-gray-700 {
+  color: var(--color-subtle) !important;
+}
+
+[data-theme="dark"] .text-gray-600,
+.theme-dark .text-gray-600 {
+  color: var(--color-muted) !important;
+}
+
+[data-theme="dark"] .text-gray-500,
+.theme-dark .text-gray-500 {
+  color: var(--color-muted) !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-50:hover,
+.theme-dark .hover\:bg-gray-50:hover {
+  background-color: var(--color-hover) !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-100:hover,
+.theme-dark .hover\:bg-gray-100:hover {
+  background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .hover\:bg-gray-200:hover,
+.theme-dark .hover\:bg-gray-200:hover {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  background-color: #0f172a;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder,
+.theme-dark input::placeholder,
+.theme-dark textarea::placeholder {
+  color: #94a3b8;
+}
+
 /* Vue <Transition name="fade"> classes for modal/backdrop */
 .fade-enter-active,
 .fade-leave-active {

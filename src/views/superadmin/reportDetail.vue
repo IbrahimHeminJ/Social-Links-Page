@@ -207,10 +207,7 @@ const closeToast = () => {
 
 const actionOptions = [
   { label: t("reports.actions.deleteUser"), value: "delete-user" },
-  { label: t("reports.actions.warnUser"), value: "warn-user" },
-  { label: t("reports.actions.banUser"), value: "ban-user" },
   { label: t("reports.actions.dismiss"), value: "dismiss" },
-  { label: t("reports.actions.normal"), value: "normal" },
 ];
 
 // Fetch report data from API
