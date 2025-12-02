@@ -69,6 +69,15 @@ export const useAuthStore = defineStore('auth', () => {
       console.log('Raw user data from API:', userData)
       console.log('User data keys:', userData ? Object.keys(userData) : 'No user data')
       
+      // Debug: Check premium field in raw user data
+      if (userData) {
+        const rawUser = userData.data || userData
+        console.log('🔍 PREMIUM CHECK - Raw user premium field:', rawUser.premium)
+        console.log('🔍 PREMIUM CHECK - Raw user premium type:', typeof rawUser.premium)
+        console.log('🔍 PREMIUM CHECK - Raw user premium value:', rawUser.premium === 1 ? 'PREMIUM (1)' : rawUser.premium === 0 ? 'NOT PREMIUM (0)' : `UNKNOWN (${rawUser.premium})`)
+        console.log('🔍 PREMIUM CHECK - Full raw user object:', rawUser)
+      }
+      
       // Always fetch complete user data after login to get role (since role is only in auth.user route)
       // The login response might not include role due to conditional logic in UserResource
       console.log('Fetching complete user data to get role...')
@@ -84,8 +93,19 @@ export const useAuthStore = defineStore('auth', () => {
         console.log('User role type:', typeof completeUser.role)
         console.log('All user fields:', Object.keys(completeUser))
         
+        // Debug: Check premium field in complete user data
+        console.log('🔍 PREMIUM CHECK - Complete user premium field:', completeUser.premium)
+        console.log('🔍 PREMIUM CHECK - Complete user premium type:', typeof completeUser.premium)
+        console.log('🔍 PREMIUM CHECK - Complete user premium value:', completeUser.premium === 1 ? 'PREMIUM (1)' : completeUser.premium === 0 ? 'NOT PREMIUM (0)' : `UNKNOWN (${completeUser.premium})`)
+        console.log('🔍 PREMIUM CHECK - Full complete user object:', JSON.stringify(completeUser, null, 2))
+        
         user.value = completeUser as User
         localStorage.setItem('user', JSON.stringify(completeUser))
+        
+        // Debug: Verify premium was stored
+        const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
+        console.log('🔍 PREMIUM CHECK - Stored user premium field:', storedUser.premium)
+        console.log('🔍 PREMIUM CHECK - Stored user premium value:', storedUser.premium === 1 ? 'PREMIUM (1)' : storedUser.premium === 0 ? 'NOT PREMIUM (0)' : `UNKNOWN (${storedUser.premium})`)
       } catch (err) {
         console.error('Failed to fetch user data, using login response:', err)
         // Fallback: Use user data from login response if available
@@ -104,6 +124,11 @@ export const useAuthStore = defineStore('auth', () => {
         storedToken: localStorage.getItem('authToken') ? '***' : null,
         storedUser: localStorage.getItem('user')
       })
+      
+      // Debug: Final premium check in auth store
+      const finalUser = user.value as any
+      console.log('🔍 PREMIUM CHECK - Final auth store user premium:', finalUser?.premium)
+      console.log('🔍 PREMIUM CHECK - Final auth store premium status:', finalUser?.premium === 1 ? '✅ USER IS PREMIUM' : finalUser?.premium === 0 ? '❌ USER IS NOT PREMIUM' : '⚠️ PREMIUM STATUS UNKNOWN')
 
       return { success: true }
     } catch (err: any) {
@@ -240,8 +265,20 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       isLoading.value = true
       const currentUser = await authService.getCurrentUser()
+      
+      // Debug: Check premium field in fetchCurrentUser
+      console.log('🔍 PREMIUM CHECK - fetchCurrentUser result:', currentUser)
+      console.log('🔍 PREMIUM CHECK - fetchCurrentUser premium field:', currentUser?.premium)
+      console.log('🔍 PREMIUM CHECK - fetchCurrentUser premium type:', typeof currentUser?.premium)
+      console.log('🔍 PREMIUM CHECK - fetchCurrentUser premium value:', currentUser?.premium === 1 ? 'PREMIUM (1)' : currentUser?.premium === 0 ? 'NOT PREMIUM (0)' : `UNKNOWN (${currentUser?.premium})`)
+      
       user.value = currentUser
       localStorage.setItem('user', JSON.stringify(currentUser))
+      
+      // Verify premium was stored
+      const stored = JSON.parse(localStorage.getItem('user') || '{}')
+      console.log('🔍 PREMIUM CHECK - After fetchCurrentUser storage, premium:', stored.premium)
+      
       return currentUser
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Failed to fetch user data'
@@ -276,6 +313,12 @@ export const useAuthStore = defineStore('auth', () => {
     // Sync auth state from localStorage (useful for router guards)
     const storedToken = authService.getToken()
     let storedUser = authService.getStoredUser()
+    
+    // Debug: Check premium in synced user
+    if (storedUser) {
+      console.log('🔍 PREMIUM CHECK - syncAuthState stored user premium:', (storedUser as any).premium)
+      console.log('🔍 PREMIUM CHECK - syncAuthState premium value:', (storedUser as any).premium === 1 ? 'PREMIUM (1)' : (storedUser as any).premium === 0 ? 'NOT PREMIUM (0)' : `UNKNOWN (${(storedUser as any).premium})`)
+    }
     
     // Handle case where "undefined" string was stored
     const userStr = localStorage.getItem('user')

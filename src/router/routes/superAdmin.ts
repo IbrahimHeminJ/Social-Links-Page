@@ -5,6 +5,7 @@ import Profile from '../../views/superadmin/profile.vue'
 import Reports from '../../views/superadmin/reports.vue'
 import ReportDetail from '../../views/superadmin/reportDetail.vue'
 import ReportHistory from '../../views/superadmin/reportHistory.vue'
+import PaymentHistory from '../../views/superadmin/paymentHistory.vue'
 
 const SuperAdminRoutes: RouteRecordRaw[] = [
     {
@@ -63,6 +64,16 @@ const SuperAdminRoutes: RouteRecordRaw[] = [
         component: ReportHistory,
         meta: {
             title: 'Report History',
+            requiresAuth: true,
+            requiresSuperAdmin: true,
+        },
+    },
+    {
+        path: '/super-admin/payments',
+        name: 'superAdmin.paymentHistory',
+        component: PaymentHistory,
+        meta: {
+            title: 'Payment History',
             requiresAuth: true,
             requiresSuperAdmin: true,
         },

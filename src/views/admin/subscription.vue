@@ -11,21 +11,26 @@
     <!-- Current Plan Section -->
     <div class="flex flex-col gap-y-4">
       <h2 class="text-lg font-bold text-gray-800">{{ t('subscription.currentPlan') }}</h2>
-      <div class="border-2 border-gray-200 rounded-xl p-6 bg-white shadow-sm">
+      <div class="border-2 rounded-xl p-6 shadow-sm" :class="isPremium ? 'border-yellow-400 bg-gradient-to-r from-yellow-50 to-yellow-100' : 'border-gray-200 bg-white'">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-xl font-bold text-gray-900">{{ currentPlan }}</h3>
-            <p class="text-gray-600 mt-1">{{ t('subscription.freePlanDescription') }}</p>
+            <div class="flex items-center gap-3 mb-2">
+              <h3 class="text-xl font-bold text-gray-900">{{ currentPlan }}</h3>
+              <svg v-if="isPremium" class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <p class="text-gray-600 mt-1">{{ isPremium ? t('subscription.premiumPlanDescription') || 'You have access to all premium features including theme customization.' : t('subscription.freePlanDescription') }}</p>
           </div>
-          <div class="px-4 py-2 bg-gray-100 rounded-lg">
-            <span class="text-gray-700 font-semibold">{{ t('subscription.free') }}</span>
+          <div class="px-4 py-2 rounded-lg" :class="isPremium ? 'bg-yellow-400' : 'bg-gray-100'">
+            <span class="font-semibold" :class="isPremium ? 'text-yellow-900' : 'text-gray-700'">{{ isPremium ? t('subscription.premium') : t('subscription.free') }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Premium Features Section -->
-    <div class="flex flex-col gap-y-6">
+    <!-- Premium Features Section (Only show if not premium) -->
+    <div v-if="!isPremium" class="flex flex-col gap-y-6">
       <h2 class="text-lg font-bold text-gray-800">{{ t('subscription.unlockPremium') }}</h2>
       
       <!-- Premium Card - Modern Gradient Design -->
@@ -110,13 +115,13 @@
         </div>
       </div>
 
-      <!-- Success Message -->
-      <div v-if="successMessage" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+      <!-- Success Message (only show if not premium) -->
+      <div v-if="!isPremium && successMessage" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
         <p class="text-green-800 font-semibold">{{ successMessage }}</p>
       </div>
 
       <!-- Development Test Button (Remove in production) -->
-      <div v-if="showQRModal" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+      <div v-if="!isPremium && showQRModal" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
         <p class="text-yellow-800 text-sm mb-2 font-semibold">🧪 Test Payment Status</p>
         <div class="flex gap-2 flex-wrap">
           <button
@@ -141,13 +146,14 @@
         <p class="text-yellow-700 text-xs mt-2">This is for testing only. Check browser console for status logs.</p>
       </div>
 
-      <!-- Error Message -->
-      <div v-if="errorMessage" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+      <!-- Error Message (only show if not premium) -->
+      <div v-if="!isPremium && errorMessage" class="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
         <p class="text-red-800 font-semibold">{{ errorMessage }}</p>
       </div>
 
-      <!-- QR Code Modal -->
+      <!-- QR Code Modal (only show if not premium) -->
       <QRCodeModal
+        v-if="!isPremium"
         :show="showQRModal"
         :qr-code="qrCode"
         :payment-id="currentPaymentId"
@@ -160,7 +166,7 @@
       />
 
       <!-- Additional Benefits -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+      <div v-if="!isPremium" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <div class="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
           <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -196,17 +202,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import TextHeading from '../../components/textHeading.vue'
 import QRCodeModal from '../../components/payment/QRCodeModal.vue'
 import api from '../../services/api'
+import { useAuthStore } from '../../store/auth'
 
 const { t } = useI18n()
-const router = useRouter()
+const authStore = useAuthStore()
 
-const currentPlan = ref(t('subscription.freePlan'))
+// Check if user is premium
+const isPremium = computed(() => {
+  const user = authStore.user as any
+  const premiumValue = user?.premium
+  
+  // Handle both boolean true/false and number 1/0
+  const isPremiumUser = premiumValue === 1 || premiumValue === true || premiumValue === '1'
+  
+  // Debug logging
+  console.log('🔍 SUBSCRIPTION PAGE - Premium Check:', {
+    user: user,
+    premiumValue: premiumValue,
+    premiumType: typeof premiumValue,
+    isPremiumUser: isPremiumUser,
+    'user?.premium === 1': user?.premium === 1,
+    'user?.premium === true': user?.premium === true,
+    'user?.premium == 1': user?.premium == 1,
+    'user?.premium == true': user?.premium == true,
+    'authStore.user': authStore.user,
+    'localStorage user': JSON.parse(localStorage.getItem('user') || '{}'),
+  })
+  
+  return isPremiumUser
+})
+
+const currentPlan = computed(() => isPremium.value ? (t('subscription.premiumPlan') || 'Premium Plan') : t('subscription.freePlan'))
 const isProcessing = ref(false)
 const errorMessage = ref<string>('')
 const successMessage = ref<string>('')
@@ -392,7 +423,7 @@ const pollPaymentStatus = async (paymentId: string) => {
   }, 5000) // Check every 5 seconds
 }
 
-const handlePaymentSuccess = async (paymentId: string) => {
+const handlePaymentSuccess = async (_paymentId: string) => {
   try {
     // Close QR modal
     showQRModal.value = false
@@ -413,12 +444,12 @@ const handlePaymentSuccess = async (paymentId: string) => {
     
     // TODO: Later when DB column is added, uncomment this:
     // await api.post('/user/subscription/activate', {
-    //   payment_id: paymentId,
+    //   payment_id: _paymentId,
     //   payment_provider: 'FIB'
     // })
     
-    // Update current plan display
-    currentPlan.value = t('subscription.premiumPlan')
+    // Refresh user data to get updated premium status
+    await authStore.fetchCurrentUser()
     
     // Auto-hide success message after 5 seconds
     setTimeout(() => {
@@ -482,7 +513,20 @@ const checkPaymentStatus = async () => {
 }
 
 // Check payment status on component mount
-onMounted(() => {
+onMounted(async () => {
+  // Sync auth state to get latest user data including premium status
+  await authStore.syncAuthState()
+  
+  // Debug: Log user data on mount
+  console.log('🔍 SUBSCRIPTION PAGE - On Mount:', {
+    'authStore.user': authStore.user,
+    'premium field': (authStore.user as any)?.premium,
+    'premium type': typeof (authStore.user as any)?.premium,
+    'isPremium computed': isPremium.value,
+    'currentPlan computed': currentPlan.value,
+    'localStorage user': JSON.parse(localStorage.getItem('user') || '{}'),
+  })
+  
   checkPaymentStatus()
 })
 

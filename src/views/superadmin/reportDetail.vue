@@ -112,26 +112,32 @@
         </div>
       </div>
 
-      <!-- Action -->
-      <Select v-model="reportData.action" :label="t('reports.action')" :placeholder="t('reports.selectAction')"
-        :options="actionOptions" />
-
-      <!-- Reason for action -->
-      <Text :label="t('reports.reasonForAction')" v-model="reportData.reason" type="text"
-        :placeholder="t('reports.enterReasonForAction')" />
-
-      <!-- Previous Reason of Action (if exists and report is already resolved) -->
-      <div v-if="reportData.reasonOfAction && reportData.reportStatus === 1">
+      <!-- Action - Display only if resolved, input if pending -->
+      <div v-if="reportData.reportStatus === 1">
         <label class="block text-sm font-medium text-gray-900 mb-2">{{
-          t("reports.previousReasonOfAction")
+          t("reports.action")
         }}</label>
         <div class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900">
-          {{ reportData.reasonOfAction }}
+          {{ getActionLabel(reportData.action) || reportData.action || t("reports.notAvailable") }}
         </div>
       </div>
+      <Select v-else v-model="reportData.action" :label="t('reports.action')" :placeholder="t('reports.selectAction')"
+        :options="actionOptions" />
 
-      <!-- Action Buttons -->
-      <div class="flex justify-center gap-4 pt-4">
+      <!-- Reason for action - Display only if resolved, input if pending -->
+      <div v-if="reportData.reportStatus === 1">
+        <label class="block text-sm font-medium text-gray-900 mb-2">{{
+          t("reports.reasonForAction")
+        }}</label>
+        <div class="w-full px-4 py-3 bg-gray-100 rounded text-gray-900 min-h-[60px] whitespace-pre-wrap">
+          {{ reportData.reasonOfAction || reportData.reason || t("reports.notAvailable") }}
+        </div>
+      </div>
+      <Text v-else :label="t('reports.reasonForAction')" v-model="reportData.reason" type="text"
+        :placeholder="t('reports.enterReasonForAction')" />
+
+      <!-- Action Buttons - Only show for pending reports -->
+      <div v-if="reportData.reportStatus !== 1" class="flex justify-center gap-4 pt-4">
         <button @click="handleResolve"
           class="px-8 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors">
           {{ t("reports.resolve") }}
@@ -235,6 +241,32 @@ const fetchReportDetail = async () => {
         ? parseInt(reportDetail.reportStatus, 10)
         : reportDetail.reportStatus;
 
+    // Determine action from database for resolved reports
+    let actionFromDB = "";
+    if (reportStatus === 1) {
+      // Report is resolved - get action from database
+      // Check if delete_user field exists in the response (check multiple possible field names)
+      const deleteUser = (reportDetail as any).delete_user || 
+                        (reportDetail as any).deleteUser ||
+                        (reportDetail as any).action === "delete-user" ||
+                        (reportDetail as any).action === 1;
+      
+      // Also check if action field is directly provided
+      const directAction = (reportDetail as any).action;
+      
+      if (directAction === "delete-user" || deleteUser === 1 || deleteUser === "1") {
+        actionFromDB = "delete-user";
+      } else if (directAction === "dismiss" || deleteUser === 0 || deleteUser === "0") {
+        actionFromDB = "dismiss";
+      } else if (directAction) {
+        // Use the action field directly if it exists
+        actionFromDB = String(directAction);
+      } else {
+        // Default to dismiss if we can't determine
+        actionFromDB = "dismiss";
+      }
+    }
+
     reportData.value = {
       id: reportDetail.id,
       type: String(reportDetail.type || reportDetail.reportType || ""),
@@ -243,11 +275,11 @@ const fetchReportDetail = async () => {
       reporterEmail: reportDetail.reporterEmail || "",
       reportedUser: String(reportDetail.reportedUser || ""),
       reportType: String(reportDetail.reportType || ""),
-      action: "", // Empty - admin will fill this
-      reason: "", // Empty - admin will fill this
+      action: actionFromDB, // From database if resolved, empty if pending
+      reason: "", // Empty - admin will fill this for pending reports
       reportStatus: reportStatus,
       handledBy: reportDetail.handledBy || null,
-      reasonOfAction: reportDetail.reasonOfAction,
+      reasonOfAction: reportDetail.reasonOfAction || (reportDetail as any).reason_of_action,
       createdAt: reportDetail.createdAt,
       updatedAt: reportDetail.updatedAt,
     };
@@ -305,6 +337,13 @@ const getReportTypeLabel = (value: string) => {
   return translation !== translationKey
     ? translation
     : value || t("reports.reportTypeLabels.unknown");
+};
+
+// Get action label for display
+const getActionLabel = (actionValue: string) => {
+  if (!actionValue) return "";
+  const option = actionOptions.find(opt => opt.value === actionValue);
+  return option ? option.label : actionValue;
 };
 
 const formatDate = (dateString: string) => {

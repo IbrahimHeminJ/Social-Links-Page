@@ -9,6 +9,7 @@ export interface SuperAdminUser {
   phone_no?: string;
   profile_image?: string;
   image?: string;
+  premium?: number;
   createdAt?: string;
   created_at?: string;
   updatedAt?: string;

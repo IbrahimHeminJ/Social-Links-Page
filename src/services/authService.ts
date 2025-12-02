@@ -23,6 +23,7 @@ export interface User {
   phone?: string;
   tag?: string;
   role: "user" | "admin" | "superadmin";
+  premium?: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -118,6 +119,14 @@ class AuthService {
 
     // Backend returns: { message: "...", data: { ...user data with role... } }
     const userData = response.data?.data || response.data;
+    
+    // Debug: Log premium field from getCurrentUser API
+    console.log('🔍 PREMIUM CHECK - getCurrentUser API response:', response.data)
+    console.log('🔍 PREMIUM CHECK - getCurrentUser userData:', userData)
+    console.log('🔍 PREMIUM CHECK - getCurrentUser premium field:', userData?.premium)
+    console.log('🔍 PREMIUM CHECK - getCurrentUser premium type:', typeof userData?.premium)
+    console.log('🔍 PREMIUM CHECK - getCurrentUser all fields:', userData ? Object.keys(userData) : 'No user data')
+    
     return userData;
   }
 

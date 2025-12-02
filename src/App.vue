@@ -17,7 +17,7 @@ const { closeToast } = useToast()
     <GuestLayout v-if="route.name === 'home' || route.name === 'explore' || route.name === 'allUsers'" />
     <AuthLayout v-else-if="route.name === 'login' || route.name === 'signup'" /> 
     <AdminLayout v-else-if="route.name === 'admin.links' || route.name === 'admin.profile'  || route.name === 'admin.themes' || route.name === 'admin.subscription'" />
-    <SuperAdminLayout v-else-if="route.name === 'superAdmin.users' || route.name === 'superAdmin.editUser' || route.name === 'superAdmin.profile' || route.name === 'superAdmin.reports' || route.name === 'superAdmin.reportDetail' || route.name === 'superAdmin.reportHistory'" />
+    <SuperAdminLayout v-else-if="route.name === 'superAdmin.users' || route.name === 'superAdmin.editUser' || route.name === 'superAdmin.profile' || route.name === 'superAdmin.reports' || route.name === 'superAdmin.reportDetail' || route.name === 'superAdmin.reportHistory' || route.name === 'superAdmin.paymentHistory'" />
     <SocialLinksLayout v-else-if="route.name === 'social-links'" />
 
     <!-- Global toast/alert -->

@@ -63,6 +63,9 @@
                 {{ t("users.name") }}
               </th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Premium
+              </th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {{ t("users.email") }}
               </th>
               <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -78,7 +81,7 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-if="users.length === 0">
-              <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+              <td colspan="9" class="px-4 py-8 text-center text-gray-500">
                 {{ t("users.noUsersFound") }}
               </td>
             </tr>
@@ -94,7 +97,20 @@
                 {{ user.username }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                {{ user.name }}
+                <div class="flex items-center gap-2">
+                  <span>{{ user.name }}</span>
+                  <svg
+                    v-if="user.premium === 1"
+                    class="w-5 h-5 text-yellow-500"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                </div>
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                {{ user.premium === 1 ? 'Yes' : 'No' }}
               </td>
               <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                 {{ user.email }}
@@ -202,6 +218,7 @@ interface User {
   email: string;
   phone: string | null;
   image: string;
+  premium?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -357,6 +374,7 @@ const fetchUsers = async (page: number = 1) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        premium: user.premium !== undefined ? (user.premium === 1 ? 1 : 0) : 0,
         image: imageUrl,
         createdAt: user.createdAt || user.created_at || "",
         updatedAt: user.updatedAt || user.updated_at || "",

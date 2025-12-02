@@ -2,6 +2,27 @@
   <div
     class="w-full h-auto pb-10 px-4 md:px-12 md:pt-10 pt-5 flex flex-col gap-y-6"
   >
+    <!-- Get Premium Banner (shown if not premium) -->
+    <div v-if="!isPremium" class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-xl p-6 shadow-lg">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          <div>
+            <h3 class="text-xl font-bold text-white">Get Premium to Customize Your Theme</h3>
+            <p class="text-yellow-100 text-sm">Upgrade to premium to unlock theme customization features</p>
+          </div>
+        </div>
+        <button
+          @click="goToSubscription"
+          class="px-6 py-3 bg-white text-yellow-600 font-bold rounded-lg hover:bg-yellow-50 transition-colors shadow-md"
+        >
+          Get Premium
+        </button>
+      </div>
+    </div>
+
     <!-- Header Section -->
     <div class="flex flex-col gap-y-2">
       <TextHeading>{{ t("themes.title") }}</TextHeading>
@@ -32,13 +53,13 @@
         <!-- Facebook Theme -->
         <button
           @click="selectTheme('Facebook')"
-          :disabled="isLoading"
+          :disabled="isLoading || !isPremium"
           :class="[
             'relative rounded-lg p-4 md:p-6 text-left text-white transition-all duration-200 hover:scale-105 hover:shadow-lg',
             selectedTheme === 'Facebook'
               ? 'ring-4 ring-[#009AFF] ring-offset-2'
               : '',
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            (isLoading || !isPremium) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
           ]"
           style="background: linear-gradient(to right, #1877f2, #42a5f5)"
         >
@@ -60,13 +81,13 @@
         <!-- LinkedIn Theme -->
         <button
           @click="selectTheme('Linkedin')"
-          :disabled="isLoading"
+          :disabled="isLoading || !isPremium"
           :class="[
             'relative rounded-lg p-4 md:p-6 text-left text-white transition-all duration-200 hover:scale-105 hover:shadow-lg',
             selectedTheme === 'Linkedin'
               ? 'ring-4 ring-[#009AFF] ring-offset-2'
               : '',
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            (isLoading || !isPremium) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
           ]"
           style="background-color: #0a66c2"
         >
@@ -88,13 +109,13 @@
         <!-- Graphic Designer Theme -->
         <button
           @click="selectTheme('Graphic Designer')"
-          :disabled="isLoading"
+          :disabled="isLoading || !isPremium"
           :class="[
             'relative rounded-lg p-4 md:p-6 text-left text-white transition-all duration-200 hover:scale-105 hover:shadow-lg',
             selectedTheme === 'Graphic Designer'
               ? 'ring-4 ring-[#009AFF] ring-offset-2'
               : '',
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            (isLoading || !isPremium) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
           ]"
           style="
             background: linear-gradient(to bottom, #8b5cf6, #6366f1, #8b5cf6);
@@ -126,13 +147,13 @@
         <!-- YouTube Theme -->
         <button
           @click="selectTheme('You tube')"
-          :disabled="isLoading"
+          :disabled="isLoading || !isPremium"
           :class="[
             'relative rounded-lg p-4 md:p-6 text-left text-white transition-all duration-200 hover:scale-105 hover:shadow-lg',
             selectedTheme === 'You tube'
               ? 'ring-4 ring-[#009AFF] ring-offset-2'
               : '',
-            isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+            (isLoading || !isPremium) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
           ]"
           style="background: linear-gradient(to bottom, #ff0000, #cc0000)"
         >
@@ -159,8 +180,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
 import TextHeading from "../../components/textHeading.vue";
 import { useAuthStore } from "../../store/auth";
 import { adminThemeService } from "../../services/admin";
@@ -168,8 +190,36 @@ import { useToast } from "../../composables/useToast";
 
 const { t } = useI18n();
 const { showToast } = useToast();
+const router = useRouter();
 
 const authStore = useAuthStore();
+
+// Check if user is premium
+const isPremium = computed(() => {
+  const user = authStore.user as any;
+  const premiumValue = user?.premium;
+  
+  // Handle both boolean true/false and number 1/0
+  const isPremiumUser = premiumValue === 1 || premiumValue === true || premiumValue === '1';
+  
+  // Debug logging
+  console.log('🔍 THEMES PAGE - Premium Check:', {
+    user: user,
+    premiumValue: premiumValue,
+    premiumType: typeof premiumValue,
+    isPremiumUser: isPremiumUser,
+    'user?.premium === 1': user?.premium === 1,
+    'user?.premium === true': user?.premium === true,
+    'user?.premium == 1': user?.premium == 1,
+    'user?.premium == true': user?.premium == true,
+  });
+  
+  return isPremiumUser;
+});
+
+const goToSubscription = () => {
+  router.push({ name: 'admin.subscription' });
+};
 
 // Theme mapping: Facebook = 1, LinkedIn = 2, YouTube = 3, Graphic Designer = 4
 const themeNameToIdMap: Record<string, number> = {
@@ -265,6 +315,13 @@ const fetchCurrentTheme = async () => {
 
 // Update theme via API
 const selectTheme = async (themeName: string) => {
+  // Check if user is premium
+  if (!isPremium.value) {
+    showToast({ type: "error", message: "Premium subscription required to change themes. Please upgrade to premium." });
+    goToSubscription();
+    return;
+  }
+
   try {
     isLoading.value = true;
 
@@ -355,6 +412,17 @@ const getCurrentThemeStyle = () => {
 
 // Fetch current theme when component mounts
 onMounted(() => {
+  // Sync auth state first to ensure we have latest user data
+  authStore.syncAuthState()
+  
+  // Debug: Log user data on mount
+  console.log('🔍 THEMES PAGE - On Mount:', {
+    'authStore.user': authStore.user,
+    'premium field': (authStore.user as any)?.premium,
+    'isPremium computed': isPremium.value,
+    'localStorage user': JSON.parse(localStorage.getItem('user') || '{}'),
+  })
+  
   fetchCurrentTheme();
 });
 </script>
